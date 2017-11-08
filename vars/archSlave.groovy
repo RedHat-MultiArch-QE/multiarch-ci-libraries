@@ -16,13 +16,13 @@ def call(Closure body, def Boolean runOnSlave = false) {
         try {
           slave = getSlave(arch, runOnSlave)
 
-          // If the provision failed, there will be an error
-          if (slave.error != null) {
-            throw new Exception(slave.error)
+          if (slave == null || slave.name == null) {
+            throw new Exception("Could not find name for provisioned slave: ${slave}")
           }
 
-          if (slave.name == null) {
-            throw new Exception("Could not find name for provisioned slave: ${slave}")
+          // If the provision failed, there will be an error
+          if (slave.error != null && !slave.error.isEmpty()) {
+            throw new Exception(slave.error)
           }
 
           if (runOnSlave) {
