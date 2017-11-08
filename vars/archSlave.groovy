@@ -18,7 +18,7 @@ def call(Closure body, def Boolean runOnSlave = false) {
 
           // If the provision failed, there will be an error
           if (slave.error != null) {
-            throw slave.error
+            throw new Exception(slave.error)
           }
 
           if (slave.name == null) {
