@@ -14,7 +14,6 @@ def call(Closure body, def Boolean runOnSlave = false) {
       return {
         def slave = [ buildNumber: null, name: null, error: null ]
         try {
-          println arch
           slave = getSlave(arch, runOnSlave)
 
           // If the provision failed, there will be an error
@@ -25,8 +24,6 @@ def call(Closure body, def Boolean runOnSlave = false) {
           if (slave.name == null) {
             throw new Exception("Could not find name for provisioned slave: ${slave}")
           }
-
-          println slave
 
           if (runOnSlave) {
             node(slave.name) {
