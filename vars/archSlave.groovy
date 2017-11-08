@@ -12,14 +12,14 @@ def call(Closure body, def Boolean runOnSlave = false) {
     { a ->
       def arch = new String(a)
       return {
-        def slave = [ buildNumber: null, name: null, buildError: null ]
+        def slave = [ buildNumber: null, name: null, error: null ]
         try {
           println arch
           slave = getSlave(arch, runOnSlave)
 
           // If the provision failed, there will be an error
-          if (slave.buildError != null) {
-            throw slave.buildError
+          if (slave.error != null) {
+            throw slave.error
           }
 
           if (slave.name == null) {
