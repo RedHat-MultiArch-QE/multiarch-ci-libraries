@@ -8,7 +8,7 @@
  * @return LinkedHashMap contained the name and buildNumber of the provisioned slave.
  */
 def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
-  def slave = [ buildNumber: null, name: null, error: null ]
+  def slave = [ buildNumber: null, arch: null, name: null, error: null ]
 
   try {
     stage('Provision Slave') {
@@ -26,7 +26,6 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
 
       // If provision was successful, you will be able to grab the build number
       slave.buildNumber = buildResult.getNumber().toString()
-      println "getSlave build successful: ${slave}"
 
       // Get results of provisioning job
       step([$class: 'CopyArtifact', filter: '*-slave.properties',
@@ -47,7 +46,7 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
     currentBuild.result = 'NOT_BUILT'
     slave.error = e.toString()
   } finally {
-    println "getSlave returning ${slave}"
+    println "Provisioned: ${slave}"
     return slave
   }
 }
