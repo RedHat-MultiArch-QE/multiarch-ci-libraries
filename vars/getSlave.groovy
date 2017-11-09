@@ -15,7 +15,7 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
       println("Provisioning ${arch}-slave with runOnProvisionedHost=${runOnProvisionedHost}")
 
       def buildResult = build([
-          job: 'provision-multiarch-slave',
+          job: 'multiarch-qe/provision-multiarch-slave',
           parameters: [
             string(name: 'ARCH', value: arch),
             booleanParam(name: 'CONNECT_AS_SLAVE', value: runOnProvisionedHost)
@@ -29,7 +29,7 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
 
       // Get results of provisioning job
       step([$class: 'CopyArtifact', filter: '*-slave.properties',
-          projectName: 'provision-multiarch-slave',
+          projectName: 'multiarch-qe/provision-multiarch-slave',
           selector: [
             $class: 'SpecificBuildSelector',
             buildNumber: slave.buildNumber

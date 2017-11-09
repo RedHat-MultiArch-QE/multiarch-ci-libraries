@@ -42,7 +42,7 @@ def call(Closure body, def Boolean runOnSlave = true) {
           stage ('Teardown Slave') {
             build(
               [
-                job: 'teardown-multiarch-slave',
+                job: 'multiarch-qe/teardown-multiarch-slave',
                 parameters: [
                   string(name: 'BUILD_NUMBER', value: slave.buildNumber)
                 ],
