@@ -3,21 +3,22 @@
  *
  * Runs closure body on a multi-arch slave for each arch in params.ARCHES.
  *
- * @param body Closure that takes a single String parameter representing the name of the slave.
+ * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
  * @param runOnSlave Boolean that specificies whether the
  *        closure should be run on directly on the provisioned slave.
  */
 def call(Closure body, def Boolean runOnSlave = false) {
   arches(
     { a ->
-      def arch = new String(a)
+      def String arch = new String(a)
       return {
-        def slave = [ buildNumber: null, name: null, error: null ]
+        def LinkedHashMap slave = [:]
         try {
           slave = getSlave(arch, runOnSlave)
 
-          if (slave == null || slave.name == null) {
-            throw new Exception("Could not find name for provisioned slave: ${slave}")
+          // Property validity check
+          if (slave == null || slave.name == null || slave.arch == null) {
+            throw new Exception("Invalid provisioned slave: ${slave}")
           }
 
           // If the provision failed, there will be an error
@@ -27,12 +28,12 @@ def call(Closure body, def Boolean runOnSlave = false) {
 
           if (runOnSlave) {
             node(slave.name) {
-              body(slave.name)
+              body(slave.name, slave.arch)
             }
             return
           }
 
-          body(slave.name)
+          body(slave.name, slave.arch)
         } catch (e) {
           // This is just a wrapper step to ensure that teardown is run upon failure
           println(e)
