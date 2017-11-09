@@ -7,7 +7,7 @@
  * @param runOnSlave Boolean that specificies whether the
  *        closure should be run on directly on the provisioned slave.
  */
-def call(Closure body, def Boolean runOnSlave = false) {
+def call(Closure body, def Boolean runOnSlave = true) {
   arches(
     { a ->
       def String arch = new String(a)
