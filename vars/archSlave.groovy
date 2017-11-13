@@ -46,7 +46,7 @@ def call(Closure body, def Boolean runOnSlave = true) {
                 parameters: [
                   string(name: 'BUILD_NUMBER', value: slave.buildNumber)
                 ],
-                propagate: true,
+                propagate: false,
                 wait: true
               ]
             )
