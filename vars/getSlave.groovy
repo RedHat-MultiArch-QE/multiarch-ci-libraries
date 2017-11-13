@@ -20,7 +20,7 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
             string(name: 'ARCH', value: arch),
             booleanParam(name: 'CONNECT_AS_SLAVE', value: runOnProvisionedHost)
           ],
-          propagate: true,
+          propagate: false,
           wait: true
         ])
 
@@ -43,7 +43,6 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost) {
   } catch (e) {
     // If provision fails, grab the build number from the error message and set build status to not built
     slave.buildNumber = ((e =~ "(provision-multiarch-slave #)([0-9]*)")[0][2])
-    currentBuild.result = 'NOT_BUILT'
     slave.error = e.toString()
   } finally {
     println "Provisioned: ${slave}"
