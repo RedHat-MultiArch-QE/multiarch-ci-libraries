@@ -3,11 +3,12 @@
  *
  * Runs closure body on a multi-arch slave for each arch in params.ARCHES.
  *
- * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
+ * @param onSuccess Closure that takes two parameters representing the name String and the architecture String of the slave.
+ * @param onFailure Closure that takes two parameters representing the Exception that occured and the architecture String of the slave.
  * @param runOnSlave Boolean that specificies whether the
  *        closure should be run on directly on the provisioned slave.
  */
-def call(Closure body, def Boolean runOnSlave = true) {
+def call(def Closure onSuccess = null, def Closure onFailure = null, def Boolean runOnSlave = true) {
   arches(
     { a ->
       def String arch = new String(a)
@@ -26,17 +27,19 @@ def call(Closure body, def Boolean runOnSlave = true) {
             throw new Exception(slave.error)
           }
 
+          if (onSuccess == null) return
+          
           if (runOnSlave) {
             node(slave.name) {
-              body(slave.name, slave.arch)
+             onSuccess(slave.name, slave.arch)
             }
             return
           }
 
-          body(slave.name, slave.arch)
+          onSuccess(slave.name, slave.arch)
         } catch (e) {
-          // This is just a wrapper step to ensure that teardown is run upon failure
-          println(e)
+          if (onFailure == null) return
+          onFailure(e, slave.arch)
         } finally {
           // Ensure teardown runs before the pipeline exits
           stage ('Teardown Slave') {
