@@ -14,7 +14,7 @@ def LinkedHashMap call(String arch, Boolean runOnProvisionedHost, def Boolean in
   try {
     stage('Provision Slave') {
       println("Provisioning ${arch}-slave with runOnProvisionedHost=${runOnProvisionedHost} and installAnsible=${installAnsible}")
-      provisioner(arch, runOnProvisionedHost, installAnsible)
+      provision(arch, runOnProvisionedHost, installAnsible)
 
       // Load slave properties (you may need to turn off sandbox or approve this in Jenkins)
       slave = readProperties(file: "${arch}-slave.properties", defaults: slave)
