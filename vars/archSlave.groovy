@@ -6,15 +6,17 @@
  * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
  * @param runOnSlave Boolean that specificies whether the
  *        closure should be run on directly on the provisioned slave.
+ * @param installAnsible Boolean that specificies whether Ansible should 
+ *        be installed on the provisioned slave.
  */
-def call(Closure body, def Boolean runOnSlave = true) {
+def call(Closure body, def Boolean runOnSlave = true, def Boolean installAnsible = true) {
   arches(
     { a ->
       def String arch = new String(a)
       return {
         def LinkedHashMap slave = [:]
         try {
-          slave = getSlave(arch, runOnSlave)
+          slave = getSlave(arch, runOnSlave, installAnsible)
 
           // Property validity check
           if (slave == null || slave.name == null || slave.arch == null) {
@@ -40,16 +42,7 @@ def call(Closure body, def Boolean runOnSlave = true) {
         } finally {
           // Ensure teardown runs before the pipeline exits
           stage ('Teardown Slave') {
-            build(
-              [
-                job: '/multiarch-qe/teardown-multiarch-slave',
-                parameters: [
-                  string(name: 'BUILD_NUMBER', value: slave.buildNumber)
-                ],
-                propagate: true,
-                wait: true
-              ]
-            )
+            teardown()
           }
         }
       }
