@@ -1,11 +1,12 @@
 /**
  * multiArchTest.groovy
  *
- * Runs @body on the multi-arch capable provisioner container.
+ * Runs @test on the multi-arch capable provisioner container, and runs @onTestFailure if it encounters an Exception.
  *
- * @param body Closure that is the test being run.
+ * @param test Closure that takes not parameters but runs the test.
+ * @param onTestFailure Closure that takes a single parameter that is the Exception that occured in test.
  */
-def call(Closure body) {
+def call(Closure test, Closure onTestFailure) {
   podTemplate(
     name: 'provisioner',
     label: 'provisioner',
@@ -29,7 +30,11 @@ def call(Closure body) {
     ansiColor('xterm') {
       timestamps {
         node('provisioner') {
-          body()
+          try {
+            test()
+          catch (e) {
+            onTestFailure(e)
+          }
         }
       }
     }

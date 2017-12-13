@@ -8,12 +8,14 @@
  *        closure should be run on directly on the provisioned slave.
  * @param installAnsible Boolean that specificies whether Ansible should
  *        be installed on the provisioned slave.
- * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
+ * @param test Closure that takes two String parameters representing the name and architecture of the slave.
+ * @param onTestFailure Closure that takes an Exception parameter and the String architecture of the slave.
  */
 import com.redhat.multiarch.qe.Task
 
-def call(LinkedList<String> arches, Boolean runOnSlave, Boolean installAnsible, Closure closure) {
-  multiArchTest({
+def call(LinkedList<String> arches, Boolean runOnSlave, Boolean installAnsible, Closure test, Closure onTestFailure) {
+  multiArchTest(
+    {
       // Create arch Tasks to parallelize test
       def LinkedList<Task> parallelTasks = [];
       for (arch in arches) {
@@ -42,15 +44,14 @@ def call(LinkedList<String> arches, Boolean runOnSlave, Boolean installAnsible, 
 
               if (runOnSlave) {
                 node(slave.name) {
-                  body(slave.name, slave.arch)
+                  test(slave.name, slave.arch)
                 }
                 return
               }
 
-              body(slave.name, slave.arch)
+              test(slave.name, slave.arch)
             } catch (e) {
-              // This is just a wrapper step to ensure that teardown is run upon failure
-              println(e)
+              onTestFailure(e, a)
             } finally {
               // Ensure teardown runs before the pipeline exits
               stage ('Teardown Slave') {
@@ -60,6 +61,7 @@ def call(LinkedList<String> arches, Boolean runOnSlave, Boolean installAnsible, 
           }
         }
       )
-    }
+    },
+    { e -> println(e) }
   )
 }
