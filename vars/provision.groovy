@@ -1,11 +1,21 @@
-def call(String arch, Boolean connectToMaster, Boolean installAnsible) {
-  // Get linchpin topology
-  git 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner'
+/**
+ * provision.groovy
+ *
+ * Attempts to provision a multi-arch host.
+ *
+ * @param arch String representing architecture of the host to provision.
+ * @param connectToMaster Boolean specifying whether to run cinch to connect the provisioned host to the Jenkins master
+ * @param installAnsible Boolean specifying whether to install ansible on the provisioned hsot.
+ */
+def LinkedHashMap call(String arch, Boolean connectToMaster, Boolean installAnsible) {
+  stage('Provision Slave') {
+    // Get linchpin topology
+    git 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner'
 
-  try {
+    def slave = [ buildNumber: null, arch: null, name: null, error: null ]
     def arch = arch
-    def slaveTarget = "${arch}-slave"
-    def slaveName = "${slaveTarget}-${env.BUILD_NUMBER}"
+    def slaveTarget = "jenkins-slave"
+    def slaveName = "${arch}-slave-${env.BUILD_NUMBER}"
     def provisioned = true
     def connectedToMaster = false
     def ansibleInstalled = false
@@ -13,7 +23,6 @@ def call(String arch, Boolean connectToMaster, Boolean installAnsible) {
 
     try {
       sh "linchpin --workspace workspace --verbose up ${slaveTarget}"
-
       if (connectToMaster) {
         def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slaveName}, \"jslave_label\":${slaveName}, \"arch\":${arch} }\'"
         sh "cinch workspace/inventories/${slaveTarget}.inventory --extra-vars ${extraVars}"
@@ -39,11 +48,9 @@ def call(String arch, Boolean connectToMaster, Boolean installAnsible) {
       "ansible.installed:${ansibleInstalled}\n" +
       "error:${error}\n"
       writeFile(file: "workspace/${slaveTarget}.properties", text: results)
+      archiveArtifacts artifacts: 'workspace/*-slave.properties', fingerprint: true
     }
-  } catch (e) {
-    currentBuild.result = 'FAILURE'
-  } finally {
-    // Archive linchpin output and provision summary properties file
-    archiveArtifacts artifacts: 'workspace/*-slave.properties', fingerprint: true
+
+    return slave
   }
 }

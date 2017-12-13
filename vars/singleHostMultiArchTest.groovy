@@ -1,22 +1,33 @@
 /**
- * archSlave.groovy
+ * singleHostMultiArchTest.groovy
  *
- * Runs closure body on a multi-arch slave for each arch in params.ARCHES.
+ * Runs closure body on a multi-arch slave for each arch in arches param.
  *
- * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
+ * @param arches LinkedList<String> specifying the arches to run single host tests on.
  * @param runOnSlave Boolean that specificies whether the
  *        closure should be run on directly on the provisioned slave.
- * @param installAnsible Boolean that specificies whether Ansible should 
+ * @param installAnsible Boolean that specificies whether Ansible should
  *        be installed on the provisioned slave.
+ * @param body Closure that takes a two String parameters representing the name and architecture of the slave.
  */
-def call(Closure body, def Boolean runOnSlave = true, def Boolean installAnsible = true) {
-  arches(
+import com.redhat.multiarch.qe.Task
+
+def call(LinkedList<String> arches, Boolean runOnSlave, Boolean installAnsible, Closure closure) {
+  // Create arch Tasks to parallelize test
+  def LinkedList<Task> parallelTasks = [];
+  for (arch in arches) {
+    parallelTasks.push(new Task(arch, { arch: arch }))
+  }
+
+  // Run single host test in parallel on each arch
+  parallelizeTasks(
+    parallelTasks,
     { a ->
       def String arch = new String(a)
       return {
         def LinkedHashMap slave = [:]
         try {
-          slave = getSlave(arch, runOnSlave, installAnsible)
+          slave = provision(arch, runOnSlave, installAnsible)
 
           // Property validity check
           if (slave == null || slave.name == null || slave.arch == null) {
