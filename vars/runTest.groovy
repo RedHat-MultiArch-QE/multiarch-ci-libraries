@@ -52,7 +52,7 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
 
             if (runOnSlave) {
               node(slave.name) {
-                test(slave))
+                test(slave)
                 return
               }
             }
