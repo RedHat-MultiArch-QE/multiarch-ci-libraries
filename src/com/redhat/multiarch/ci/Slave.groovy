@@ -1,10 +1,12 @@
 package com.redhat.multiarch.ci
 
 class Slave {
-  def String name = null
-  def String hostName = null
-  def Boolean provisioned = false
-  def Boolean connectedToMaster = false
-  def Boolean ansibleInstalled = false
-  def String error = null
+  String arch = null
+  String hostName = null
+  String error = null
+  String name = null
+  String target = null
+  Boolean provisioned = false
+  Boolean connectedToMaster = false
+  Boolean ansibleInstalled = false
 }
