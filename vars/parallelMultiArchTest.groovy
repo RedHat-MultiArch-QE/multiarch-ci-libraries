@@ -8,8 +8,8 @@
  *        closure should be run on directly on the provisioned slave.
  * @param installAnsible Boolean that specificies whether Ansible should
  *        be installed on the provisioned slave.
- * @param test Closure that takes a slave object.
- * @param onTestFailure Closure that takes an Exception parameter and the String architecture of the slave.
+ * @param test Closure that takes the Slave used by the test.
+ * @param onTestFailure Closure that takes the Slave used by the test and the Exception that occured.
  */
 import com.redhat.multiarch.ci.Task
 
@@ -26,12 +26,7 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
     { a ->
       def String arch = new String(a)
       return {
-        runTest(arch, runOnSlave, installAnsible, test, 
-          { 
-            e -> 
-            onTestFailure(e, a) 
-          }
-        )
+        runTest(arch, runOnSlave, installAnsible, test, onTestFailure)
       }
     }
   )
