@@ -12,7 +12,7 @@ import com.redhat.multiarch.ci.Slave
 Slave call(String arch, Boolean connectToMaster, Boolean installAnsible) {
   stage('Provision Slave') {
     // Get linchpin topology
-    git 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner'
+    git 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner@dev'
 
     Slave slave = new Slave(
       arch: arch,
