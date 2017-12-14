@@ -23,8 +23,8 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
   // Run single host test in parallel on each arch
   parallelizeTasks(
     parallelTasks,
-    { a ->
-      String arch = new String(a)
+    { params ->
+      String arch = new String(params.arch)
       {
         runTest(arch, runOnSlave, installAnsible, test, onTestFailure)
       }
