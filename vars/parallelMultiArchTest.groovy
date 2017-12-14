@@ -17,7 +17,7 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
   // Create arch Tasks to parallelize test
   def LinkedList<Task> parallelTasks = []
   for (arch in arches) {
-    parallelTasks.push(new Task(name: arch, params: { arch: arch }))
+    parallelTasks.push(new Task(name: arch, params: [ arch: arch ]))
   }
 
   // Run single host test in parallel on each arch
