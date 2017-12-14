@@ -7,8 +7,8 @@
  *        closure should be run on directly on the provisioned slave.
  * @param installAnsible Boolean that specificies whether Ansible should
  *        be installed on the provisioned slave.
- * @param test Closure that takes no parameters but runs the test.
- * @param onTestFailure Closure that takes a single parameter that is the Exception that occured in test.
+ * @param test Closure that takes the Slave used by the test.
+ * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
  */
 import com.redhat.multiarch.ci.Slave
 
@@ -58,7 +58,7 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
 
             test(slave)
           } catch (e) {
-            onTestFailure(e)
+            onTestFailure(slave, e)
           } finally {
             // Ensure teardown runs before the pipeline exits
             stage ('Teardown Slave') {
