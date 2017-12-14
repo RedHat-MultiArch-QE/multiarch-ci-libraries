@@ -38,16 +38,18 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
         node('provisioner') {
           Slave slave
           try {
-            slave = provision(arch, runOnSlave, installAnsible)
+            stage('Provision Slave') {
+              slave = provision(arch, runOnSlave, installAnsible)
 
-            // Property validity check
-            if (!slave.name || !slave.arch) {
-              throw new Exception("Invalid provisioned slave: ${slave}")
-            }
+              // Property validity check
+              if (!slave.name || !slave.arch) {
+                throw new Exception("Invalid provisioned slave: ${slave}")
+              }
 
-            // If the provision failed, there will be an error
-            if (slave.error) {
-              throw new Exception(slave.error)
+              // If the provision failed, there will be an error
+              if (slave.error) {
+                throw new Exception(slave.error)
+              }
             }
 
             if (runOnSlave) {
