@@ -6,7 +6,7 @@
  * @param tasks List<Task> to be parallelized.
  * @param body Closure that takes a single parameter representing a LinkedHashMap of arguments.
  */
-import com.redhat.multiarch.qe.Task
+import com.redhat.multiarch.ci.Task
 
 def call(List<Task> tasks, Closure body) {
   def parallelTasks = [:]
