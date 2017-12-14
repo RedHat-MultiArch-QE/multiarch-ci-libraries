@@ -15,7 +15,7 @@ import com.redhat.multiarch.ci.Task
 
 def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closure test, Closure onTestFailure) {
   // Create arch Tasks to parallelize test
-  def LinkedList<Task> parallelTasks = []
+  def parallelTasks = []
   for (arch in arches) {
     parallelTasks.push(new Task(name: arch, params: [ arch: arch ]))
   }
