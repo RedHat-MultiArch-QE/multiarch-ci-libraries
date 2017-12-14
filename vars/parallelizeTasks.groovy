@@ -4,7 +4,7 @@
  * Calls a @body for each task in @tasks.
  *
  * @param tasks List<Task> to be parallelized.
- * @param body Closure that takes a single parameter representing a LinkedHashMap of arguments.
+ * @param body Closure that takes a single parameter representing a Map of arguments.
  */
 import com.redhat.multiarch.ci.Task
 
