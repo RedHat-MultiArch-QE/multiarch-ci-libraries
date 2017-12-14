@@ -25,7 +25,6 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
     parallelTasks,
     { params ->
       String arch = new String(params.arch)
-      println params
       println arch
       test: {
         runTest(arch, runOnSlave, installAnsible, test, onTestFailure)
