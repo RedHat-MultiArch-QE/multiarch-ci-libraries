@@ -24,7 +24,7 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
       // This adds the custom slave container to the pod. Must be first with name 'jnlp'
       containerTemplate(
         name: 'jnlp',
-        image: "172.30.1.1:5000/redhat-multiarch-qe/provisioner",
+        image: '172.30.1.1:5000/redhat-multiarch-qe/provisioner',
         ttyEnabled: false,
         args: '${computer.jnlpmac} ${computer.name}',
         command: '',
@@ -36,16 +36,17 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
     ansiColor('xterm') {
       timestamps {
         node('provisioner') {
+          Slave slave
           try {
-            def Slave slave = provision(arch, runOnSlave, installAnsible)
+            slave = provision(arch, runOnSlave, installAnsible)
 
             // Property validity check
-            if (slave == null || slave.name == null || slave.arch == null) {
+            if (!slave.name || !slave.arch) {
               throw new Exception("Invalid provisioned slave: ${slave}")
             }
 
             // If the provision failed, there will be an error
-            if (slave.error != null && !slave.error.isEmpty()) {
+            if (slave.error) {
               throw new Exception(slave.error)
             }
 
@@ -62,7 +63,7 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
           } finally {
             // Ensure teardown runs before the pipeline exits
             stage ('Teardown Slave') {
-              teardown()
+              teardown(slave)
             }
           }
         }
