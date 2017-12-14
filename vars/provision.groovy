@@ -10,9 +10,6 @@
 import com.redhat.multiarch.ci.Slave
 
 Slave call(String arch, Boolean connectToMaster, Boolean installAnsible) {
-  // Get linchpin topology
-  git 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner@dev'
-
   Slave slave = new Slave(
     arch: arch,
     target: 'jenkins-slave',
@@ -20,8 +17,13 @@ Slave call(String arch, Boolean connectToMaster, Boolean installAnsible) {
   )
 
   try {
+    // Get linchpin workspace
+    git(url: 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner', branch: 'dev')
+    
+    // Attempt provisioning
     sh "linchpin --workspace workspace --verbose up ${slave.target}"
     slave.provisioned = true
+    
     if (connectToMaster) {
       def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slave.name}, \"jslave_label\":${slave.name}, \"arch\":${slave.arch} }\'"
       sh "cinch workspace/inventories/${slave.target}.inventory --extra-vars ${extraVars}"
