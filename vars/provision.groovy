@@ -21,7 +21,7 @@ Slave call(String arch, Boolean connectToMaster, Boolean installAnsible) {
     git(url: 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-provisioner', branch: 'dev')
     
     // Attempt provisioning
-    sh "linchpin --workspace workspace --verbose up ${slave.target}"
+    sh "linchpin --workspace workspace --pinfile workspace/PinFile --template-data '{ arch: ${slave.arch} }' --verbose up ${slave.target}"
     slave.provisioned = true
     
     if (connectToMaster) {
