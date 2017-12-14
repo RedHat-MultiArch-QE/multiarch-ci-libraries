@@ -26,7 +26,7 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
     { params ->
       String arch = new String(params.arch)
       println arch
-      test: {
+      return {
         runTest(arch, runOnSlave, installAnsible, test, onTestFailure)
       }
     }

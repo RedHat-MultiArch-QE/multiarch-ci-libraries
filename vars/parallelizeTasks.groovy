@@ -11,7 +11,6 @@ import com.redhat.multiarch.ci.Task
 def call(List<Task> tasks, Closure body) {
   def parallelTasks = [:]
   for (task in tasks) {
-    println task
     parallelTasks[task.name] = body(task.params)
   }
 
