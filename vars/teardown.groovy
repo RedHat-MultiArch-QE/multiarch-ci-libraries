@@ -4,10 +4,14 @@
  * Runs a teardown for provisioned slave.
  *
  * @param slave Slave to be torn down.
+ * @param arch String specifying the arch to run tests on.
+ * @param config ProvisioningConfig for provisioning.
+ *
  */
 import com.redhat.multiarch.ci.Slave
+import com.redhat.multiarch.ci.ProvisioningConfig
 
-def call(Slave slave) {
+def call(Slave slave, String arch, ProvisioningConfig config) {
   // Prepare the cinch teardown inventory
   if (!slave.provisioned) {
     // The provisioning job did not successfully provision a machine, so there is nothing to teardown
@@ -23,7 +27,7 @@ def call(Slave slave) {
   }
 
   try {
-    sh "linchpin --workspace workspace --verbose destroy ${slave.target}"
+    sh "linchpin --workspace workspace --pinfile workspace/PinFile --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${slave.target}"
   } catch (e) {
     println e
 

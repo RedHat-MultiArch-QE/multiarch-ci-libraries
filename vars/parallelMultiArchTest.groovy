@@ -4,16 +4,18 @@
  * Runs closure body on a multi-arch slave for each arch in arches param.
  *
  * @param arches List<String> specifying the arches to run single host tests on.
- * @param runOnSlave Boolean that specificies whether the
- *        closure should be run on directly on the provisioned slave.
- * @param installAnsible Boolean that specificies whether Ansible should
- *        be installed on the provisioned slave.
+ * @param config ProvisioningConfig Configuration for provisioning.
  * @param test Closure that takes the Slave used by the test.
  * @param onTestFailure Closure that takes the Slave used by the test and the Exception that occured.
  */
 import com.redhat.multiarch.ci.Task
+import com.redhat.multiarch.ci.ProvisioningConfig
 
-def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closure test, Closure onTestFailure) {
+def call(List<String> arches,
+         ProvisioningConfig config,
+         Closure test,
+         Closure onTestFailure) {
+
   // Create arch Tasks to parallelize test
   def parallelTasks = []
   for (arch in arches) {
@@ -24,11 +26,14 @@ def call(List<String> arches, Boolean runOnSlave, Boolean installAnsible, Closur
   parallelizeTasks(
     parallelTasks,
     { params ->
-      String arch = new String(params.arch)
-      println arch
-      return {
-        runTest(arch, runOnSlave, installAnsible, test, onTestFailure)
-      }
+        String arch = params.arch
+        println arch
+        return {
+            runTest(arch,
+                    config,
+                    test,
+                    onTestFailure)
+        }
     }
   )
 }
