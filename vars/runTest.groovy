@@ -3,33 +3,34 @@
  *
  * Runs @test on the multi-arch capable provisioner container, and runs @onTestFailure if it encounters an Exception.
  * @param arch String specifying the arch to run tests on.
- * @param runOnSlave Boolean that specificies whether the
- *        closure should be run on directly on the provisioned slave.
- * @param installAnsible Boolean that specificies whether Ansible should
- *        be installed on the provisioned slave.
+ * @param config ProvisioningConfig Configuration for provisioning.
  * @param test Closure that takes the Slave used by the test.
  * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
  */
 import com.redhat.multiarch.ci.Slave
+import com.redhat.multiarch.ci.ProvisioningConfig
 
-def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, Closure onTestFailure) {
+def call(String arch,
+         ProvisioningConfig config,
+         Closure test,
+         Closure onTestFailure) {
+
   podTemplate(
     name: 'provisioner',
     label: 'provisioner',
     cloud: 'openshift',
     serviceAccount: 'jenkins',
     idleMinutes: 0,
-    namespace: 'redhat-multiarch-qe',
+    namespace: config.tenant,
     containers: [
       // This adds the custom slave container to the pod. Must be first with name 'jnlp'
       containerTemplate(
         name: 'jnlp',
-        image: '172.30.1.1:5000/redhat-multiarch-qe/provisioner',
+        image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}",
         ttyEnabled: false,
         args: '${computer.jnlpmac} ${computer.name}',
         command: '',
-        workingDir: '/tmp',
-        privileged: true
+        workingDir: '/tmp'
       )
     ]
   ) {
@@ -39,7 +40,7 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
           Slave slave
           try {
             stage('Provision Slave') {
-              slave = provision(arch, runOnSlave, installAnsible)
+              slave = provision(arch, config)
 
               // Property validity check
               if (!slave.name || !slave.arch) {
@@ -48,24 +49,24 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
 
               // If the provision failed, there will be an error
               if (slave.error) {
-                throw new Exception(slave.error)
+                error slave.error
               }
             }
 
-            if (runOnSlave) {
+            if (config.runOnSlave) {
               node(slave.name) {
-                test(slave)
+                test(slave, config)
                 return
               }
             }
 
-            test(slave)
+            test(slave, config)
           } catch (e) {
-            onTestFailure(slave, e)
+            onTestFailure(e, slave)
           } finally {
             // Ensure teardown runs before the pipeline exits
             stage ('Teardown Slave') {
-              teardown(slave)
+              teardown(slave, arch, config)
             }
           }
         }
