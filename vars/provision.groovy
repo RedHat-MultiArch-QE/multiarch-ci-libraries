@@ -36,11 +36,13 @@ Slave call(String arch,
 
     }
 
-    // Get linchpin workspace
-    git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
+    if (config.provisioningRepoUrl != null) {
+      // Get linchpin workspace
+      git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
+    }
 
     // Attempt provisioning
-    sh "linchpin --workspace workspace --pinfile workspace/PinFile --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
+    sh "linchpin --workspace ${config.provisioningWorkspaceDir} --pinfile ${config.provisioningWorkspaceDir}/PinFile --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
 
     sh 'find . | grep inventory'
 
