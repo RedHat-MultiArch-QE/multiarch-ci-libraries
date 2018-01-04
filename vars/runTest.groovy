@@ -37,6 +37,9 @@ def call(String arch,
     ansiColor('xterm') {
       timestamps {
         node('provisioner') {
+
+          checkout scm
+
           Slave slave
           try {
             stage('Provision Slave') {
