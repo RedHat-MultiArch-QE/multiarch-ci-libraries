@@ -38,8 +38,6 @@ def call(String arch,
       timestamps {
         node('provisioner') {
 
-          checkout scm
-
           Slave slave
           try {
             stage('Provision Slave') {

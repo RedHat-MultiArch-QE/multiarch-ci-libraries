@@ -39,6 +39,8 @@ Slave call(String arch,
     if (config.provisioningRepoUrl != null) {
       // Get linchpin workspace
       git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
+    } else {
+      checkout scm
     }
 
     // Attempt provisioning
@@ -47,7 +49,7 @@ Slave call(String arch,
     sh 'find . | grep inventory'
 
     slave.inventory = sh (returnStdout: true, script: """
-            ls -1 workspace/inventories/*.inventory
+            ls -1 ${config.provisioningWorkspaceDir}/inventories/*.inventory
             """).trim()
 
     sh "cat ${slave.inventory}"
@@ -56,7 +58,7 @@ Slave call(String arch,
     
     if (config.runOnSlave) {
       def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slave.name}, \"jslave_label\":${slave.name}, \"arch\":${slave.arch} }\'"
-      sh "cinch workspace/inventories/${slave.target}.inventory --extra-vars ${extraVars}"
+      sh "cinch ${config.provisioningWorkspaceDir}/inventories/${slave.target}.inventory --extra-vars ${extraVars}"
       slave.connectedToMaster = true
     }
     if (config.installAnsible) {
