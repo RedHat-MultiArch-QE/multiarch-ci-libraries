@@ -16,6 +16,7 @@ class ProvisioningConfig {
     // Provisioning workspace location (needed for Linchpin)
     // This can reference a relative path in the above repo
     // or it can reference a relative path that already exists
+    // in the current directory
     String provisioningWorkspaceDir = null
     // Kerberos principal for Beaker authentication.
     String krbPrincipal = null
