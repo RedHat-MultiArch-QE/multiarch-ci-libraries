@@ -42,7 +42,7 @@ Slave call(String arch,
     }
 
     // Attempt provisioning
-    sh "linchpin --workspace ${config.provisioningWorkspaceDir} --pinfile ${config.provisioningWorkspaceDir}/PinFile --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
+    sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
 
     sh 'find . | grep inventory'
 
