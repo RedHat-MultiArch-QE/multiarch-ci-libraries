@@ -49,7 +49,7 @@ Slave call(String arch,
     sh 'find . | grep inventory'
 
     slave.inventory = sh (returnStdout: true, script: """
-            ls -1 ${config.provisioningWorkspaceDir}/inventories/*.inventory
+            readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
             """).trim()
 
     sh "cat ${slave.inventory}"
