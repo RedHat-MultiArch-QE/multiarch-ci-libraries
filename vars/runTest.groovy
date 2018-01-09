@@ -45,7 +45,7 @@ def call(String arch,
 
               // Property validity check
               if (!slave.name || !slave.arch) {
-                throw new Exception("Invalid provisioned slave: ${slave}")
+                error "Invalid provisioned slave: ${slave}"
               }
 
               // If the provision failed, there will be an error
