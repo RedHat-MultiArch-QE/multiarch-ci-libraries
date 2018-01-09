@@ -46,8 +46,6 @@ Slave call(String arch,
     // Attempt provisioning
     sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
 
-    sh 'find . | grep inventory'
-
     slave.inventory = sh (returnStdout: true, script: """
             readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
             """).trim()
@@ -60,6 +58,21 @@ Slave call(String arch,
       def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slave.name}, \"jslave_label\":${slave.name}, \"arch\":${slave.arch} }\'"
       sh "cinch ${config.provisioningWorkspaceDir}/inventories/${slave.target}.inventory --extra-vars ${extraVars}"
       slave.connectedToMaster = true
+    } else {
+      withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
+                          variable: 'SSHPRIVKEY'),
+                       file(credentialsId: config.SSHPUBKEYCREDENTIALID,
+                          variable: 'SSHPUBKEY')])
+              {
+                env.HOME = "/home/jenkins"
+                sh """
+                  mkdir -p ~/.ssh
+                  cp ${SSHPRIVKEY} ~/.ssh/id_rsa
+                  cp ${SSHPUBKEY} ~/.ssh/id_rsa.pub
+                  chmod 600 ~/.ssh/id_rsa
+                  chmod 644 ~/.ssh/id_rsa.pub
+                """
+              }
     }
     if (config.installAnsible) {
       node (slaveName) {
