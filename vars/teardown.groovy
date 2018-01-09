@@ -23,13 +23,13 @@ def call(Slave slave, String arch, ProvisioningConfig config) {
   try {
     sh "teardown workspace/inventories/${slave.target}.inventory"
   } catch (e) {
-    println e
+    echo e
   }
 
   try {
     sh "linchpin --workspace workspace --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${slave.target}"
   } catch (e) {
-    println e
+    echo e
 
     if (slave.error) {
       currentBuild.result = 'FAILURE'
