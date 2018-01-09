@@ -46,6 +46,12 @@ Slave call(String arch,
     // Attempt provisioning
     sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${slave.arch}, job_group: ${config.jobgroup} }' --verbose up ${slave.target}"
 
+    // We need to scan for inventory file. Please see the following for reasoning:
+    // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
+    // Possible solutions to not require the scan:
+    // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
+    // - overriding [evars] section and specifying inventory_file
+    //
     slave.inventory = sh (returnStdout: true, script: """
             readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
             """).trim()
