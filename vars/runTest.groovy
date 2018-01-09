@@ -43,12 +43,12 @@ def call(String arch, Boolean runOnSlave, Boolean installAnsible, Closure test, 
 
               // Property validity check
               if (!slave.name || !slave.arch) {
-                throw new Exception("Invalid provisioned slave: ${slave}")
+                error "Invalid provisioned slave: ${slave}"
               }
 
               // If the provision failed, there will be an error
               if (slave.error) {
-                throw new Exception(slave.error)
+                error slave.error
               }
             }
 
