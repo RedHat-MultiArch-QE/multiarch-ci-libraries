@@ -19,13 +19,13 @@ def call(Slave slave) {
   try {
     sh "teardown workspace/inventories/${slave.target}.inventory"
   } catch (e) {
-    println e
+    echo e
   }
 
   try {
     sh "linchpin --workspace workspace --verbose destroy ${slave.target}"
   } catch (e) {
-    println e
+    echo e
 
     if (slave.error) {
       currentBuild.result = 'FAILURE'
