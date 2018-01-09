@@ -26,14 +26,11 @@ def call(List<String> arches,
   parallelizeTasks(
     parallelTasks,
     { params ->
-        String arch = params.arch
-        println arch
-        return {
-            runTest(arch,
-                    config,
-                    test,
-                    onTestFailure)
-        }
+      String arch = new String(params.arch)
+      echo arch
+      return {
+        runTest(arch, config, test, onTestFailure)
+      }
     }
   )
 }
