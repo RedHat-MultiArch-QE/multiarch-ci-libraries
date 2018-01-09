@@ -27,7 +27,7 @@ def call(Slave slave, String arch, ProvisioningConfig config) {
   }
 
   try {
-    sh "linchpin --workspace workspace --pinfile workspace/PinFile --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${slave.target}"
+    sh "linchpin --workspace workspace --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${slave.target}"
   } catch (e) {
     println e
 
