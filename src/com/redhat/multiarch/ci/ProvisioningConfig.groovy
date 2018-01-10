@@ -10,9 +10,9 @@ class ProvisioningConfig {
     // name of provisioning image. Can include tag name.
     String provisioningImage = 'provisioner'
     // Provisioning repo url
-    String provisioningRepoUrl = null
+    String provisioningRepoUrl = ''
     // Provisioning repo ref
-    String provisioningRepoRef = null
+    String provisioningRepoRef = ''
     // Provisioning workspace location (needed for Linchpin)
     // This can reference a relative path in the above repo
     // or it can reference a relative path that already exists
