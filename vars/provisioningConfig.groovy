@@ -2,11 +2,11 @@ import com.redhat.multiarch.ci.ProvisioningConfig
 
 class provisioningConfig {
 
-    def create(params) {
-        config = new ProvisioningConfig()
-        config.KEYTABCREDENTIALID = params.KEYTABCREDENTIALID ?: 'KEYTAB'
-        config.SSHPRIVKEYCREDENTIALID = params.SSHPRIVKEYCREDENTIALID ?: 'SSHPRIVKEY'
-        config.SSHPUBKEYCREDENTIALID = params.SSHPUBKEYCREDENTIALID ?: 'SSHPUBKEY'
+    def create() {
+        def config = new ProvisioningConfig()
+        //config.KEYTABCREDENTIALID = params.KEYTABCREDENTIALID ?: 'KEYTAB'
+        //config.SSHPRIVKEYCREDENTIALID = params.SSHPRIVKEYCREDENTIALID ?: 'SSHPRIVKEY'
+        //config.SSHPUBKEYCREDENTIALID = params.SSHPUBKEYCREDENTIALID ?: 'SSHPUBKEY'
         return config
     }
 }
