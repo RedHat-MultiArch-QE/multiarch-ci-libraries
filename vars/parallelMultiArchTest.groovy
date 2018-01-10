@@ -26,7 +26,7 @@ def call(List<String> arches,
   parallelizeTasks(
     parallelTasks,
     { params ->
-      String arch = new String(params.arch)
+      String arch = params.arch
       echo arch
       return {
         runTest(arch, config, test, onTestFailure)
