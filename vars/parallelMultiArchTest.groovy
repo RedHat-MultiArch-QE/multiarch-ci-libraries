@@ -27,7 +27,6 @@ def call(List<String> arches,
     parallelTasks,
     { params ->
       String arch = params.arch
-      echo arch
       return {
         runTest(arch, config, test, onTestFailure)
       }
