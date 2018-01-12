@@ -23,19 +23,8 @@ Slave call(String arch,
     withCredentials([file(credentialsId: config.KEYTABCREDENTIALID,
             variable: 'KEYTAB')]) {
       sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
-               
-      sh "cat /etc/beaker/client.conf"
-      sh "cat /etc/krb5.conf"
-      sh "ls -a ~"
 
-      // prepare beaker client config.
-      //def clientConf = readFile '/etc/beaker/client.conf'
-      //writeFile(file: "/tmp/client.conf", text: "${clientConf}\nKRB_KEYTAB = \"${KEYTAB}\"\n")
-
-      // tell beaker to use our config file.
-      //env.BEAKER_CLIENT_CONF = '/tmp/client.conf'
-
-      // test to make sure we can authenticate.
+      // Test to make sure we can authenticate.
       sh 'bkr whoami'
 
     }
