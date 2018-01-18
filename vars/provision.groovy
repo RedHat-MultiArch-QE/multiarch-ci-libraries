@@ -19,7 +19,6 @@ Slave call(String arch,
   )
 
   try {
-
     withCredentials([file(credentialsId: config.KEYTABCREDENTIALID,
             variable: 'KEYTAB')]) {
       sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
@@ -33,7 +32,6 @@ Slave call(String arch,
 
       // test to make sure we can authenticate.
       sh 'bkr whoami'
-
     }
 
     if (config.provisioningRepoUrl != null) {
@@ -81,7 +79,7 @@ Slave call(String arch,
               }
     }
     if (config.installAnsible) {
-      node (slaveName) {
+      node (slave.name) {
         sh 'sudo yum install python-devel openssl-devel libffi-devel -y'
         sh 'sudo pip install --upgrade pip; sudo pip install --upgrade setuptools; sudo pip install --upgrade ansible'
       }
