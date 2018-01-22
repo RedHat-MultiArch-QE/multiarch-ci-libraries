@@ -33,6 +33,12 @@ class ProvisioningConfig {
     // ID of the Jenkins credential for the username and password
     // used by cinch to connect the provisioned host to the Jenkins master
     String JENKINSSLAVECREDENTIALID = 'JENKINS_SLAVE_CREDENTIALS'
+    // URL of the Jenkins master that cinch will use to connect the provisioned
+    // host as a slave.
+    String JENKINS_SLAVE_MASTER = ""
+    // Extra arguments passed to the jswarm call.
+    // Allows for the connection to be tunneled in the case of an OpenShift hosted Jenkins.
+    String JSWARM_EXTRA_ARGS = ""
     // Whether the closure should be run on directly on the provisioned slave.
     Boolean runOnSlave = true
     // Whether Ansible should be installed on the provisioned slave.
