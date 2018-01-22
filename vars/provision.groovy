@@ -46,15 +46,34 @@ Slave call(String arch,
     slave.inventory = sh (returnStdout: true, script: """
             readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
             """).trim()
-
-    sh "cat ${slave.inventory}"
-
     slave.provisioned = true
     
     if (config.runOnSlave) {
-      def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slave.name}, \"jslave_label\":${slave.name}, \"arch\":${slave.arch} }\'"
-      sh "cinch ${slave.inventory} --extra-vars ${extraVars}"
-      slave.connectedToMaster = true
+      withCredentials([
+          [
+            $class: 'UsernamePasswordMultiBinding',
+	    credentialsId: config.JENKINSSLAVECREDENTIALID,
+	    usernameVariable: 'JENKINS_SLAVE_USERNAME', 
+	    passwordVariable: 'JENKINS_SLAVE_PASSWORD'
+          ]
+        ]) {
+        def extraVars = """
+        '{
+          "rpm_key_imports":[],
+          "jenkins_master_repositories":[],
+          "jenkins_master_download_repositories":[],
+          "jslave_name":${slave.name}, 
+          "jslave_label":${slave.name}, 
+          "arch":${slave.arch},
+          "jenkins_master_url":${env.JENKINS_MASTER_URL},
+          "jenkins_slave_username":${JENKINS_SLAVE_USERNAME},
+          "jenkins_slave_password":${JENKINS_SLAVE_PASSWORD},
+          "jswarm_extra_args":${env.JSWARM_EXTRA_ARGS}
+        }'
+        """
+        sh "cinch ${slave.inventory} --extra-vars ${extraVars}"
+        slave.connectedToMaster = true
+      }
     } else {
       withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
                           variable: 'SSHPRIVKEY'),
