@@ -58,20 +58,20 @@ Slave call(String arch,
           ]
         ]) {
         def extraVars = """
-        '{
-          "rpm_key_imports":[],
-          "jenkins_master_repositories":[],
-          "jenkins_master_download_repositories":[],
-          "jslave_name":${slave.name}, 
-          "jslave_label":${slave.name}, 
-          "arch":${slave.arch},
-          "jenkins_master_url":${env.JENKINS_MASTER_URL},
-          "jenkins_slave_username":${JENKINS_SLAVE_USERNAME},
-          "jenkins_slave_password":${JENKINS_SLAVE_PASSWORD},
-          "jswarm_extra_args":${env.JSWARM_EXTRA_ARGS}
-        }'
+          '{
+            "rpm_key_imports":[],
+            "jenkins_master_repositories":[],
+            "jenkins_master_download_repositories":[],
+            "jslave_name":${slave.name}, 
+            "jslave_label":${slave.name}, 
+            "arch":${slave.arch},
+            "jenkins_master_url":${env.JENKINS_MASTER_URL},
+            "jenkins_slave_username":${JENKINS_SLAVE_USERNAME},
+            "jenkins_slave_password":${JENKINS_SLAVE_PASSWORD},
+            "jswarm_extra_args":${env.JSWARM_EXTRA_ARGS}
+          }'
         """
-        sh "cinch ${slave.inventory} --extra-vars ${extraVars}"
+        sh "cinch ${slave.inventory} --extra-vars ${extraVars.replaceAll("\\s")}"
         slave.connectedToMaster = true
       }
     } else {
