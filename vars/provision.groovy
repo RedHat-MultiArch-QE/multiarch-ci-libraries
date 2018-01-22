@@ -71,7 +71,7 @@ Slave call(String arch,
             "jswarm_extra_args":${env.JSWARM_EXTRA_ARGS}
           }'
         """
-        sh "cinch ${slave.inventory} --extra-vars ${extraVars.replaceAll("\\s")}"
+        sh "cinch ${slave.inventory} --extra-vars ${extraVars.replaceAll("\\s", "")}"
         slave.connectedToMaster = true
       }
     } else {
