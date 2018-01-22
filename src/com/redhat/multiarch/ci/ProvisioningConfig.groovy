@@ -30,6 +30,9 @@ class ProvisioningConfig {
     // copied to provisioned resource
     // *** This must be the same as what was added to Beaker ***
     String SSHPUBKEYCREDENTIALID = 'SSHPUBKEY'
+    // ID of the Jenkins credential for the username and password
+    // used by cinch to connect the provisioned host to the Jenkins master
+    String JENKINSSLAVECREDENTIALID = 'JENKINS_SLAVE_CREDENTIALS'
     // Whether the closure should be run on directly on the provisioned slave.
     Boolean runOnSlave = true
     // Whether Ansible should be installed on the provisioned slave.
