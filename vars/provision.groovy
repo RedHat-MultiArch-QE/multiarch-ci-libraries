@@ -57,21 +57,20 @@ Slave call(String arch,
 	    passwordVariable: 'JENKINS_SLAVE_PASSWORD'
           ]
         ]) {
-        def extraVars = """
-          '{
-            "rpm_key_imports":[],
-            "jenkins_master_repositories":[],
-            "jenkins_master_download_repositories":[],
-            "jslave_name":${slave.name}, 
-            "jslave_label":${slave.name}, 
-            "arch":${slave.arch},
-            "jenkins_master_url":${config.JENKINS_MASTER_URL},
-            "jenkins_slave_username":${JENKINS_SLAVE_USERNAME},
-            "jenkins_slave_password":${JENKINS_SLAVE_PASSWORD},
-            "jswarm_extra_args":${config.JSWARM_EXTRA_ARGS}
-          }'
-        """
-        sh "cinch ${slave.inventory} --extra-vars ${extraVars.replaceAll("\\s", "")}"
+        def extraVars = "'{" +
+          "'rpm_key_imports':[]," +
+          "'jenkins_master_repositories':[]," +
+          "'jenkins_master_download_repositories':[]," +
+	  "'jslave_name':'${slave.name}'," +
+          "'jslave_label':'${slave.name}'," +
+          "'arch':'${slave.arch}'," +
+	  "'jenkins_master_url':'${config.JENKINS_MASTER_URL}'," +
+	  "'jenkins_slave_username':'${JENKINS_SLAVE_USERNAME}'," +
+          "'jenkins_slave_password':'${JENKINS_SLAVE_PASSWORD}'," +
+          "'jswarm_extra_args':'${config.JSWARM_EXTRA_ARGS}'" +
+          "}'"
+
+        sh "cinch ${slave.inventory} --extra-vars ${extraVars}"
         slave.connectedToMaster = true
       }
     } else {
