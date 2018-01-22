@@ -53,7 +53,7 @@ Slave call(String arch,
     
     if (config.runOnSlave) {
       def extraVars = "\'{ \"rpm_key_imports\":[], \"jenkins_master_repositories\":[], \"jenkins_master_download_repositories\":[], \"jslave_name\":${slave.name}, \"jslave_label\":${slave.name}, \"arch\":${slave.arch} }\'"
-      sh "cinch ${config.provisioningWorkspaceDir}/inventories/${slave.target}.inventory --extra-vars ${extraVars}"
+      sh "cinch ${slave.inventory} --extra-vars ${extraVars}"
       slave.connectedToMaster = true
     } else {
       withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
