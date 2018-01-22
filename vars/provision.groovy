@@ -65,10 +65,10 @@ Slave call(String arch,
             "jslave_name":${slave.name}, 
             "jslave_label":${slave.name}, 
             "arch":${slave.arch},
-            "jenkins_master_url":${env.JENKINS_MASTER_URL},
+            "jenkins_master_url":${config.JENKINS_MASTER_URL},
             "jenkins_slave_username":${JENKINS_SLAVE_USERNAME},
             "jenkins_slave_password":${JENKINS_SLAVE_PASSWORD},
-            "jswarm_extra_args":${env.JSWARM_EXTRA_ARGS}
+            "jswarm_extra_args":${config.JSWARM_EXTRA_ARGS}
           }'
         """
         sh "cinch ${slave.inventory} --extra-vars ${extraVars.replaceAll("\\s", "")}"
