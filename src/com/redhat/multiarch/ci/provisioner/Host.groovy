@@ -1,6 +1,6 @@
-package com.redhat.multiarch.ci
+package com.redhat.multiarch.ci.provisioner
 
-class Slave {
+class Host {
   String arch = null
   String hostName = null
   String error = null

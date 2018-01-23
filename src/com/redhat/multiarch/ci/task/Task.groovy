@@ -1,4 +1,4 @@
-package com.redhat.multiarch.ci
+package com.redhat.multiarch.ci.task
 
 class Task {
   String name

@@ -6,7 +6,7 @@
  * @param tasks List<Task> to be parallelized.
  * @param body Closure that takes a single parameter representing a Map of arguments.
  */
-import com.redhat.multiarch.ci.Task
+package com.redhat.multiarch.ci.task
 
 def call(List<Task> tasks, Closure body) {
   def parallelTasks = [:]
