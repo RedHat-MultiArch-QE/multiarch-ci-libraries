@@ -1,4 +1,7 @@
-class Utils {
+import com.redhat.multiarch.ci.provisioner.*
+import com.redhat.multiarch.ci.test.*
+
+class TestUtils {
   static ProvisioningConfig createProvisioningConfig(script) {
     return new ProvisioningConfig(script.params, script.env)
   }
