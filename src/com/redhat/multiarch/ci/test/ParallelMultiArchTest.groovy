@@ -1,5 +1,6 @@
 package com.redhat.multiarch.ci.test
 
+import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 import com.redhat.multiarch.ci.task.*
 
 class ParallelMultiArchTest extends Test {
