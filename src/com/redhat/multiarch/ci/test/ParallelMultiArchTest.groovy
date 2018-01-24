@@ -8,12 +8,14 @@ class ParallelMultiArchTest extends Test {
   List<String> arches
 
   /**
+   * @param script The pipeline context to call steps.
    * @param arches List<String> specifying the arches to run single host tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Host to be used by the test.
    * @param onTestFailure Closure that takes the Host used by the test and the Exception that occured.
    */
-  ParallelMultiArchTest(List<String> arches,
+  ParallelMultiArchTest(def script, 
+                        List<String> arches,
                         ProvisioningConfig config,
                         Closure test,
                         Closure onTestFailure) {
@@ -33,6 +35,7 @@ class ParallelMultiArchTest extends Test {
 
     // Run single host test in parallel on each arch
     Task.parallelize(
+      script,
       parallelTasks,
       { params ->
         this.arch = params.arch
