@@ -5,10 +5,10 @@ import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 
 class Test {
-  String arch;
-  ProvisioningConfig config;
-  Closure test,
-  Closure onTestFailure;
+  String arch
+  ProvisioningConfig config
+  Closure test
+  Closure onTestFailure
 
   /**
    * @param arch String specifying the arch to run tests on.
