@@ -73,7 +73,7 @@ class ProvisioningConfig {
     this.jenkinsMasterUrl = url
   }
   
-  setJswarmExtraArgs(String args) {
+  def setJswarmExtraArgs(String args) {
     this.jswarmExtraArgs = args
   }
 }
