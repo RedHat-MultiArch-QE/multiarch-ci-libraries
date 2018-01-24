@@ -19,7 +19,7 @@ class ParallelMultiArchTest extends Test {
                         ProvisioningConfig config,
                         Closure test,
                         Closure onTestFailure) {
-    super(null, config, test, onTestFailure)
+    super(script, null, config, test, onTestFailure)
     this.arches = arches
   }
 
