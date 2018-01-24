@@ -5,7 +5,7 @@ class TestUtils {
   static def config
   
   static ProvisioningConfig getProvisioningConfig(script) {
-    if (provisioningConfig) return provisioningConfig
+    if (config) return config
     config = new ProvisioningConfig(script.params, script.env)
   }
 
