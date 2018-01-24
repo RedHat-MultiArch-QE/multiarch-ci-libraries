@@ -18,7 +18,7 @@ class Test {
    * @param test Closure that takes the Slave used by the test.
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
-  Test(def script
+  Test(def script,
        String arch,
        ProvisioningConfig config,
        Closure test,
