@@ -20,7 +20,6 @@ class Test {
        ProvisioningConfig config,
        Closure test,
        Closure onTestFailure) {
-    this.script = script
     this.arch = arch
     this.config = config
     this.test = test
