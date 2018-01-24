@@ -45,7 +45,7 @@ class ProvisioningConfig {
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
-    keyTabCredentialId = params.KEYTABCREDENTIALID ?: keyTabCredentialId
+    keytabCredentialId = params.KEYTABCREDENTIALID ?: keytabCredentialId
     sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: sshPrivKeyCredentialId
     sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: sshPubKeyCredentialId
     jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: jenkinsSlaveCredentialId
