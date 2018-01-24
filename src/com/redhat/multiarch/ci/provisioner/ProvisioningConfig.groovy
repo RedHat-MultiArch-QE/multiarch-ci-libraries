@@ -45,59 +45,59 @@ class ProvisioningConfig {
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
-    this.keyTabCredentialId = params.KEYTABCREDENTIALID ?: this.keyTabCredentialId
-    this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
-    this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
-    this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
-    this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
-    this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+    keyTabCredentialId = params.KEYTABCREDENTIALID ?: keyTabCredentialId
+    sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: sshPrivKeyCredentialId
+    sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: sshPubKeyCredentialId
+    jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: jenkinsSlaveCredentialId
+    jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: jenkinsMasterUrl
+    jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: jswarmExtraArgs
   }
   
   String getKeytabCredentialId() {
-    return this.keyTabCredentialId
+    keyTabCredentialId
   }
   
   def setKeytabCredentialId(String id) {
-    this.keytabCredentialId = id
+    keytabCredentialId = id
   }
   
   String getSshPrivKeyCredentialId() {
-    return this.sshPrivKeyCredentialId
+    sshPrivKeyCredentialId
   }
   
   def setSshPrivKeyCredentialId(String id) {
-    this.sshPrivKeyCredentialId = id
+    sshPrivKeyCredentialId = id
   }
   
   String getSshPubKeyCredentialId() {
-    return this.sshPubKeyCredentialId
+    sshPubKeyCredentialId
   }
   
   def setSshPubKeyCredentialId(String id) {
-    this.sshPubKeyCredentialId = id
+    sshPubKeyCredentialId = id
   }
   
   String getJenkinsSlaveCredentialId() {
-    return this.jenkinsSlaveCredentialId
+    jenkinsSlaveCredentialId
   }
   
   def setJenkinsSlaveCredentialId(String id) {
-    this.jenkinsSlaveCredentialId = id
+    jenkinsSlaveCredentialId = id
   }
   
   String getJenkinsMasterUrl() {
-    return this.jenkinsMasterUrl
+    jenkinsMasterUrl
   }
   
   def setJenkinsMasterUrl(String url) {
-    this.jenkinsMasterUrl = url
+    jenkinsMasterUrl = url
   }
   
   String getJswarmExtraArgs() {
-    return this.jswarmExtraArgs
+    jswarmExtraArgs
   }
   
   def setJswarmExtraArgs(String args) {
-    this.jswarmExtraArgs = args
+    jswarmExtraArgs = args
   }
 }
