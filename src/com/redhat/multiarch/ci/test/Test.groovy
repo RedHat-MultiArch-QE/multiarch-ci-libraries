@@ -59,7 +59,7 @@ class Test {
             Host host
             try {
               stage('Provision Slave') {
-                host = provisioner.provision(arch, config)
+                host = provisioner.provision(arch)
 
                 // Property validity check
                 if (!host.name || !host.arch) {
@@ -85,7 +85,7 @@ class Test {
             } finally {
               // Ensure teardown runs before the pipeline exits
               stage ('Teardown Slave') {
-                provisioner.teardown(host, arch, config)
+                provisioner.teardown(host, arch)
               }
             }
           }
