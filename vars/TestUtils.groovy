@@ -2,8 +2,11 @@ import com.redhat.multiarch.ci.provisioner.*
 import com.redhat.multiarch.ci.test.*
 
 class TestUtils {
-  static ProvisioningConfig createProvisioningConfig(script) {
-    return new ProvisioningConfig(script.params, script.env)
+  static def config
+  
+  static ProvisioningConfig getProvisioningConfig() {
+    if (provisioningConfig) return provisioningConfig
+    config = new ProvisioningConfig(params, env)
   }
 
   /**
@@ -19,7 +22,7 @@ class TestUtils {
        ProvisioningConfig config,
        Closure test,
        Closure onTestFailure) {
-    (new Test(arch, config, test, onTestFailure)).run()
+    (new Test(this, arch, config, test, onTestFailure)).run()
   }
 
   /**
@@ -34,6 +37,6 @@ class TestUtils {
        ProvisioningConfig config,
        Closure test,
        Closure onTestFailure) {
-    (new ParallelMultiArchTest(arches, config, test, onTestFailure)).run()
+    (new ParallelMultiArchTest(this, arches, config, test, onTestFailure)).run()
   }
 }
