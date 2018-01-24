@@ -53,24 +53,48 @@ class ProvisioningConfig {
     this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
   }
   
+  String getKeytabCredentialId() {
+    return this.keyTabCredentialId
+  }
+  
   def setKeytabCredentialId(String id) {
     this.keytabCredentialId = id
+  }
+  
+  String getSshPrivKeyCredentialId() {
+    return this.sshPrivKeyCredentialId
   }
   
   def setSshPrivKeyCredentialId(String id) {
     this.sshPrivKeyCredentialId = id
   }
   
+  String getSshPubKeyCredentialId() {
+    return this.sshPubKeyCredentialId
+  }
+  
   def setSshPubKeyCredentialId(String id) {
     this.sshPubKeyCredentialId = id
+  }
+  
+  String getJenkinsSlaveCredentialId() {
+    return this.jenkinsSlaveCredentialId
   }
   
   def setJenkinsSlaveCredentialId(String id) {
     this.jenkinsSlaveCredentialId = id
   }
   
+  String getJenkinsMasterUrl() {
+    return this.jenkinsMasterUrl
+  }
+  
   def setJenkinsMasterUrl(String url) {
     this.jenkinsMasterUrl = url
+  }
+  
+  String getJswarmExtraArgs() {
+    return this.jswarmExtraArgs
   }
   
   def setJswarmExtraArgs(String args) {
