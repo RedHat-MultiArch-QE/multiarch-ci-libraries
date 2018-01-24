@@ -34,8 +34,7 @@ class ParallelMultiArchTest extends Test {
     }
 
     // Run single host test in parallel on each arch
-    Task.parallelize(
-      script,
+    script.parallel Task.parallelizeTaskList(
       parallelTasks,
       { params ->
         this.arch = params.arch
