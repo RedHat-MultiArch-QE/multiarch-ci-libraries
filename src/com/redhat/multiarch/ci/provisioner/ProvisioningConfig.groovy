@@ -45,11 +45,11 @@ class ProvisioningConfig {
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
-    keytabCredentialId = params.KEYTABCREDENTIALID ?: keytabCredentialId
-    sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: sshPrivKeyCredentialId
-    sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: sshPubKeyCredentialId
-    jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: jenkinsSlaveCredentialId
-    jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: jenkinsMasterUrl
-    jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: jswarmExtraArgs
+    this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
+    this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
+    this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
+    this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
+    this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
+    this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
   }
 }
