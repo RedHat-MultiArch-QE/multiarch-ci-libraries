@@ -12,6 +12,7 @@ class Test {
   Closure onTestFailure
 
   /**
+   * @param script Context to run pipeline steps.
    * @param arch String specifying the arch to run tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Slave used by the test.
