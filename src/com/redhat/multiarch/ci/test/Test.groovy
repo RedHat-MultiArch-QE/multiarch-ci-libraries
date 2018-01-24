@@ -5,21 +5,18 @@ import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 
 class Test {
-  def script
   String arch
   ProvisioningConfig config
   Closure test
   Closure onTestFailure
 
   /**
-   * @param script Context to run pipeline steps.
    * @param arch String specifying the arch to run tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Slave used by the test.
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
-  Test(def script,
-       String arch,
+  Test(String arch,
        ProvisioningConfig config,
        Closure test,
        Closure onTestFailure) {
