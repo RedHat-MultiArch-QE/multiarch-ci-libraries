@@ -21,35 +21,59 @@ class ProvisioningConfig {
   // Kerberos principal for Beaker authentication.
   String krbPrincipal = 'jenkins/multiarch-qe-jenkins.rhev-ci-vms.eng.rdu2.redhat.com'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
-  String KEYTABCREDENTIALID = 'KEYTAB'
+  String keytabCredentialId = 'KEYTAB'
   // ID of Jenkins credential for SSH private key to will be
   // copied to provisioned resource.
   // *** This must be the same as what was added to Beaker ***
-  String SSHPRIVKEYCREDENTIALID = 'SSHPRIVKEY'
+  String sshPrivKeyCredentialId = 'SSHPRIVKEY'
   // ID of Jenkins credential for SSH public key to will be
   // copied to provisioned resource
   // *** This must be the same as what was added to Beaker ***
-  String SSHPUBKEYCREDENTIALID = 'SSHPUBKEY'
+  String sshPubKeyCredentialId = 'SSHPUBKEY'
   // ID of the Jenkins credential for the username and password
   // used by cinch to connect the provisioned host to the Jenkins master
-  String JENKINSSLAVECREDENTIALID = 'JENKINS_SLAVE_CREDENTIALS'
+  String jenkinsSlaveCredentialId = 'JENKINS_SLAVE_CREDENTIALS'
   // URL of the Jenkins master that cinch will use to connect the provisioned
   // host as a slave.
-  String JENKINS_SLAVE_MASTER = ""
+  String jenkinsSlaveMaster = ""
   // Extra arguments passed to the jswarm call.
   // Allows for the connection to be tunneled in the case of an OpenShift hosted Jenkins.
-  String JSWARM_EXTRA_ARGS = ""
+  String jswarmExtraArgs = ""
   // Whether the closure should be run on directly on the provisioned slave.
   Boolean runOnSlave = true
   // Whether Ansible should be installed on the provisioned slave.
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
-    this.KEYTABCREDENTIALID = params.KEYTABCREDENTIALID ?: this.KEYTABCREDENTIALID
-    this.SSHPRIVKEYCREDENTIALID = params.SSHPRIVKEYCREDENTIALID ?: this.SSHPRIVKEYCREDENTIALID
-    this.SSHPUBKEYCREDENTIALID = params.SSHPUBKEYCREDENTIALID ?: this.SSHPUBKEYCREDENTIALID
-    this.JENKINSSLAVECREDENTIALID = params.JENKINSSLAVECREDENTIALID ?: this.JENKINSSLAVECREDENTIALID
-    this.JENKINS_MASTER_URL = params.JENKINS_MASTER_URL ?: this.JENKINS_MASTER_URL
-    this.JSWARM_EXTRA_ARGS = env.JSWARM_EXTRA_ARGS ?: this.JSWARM_EXTRA_ARGS
+    this.keyTabCredentialId = params.KEYTABCREDENTIALID ?: this.keyTabCredentialId
+    this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
+    this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
+    this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
+    this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
+    this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+  }
+  
+  setKeyTabCredentialId(String id) {
+    this.keyTabCredentialId = id
+  }
+  
+  setSshPrivKeyCredentialId(String id) {
+    this.sshPrivKeyCredentialId = id
+  }
+  
+  setSshPubKeyCredentialId(String id) {
+    this.sshPubKeyCredentialId = id
+  }
+  
+  setJenkinsSlaveCredentialId(String id) {
+    this.jenkinsSlaveCredentialId = id
+  }
+  
+  setJenkinsMasterUrl(String url) {
+    this.jenkinsMasterUrl = url
+  }
+  
+  setJswarmExtraArgs(String args) {
+    this.jswarmExtraArgs = args
   }
 }
