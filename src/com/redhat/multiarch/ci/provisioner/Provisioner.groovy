@@ -1,15 +1,18 @@
 package com.redhat.multiarch.ci.provisioner
 
 class Provisioner {
+  ProvisioningConfig config
+  
+  Provisioner(ProvisioningConfig config) {
+    this.config = config
+  }
 
   /**
    * Attempts to provision a multi-arch host.
    *
    * @param arch String representing architecture of the host to provision.
-   * @param config ProvisioningConfig Configuration for provisioning.
    */
-  Host provision(String arch,
-                 ProvisioningConfig config) {
+  Host provision(String arch) {
     Host host = new Host(
       arch: arch,
       target: 'jenkins-slave',
@@ -107,10 +110,8 @@ class Provisioner {
    *
    * @param host Provisioned host to be torn down.
    * @param arch String specifying the arch to run tests on.
-   * @param config ProvisioningConfig for provisioning.
-   *
    */
-  def teardown(Host host, String arch, ProvisioningConfig config) {
+  def teardown(Host host, String arch) {
     // Prepare the cinch teardown inventory
     if (!host.provisioned) {
       // The provisioning job did not successfully provision a machine, so there is nothing to teardown
