@@ -37,7 +37,7 @@ class TestUtils {
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
   static def runParallelMultiArchTest(
-    script,
+    WorkflowScript script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
@@ -49,7 +49,7 @@ class TestUtils {
     }
 
     // Run single host test in parallel on each arch
-    parallel Task.parallelizeTaskList(
+    script.parallel Task.parallelizeTaskList(
       parallelTasks,
       { params ->
         def arch = params.arch
