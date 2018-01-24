@@ -3,11 +3,11 @@ import com.redhat.multiarch.ci.test.*
 import com.redhat.multiarch.ci.task.*
 
 class TestUtils {
-  static def config
+  static ProvisioningConfig config = null
   
   static ProvisioningConfig getProvisioningConfig(script) {
-    if (config) return config
-    config = new ProvisioningConfig(script.params, script.env)
+    if (!config) config = new ProvisioningConfig(script.params, script.env)
+    config
   }
 
   /**
