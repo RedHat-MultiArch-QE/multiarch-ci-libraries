@@ -35,7 +35,7 @@ class ProvisioningConfig {
   String jenkinsSlaveCredentialId = 'JENKINS_SLAVE_CREDENTIALS'
   // URL of the Jenkins master that cinch will use to connect the provisioned
   // host as a slave.
-  String jenkinsSlaveMaster = ""
+  String jenkinsMasterUrl = ""
   // Extra arguments passed to the jswarm call.
   // Allows for the connection to be tunneled in the case of an OpenShift hosted Jenkins.
   String jswarmExtraArgs = ""
