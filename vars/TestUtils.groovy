@@ -37,6 +37,7 @@ class TestUtils {
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
   static def runParallelMultiArchTest(
+    script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
