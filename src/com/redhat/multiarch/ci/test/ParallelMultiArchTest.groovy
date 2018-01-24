@@ -36,7 +36,7 @@ class ParallelMultiArchTest extends Test {
       { params ->
         this.arch = params.arch
         return {
-          super()
+          super.run()
         }
       }
     )
