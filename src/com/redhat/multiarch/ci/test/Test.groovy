@@ -5,6 +5,7 @@ import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 
 class Test {
+  def script
   String arch
   ProvisioningConfig config
   Closure test
@@ -16,10 +17,12 @@ class Test {
    * @param test Closure that takes the Slave used by the test.
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
-  Test(String arch,
+  Test(def script
+       String arch,
        ProvisioningConfig config,
        Closure test,
        Closure onTestFailure) {
+    this.script = script
     this.arch = arch
     this.config = config
     this.test = test
