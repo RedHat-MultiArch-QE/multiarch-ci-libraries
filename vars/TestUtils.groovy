@@ -48,7 +48,7 @@ class TestUtils {
     }
 
     // Run single host test in parallel on each arch
-    script.parallel Task.parallelizeTaskList(
+    parallel Task.parallelizeTaskList(
       parallelTasks,
       { params ->
         def arch = params.arch
