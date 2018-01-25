@@ -23,7 +23,7 @@ class Provisioner {
 
     try {
       script.withCredentials([script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
-        script.sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
+        script.sh "kinit ${config.krbPrincipal} -k -t ${script.KEYTAB}"
 
         // Test to make sure we can authenticate.
         script.sh 'bkr whoami'
@@ -82,8 +82,8 @@ class Provisioner {
           script.env.HOME = "/home/jenkins"
           script.sh """
             mkdir -p ~/.ssh
-            cp ${SSHPRIVKEY} ~/.ssh/id_rsa
-            cp ${SSHPUBKEY} ~/.ssh/id_rsa.pub
+            cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+            cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
             chmod 600 ~/.ssh/id_rsa
             chmod 644 ~/.ssh/id_rsa.pub
           """
