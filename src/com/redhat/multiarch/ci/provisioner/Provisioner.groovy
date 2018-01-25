@@ -33,7 +33,7 @@ class Provisioner {
         // Get linchpin workspace
         script.git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
       } else {
-        script.checkout scm
+        script.checkout script.scm
       }
 
       // Attempt provisioning
@@ -45,7 +45,7 @@ class Provisioner {
       // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
       // - overriding [evars] section and specifying inventory_file
       //
-      host.inventory = sh (returnStdout: true, script: """
+      host.inventory = script.sh (returnStdout: true, script: """
         readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
         """).trim()
       host.provisioned = true
