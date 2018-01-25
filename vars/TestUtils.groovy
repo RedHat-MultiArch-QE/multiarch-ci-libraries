@@ -5,7 +5,7 @@ import com.redhat.multiarch.ci.task.*
 class TestUtils {
   static ProvisioningConfig config = null
 
-  static ProvisioningConfig getProvisioningConfig(Workflow script) {
+  static ProvisioningConfig getProvisioningConfig(WorkflowScript script) {
     if (!config) config = new ProvisioningConfig(script.params, script.env)
     config
   }
