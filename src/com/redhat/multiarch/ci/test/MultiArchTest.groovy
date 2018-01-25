@@ -37,11 +37,12 @@ class MultiArchTest extends Test {
       Task.parallelizeTaskList(
         parallelTasks,
         { params ->
-          owner.arch = params.arch
+          this.arch = params.arch
           return {
-            println this
-            println owner
-            owner.super.runTest()
+            println this.class.name
+            println owner.class.name
+            println delegate.class.name
+            //owner.super.runTest()
           }
         }
       )
