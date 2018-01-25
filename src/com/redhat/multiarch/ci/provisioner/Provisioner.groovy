@@ -1,5 +1,7 @@
 package com.redhat.multiarch.ci.provisioner
 
+import groovy.json.*
+
 class Provisioner {
   def script
   ProvisioningConfig config
@@ -37,7 +39,7 @@ class Provisioner {
       }
 
       // Attempt provisioning
-      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${host.arch}, job_group: ${config.jobgroup} }' --verbose up ${host.target}"
+      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
 
       // We need to scan for inventory file. Please see the following for reasoning:
       // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
@@ -126,7 +128,7 @@ class Provisioner {
     }
 
     try {
-      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'{ arch: ${arch}, job_group: ${config.jobgroup} }\' --verbose destroy ${host.target}"
+      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(arch)}\' --verbose destroy ${host.target}"
     } catch (e) {
       script.echo e
 
@@ -134,5 +136,18 @@ class Provisioner {
         script.currentBuild.result = 'FAILURE'
       }
     }
+  }
+
+  String getTemplateData(String arch) {
+    // Build template data
+    def templateData = [:]
+    templateData.arch = arch
+    templateData.job_group = config.jobgroup
+    templateData.hostrequires = config.hostrequires
+
+    def templateDataJson = JsonOutput.toJson(templateData)
+    script.echo templateDataJson
+
+    templateDataJson
   }
 }
