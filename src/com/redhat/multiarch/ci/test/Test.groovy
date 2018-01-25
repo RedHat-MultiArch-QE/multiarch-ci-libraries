@@ -3,6 +3,7 @@ package com.redhat.multiarch.ci.test
 import com.redhat.multiarch.ci.provisioner.Host
 import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
+import WorkflowScript
 
 class Test {
   WorkflowScript script
