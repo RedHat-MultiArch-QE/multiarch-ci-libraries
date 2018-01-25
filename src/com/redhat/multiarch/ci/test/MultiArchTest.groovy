@@ -36,7 +36,7 @@ class MultiArchTest extends Test {
     script.parallel Task.parallelizeTaskList(
       parallelTasks,
       { params ->
-        def arch = params.arch
+        this.arch = params.arch
         return {
           super.run()
         }
