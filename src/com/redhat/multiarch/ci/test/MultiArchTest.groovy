@@ -25,7 +25,7 @@ class MultiArchTest extends Test {
    * Runs @test on a multi-arch provisioned host for each arch in arches param.
    * Runs @onTestFailure if it encounters an Exception.
    */
-  def run() {
+  def runTest() {
     // Create arch Tasks to parallelize test
     def parallelTasks = []
     for (arch in arches) {
@@ -38,7 +38,7 @@ class MultiArchTest extends Test {
       { params ->
         this.arch = params.arch
         return {
-          super.run()
+          super.runTest()
         }
       }
     )
