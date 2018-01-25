@@ -54,7 +54,7 @@ class Provisioner {
         script.withCredentials([
           [
             $class: 'UsernamePasswordMultiBinding',
-            credentialsId: config.JENKINSSLAVECREDENTIALID,
+            credentialsId: config.jenkinsSlaveCredentialId,
             usernameVariable: 'JENKINS_SLAVE_USERNAME',
             passwordVariable: 'JENKINS_SLAVE_PASSWORD'
           ]
@@ -66,10 +66,10 @@ class Provisioner {
             "'jslave_name':'${host.name}'," +
             "'jslave_label':'${host.name}'," +
             "'arch':'${host.arch}'," +
-            "'jenkins_master_url':'${config.JENKINS_MASTER_URL}'," +
-            "'jenkins_slave_username':'${JENKINS_SLAVE_USERNAME}'," +
-            "'jenkins_slave_password':'${JENKINS_SLAVE_PASSWORD}'," +
-            "'jswarm_extra_args':'${config.JSWARM_EXTRA_ARGS}'" +
+            "'jenkins_master_url':'${config.jenkinsMasterUrl}'," +
+            "'jenkins_slave_username':'${script.JENKINS_SLAVE_USERNAME}'," +
+            "'jenkins_slave_password':'${script.JENKINS_SLAVE_PASSWORD}'," +
+            "'jswarm_extra_args':'${config.jswarmExtraArgs}'" +
             "}'"
 
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
