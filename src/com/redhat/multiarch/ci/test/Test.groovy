@@ -30,7 +30,7 @@ class Test {
    * Runs @test on a multi-arch provisioned host for the specified arch.
    * Runs @onTestFailure if it encounters an Exception.
    */
-  def runTest() {
+  def run() {
     Provisioner provisioner = new Provisioner(config)
 
     script.podTemplate(
