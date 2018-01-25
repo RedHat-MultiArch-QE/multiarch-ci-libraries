@@ -22,7 +22,7 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials([file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
+      script.withCredentials([script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
         script.sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
 
         // Test to make sure we can authenticate.
@@ -46,8 +46,8 @@ class Provisioner {
       // - overriding [evars] section and specifying inventory_file
       //
       host.inventory = sh (returnStdout: true, script: """
-            readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
-            """).trim()
+        readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
+        """).trim()
       host.provisioned = true
 
       if (config.runOnSlave) {
@@ -76,8 +76,8 @@ class Provisioner {
           host.connectedToMaster = true
         }
       } else {
-        script.withCredentials([file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-                                file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
+        script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+                                script.file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
         {
           script.env.HOME = "/home/jenkins"
           script.sh """
