@@ -52,13 +52,13 @@ class Test {
         )
       ]
     ) {
-      ansiColor('xterm') {
-        timestamps {
-          node('provisioner') {
+      script.ansiColor('xterm') {
+        script.timestamps {
+          script.node('provisioner') {
 
             Host host
             try {
-              stage('Provision Slave') {
+              script.stage('Provision Slave') {
                 host = provisioner.provision(arch)
 
                 // Property validity check
@@ -73,7 +73,7 @@ class Test {
               }
 
               if (config.runOnSlave) {
-                node(host.name) {
+                script.node(host.name) {
                   test(host, config)
                   return
                 }
@@ -84,7 +84,7 @@ class Test {
               onTestFailure(e, host)
             } finally {
               // Ensure teardown runs before the pipeline exits
-              stage ('Teardown Slave') {
+              script.stage ('Teardown Slave') {
                 provisioner.teardown(host, arch)
               }
             }
