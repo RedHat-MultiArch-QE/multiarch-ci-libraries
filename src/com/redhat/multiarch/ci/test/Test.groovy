@@ -5,35 +5,35 @@ import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 
 class Test {
+  WorkflowScript script
   String arch
   ProvisioningConfig config
   Closure test
   Closure onTestFailure
 
   /**
+   * @param script WorkflowScript that the test will run in.
    * @param arch String specifying the arch to run tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Slave used by the test.
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
-  Test(String arch,
-       ProvisioningConfig config,
-       Closure test,
-       Closure onTestFailure) {
+  Test(WorkflowScript script, String arch, ProvisioningConfig config, Closure test, Closure onTestFailure) {
+    this.script = script
     this.arch = arch
     this.config = config
     this.test = test
     this.onTestFailure = onTestFailure
   }
 
-  /**
-   * Runs @test on the multi-arch capable provisioner container,
-   * and runs @onTestFailure if it encounters an Exception.
+  /*
+   * Runs @test on a multi-arch provisioned host for the specified arch.
+   * Runs @onTestFailure if it encounters an Exception.
    */
   def run() {
     Provisioner provisioner = new Provisioner(config)
 
-    podTemplate(
+    script.podTemplate(
       name: 'provisioner',
       label: 'provisioner',
       cloud: 'openshift',
