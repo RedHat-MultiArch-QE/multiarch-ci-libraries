@@ -41,8 +41,6 @@ class MultiArchTest extends Test {
           return {
             println this
             println owner
-            println this.super
-            println owner.super
             owner.super.runTest()
           }
         }
