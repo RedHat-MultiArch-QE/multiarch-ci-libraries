@@ -3,6 +3,8 @@ package com.redhat.multarch.ci.test
 import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 import com.redhat.multiarch.ci.task.Task
+import com.redhat.multiarch.ci.test.Test
+import WorkflowScript
 
 class MultiArchTest extends Test {
   List<String> arches
