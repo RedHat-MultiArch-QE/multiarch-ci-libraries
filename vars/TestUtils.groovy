@@ -26,7 +26,7 @@ class TestUtils {
     ProvisioningConfig config,
     Closure test,
     Closure onTestFailure) {
-    (new Test(arch, config, test, onTestFailure)).run()
+    (new Test(arch, config, test, onTestFailure)).runTest()
   }
 
 
@@ -46,6 +46,6 @@ class TestUtils {
     ProvisioningConfig config,
     Closure test,
     Closure onTestFailure) {
-    (new MultiArchTest(script, arches, config, test, onTestFailure)).run()
+    (new MultiArchTest(script, arches, config, test, onTestFailure)).runTest()
   }
 }
