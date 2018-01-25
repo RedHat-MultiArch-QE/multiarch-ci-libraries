@@ -4,7 +4,6 @@ import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 import com.redhat.multiarch.ci.task.Task
 import com.redhat.multiarch.ci.test.Test
-import WorkflowScript
 
 class MultiArchTest extends Test {
   List<String> arches
@@ -16,7 +15,7 @@ class MultiArchTest extends Test {
    * @param test Closure that takes the Slave used by the test.
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
-  MultiArchTest(WorkflowScript script, List<String> arches, ProvisioningConfig config,
+  MultiArchTest(def script, List<String> arches, ProvisioningConfig config,
                 Closure test, Closure onTestFailure) {
     super(script, null, config, test, onTestFailure)
     this.arches = arches
