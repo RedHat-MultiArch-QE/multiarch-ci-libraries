@@ -31,7 +31,7 @@ class Test {
    * Runs @onTestFailure if it encounters an Exception.
    */
   def run() {
-    Provisioner provisioner = new Provisioner(config)
+    Provisioner provisioner = new Provisioner(script, config)
 
     script.podTemplate(
       name: 'provisioner',
