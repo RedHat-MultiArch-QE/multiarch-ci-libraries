@@ -63,7 +63,7 @@ class Test {
 
                 // Property validity check
                 if (!host.name || !host.arch) {
-                  error "Invalid provisioned host: ${host}"
+                  script.error "Invalid provisioned host: ${host}"
                 }
 
                 // If the provision failed, there will be an error
