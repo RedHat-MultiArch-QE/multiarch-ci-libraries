@@ -38,7 +38,7 @@ class MultiArchTest extends Test {
       { params ->
         def arch = params.arch
         return {
-          (new Test(arch, config, test, onTestFailure)).run()
+          super.run()
         }
       }
     )
