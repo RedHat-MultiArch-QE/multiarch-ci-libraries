@@ -5,8 +5,12 @@ import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
 import com.redhat.multiarch.ci.task.Task
 import com.redhat.multiarch.ci.test.Test
 
-class MultiArchTest extends Test {
+class MultiArchTest {
+  def script
   List<String> arches
+  ProvisioningConfig config
+  Closure test
+  Closure onTestFailure
 
   /**
    * @param script WorkflowScript that the test will run in.
@@ -17,15 +21,18 @@ class MultiArchTest extends Test {
    */
   MultiArchTest(def script, List<String> arches, ProvisioningConfig config,
                 Closure test, Closure onTestFailure) {
-    super(script, null, config, test, onTestFailure)
+    this.script = script
     this.arches = arches
+    this.config = config
+    this.test = test
+    this.onTestFailure = onTestFailure
   }
 
   /**
    * Runs @test on a multi-arch provisioned host for each arch in arches param.
    * Runs @onTestFailure if it encounters an Exception.
    */
-  def runTest() {
+  def run() {
     // Create arch Tasks to parallelize test
     def parallelTasks = []
     for (arch in arches) {
@@ -37,15 +44,8 @@ class MultiArchTest extends Test {
       Task.parallelizeTaskList(
         parallelTasks,
         { params ->
-          this.arch = params.arch
-          println this.arch
-          println this.class.name
-          return {
-            println this.class.name
-            println owner.class.name
-            println delegate.class.name
-            //owner.super.runTest()
-          }
+          Test test = new Test(script, params.arch, config, test, onTestFailure)
+          return { test.run() }
         }
       )
     )
