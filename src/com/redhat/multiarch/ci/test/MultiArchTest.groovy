@@ -39,10 +39,10 @@ class MultiArchTest extends Test {
         { params ->
           owner.arch = params.arch
           return {
-            echo this
-            echo owner
-            echo this.super
-            echo owner.super
+            println this
+            println owner
+            println this.super
+            println owner.super
             owner.super.runTest()
           }
         }
