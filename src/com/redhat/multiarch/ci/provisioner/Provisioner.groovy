@@ -1,9 +1,11 @@
 package com.redhat.multiarch.ci.provisioner
 
 class Provisioner {
+  def script
   ProvisioningConfig config
 
-  Provisioner(ProvisioningConfig config) {
+  Provisioner(def script, ProvisioningConfig config) {
+    this.script = script
     this.config = config
   }
 
@@ -20,23 +22,23 @@ class Provisioner {
     )
 
     try {
-      withCredentials([file(credentialsId: config.KEYTABCREDENTIALID,
-                            variable: 'KEYTAB')]) {
-        sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
+      script.withCredentials([file(credentialsId: config.KEYTABCREDENTIALID,
+                                   variable: 'KEYTAB')]) {
+        script.sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
 
         // Test to make sure we can authenticate.
-        sh 'bkr whoami'
+        script.sh 'bkr whoami'
       }
 
       if (config.provisioningRepoUrl != null) {
         // Get linchpin workspace
-        git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
+        script.git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
       } else {
-        checkout scm
+        script.checkout scm
       }
 
       // Attempt provisioning
-      sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${host.arch}, job_group: ${config.jobgroup} }' --verbose up ${provisionedHost.target}"
+      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data '{ arch: ${host.arch}, job_group: ${config.jobgroup} }' --verbose up ${host.target}"
 
       // We need to scan for inventory file. Please see the following for reasoning:
       // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
@@ -50,7 +52,7 @@ class Provisioner {
       host.provisioned = true
 
       if (config.runOnSlave) {
-        withCredentials([
+        script.withCredentials([
           [
             $class: 'UsernamePasswordMultiBinding',
             credentialsId: config.JENKINSSLAVECREDENTIALID,
@@ -71,34 +73,34 @@ class Provisioner {
             "'jswarm_extra_args':'${config.JSWARM_EXTRA_ARGS}'" +
             "}'"
 
-          sh "cinch ${host.inventory} --extra-vars ${extraVars}"
+          script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
           host.connectedToMaster = true
         }
       } else {
-        withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
-                              variable: 'SSHPRIVKEY'),
-                         file(credentialsId: config.SSHPUBKEYCREDENTIALID,
-                              variable: 'SSHPUBKEY')])
+        script.withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
+                                     variable: 'SSHPRIVKEY'),
+                                file(credentialsId: config.SSHPUBKEYCREDENTIALID,
+                                     variable: 'SSHPUBKEY')])
         {
-          env.HOME = "/home/jenkins"
-          sh """
-                  mkdir -p ~/.ssh
-                  cp ${SSHPRIVKEY} ~/.ssh/id_rsa
-                  cp ${SSHPUBKEY} ~/.ssh/id_rsa.pub
-                  chmod 600 ~/.ssh/id_rsa
-                  chmod 644 ~/.ssh/id_rsa.pub
-                """
+          script.env.HOME = "/home/jenkins"
+          script.sh """
+            mkdir -p ~/.ssh
+            cp ${SSHPRIVKEY} ~/.ssh/id_rsa
+            cp ${SSHPUBKEY} ~/.ssh/id_rsa.pub
+            chmod 600 ~/.ssh/id_rsa
+            chmod 644 ~/.ssh/id_rsa.pub
+          """
         }
       }
       if (config.installAnsible) {
-        node (host.name) {
-          sh 'sudo yum install python-devel openssl-devel libffi-devel -y'
-          sh 'sudo pip install --upgrade pip; sudo pip install --upgrade setuptools; sudo pip install --upgrade ansible'
+        script.node (host.name) {
+          script.sh 'sudo yum install python-devel openssl-devel libffi-devel -y'
+          script.sh 'sudo pip install --upgrade pip; sudo pip install --upgrade setuptools; sudo pip install --upgrade ansible'
         }
         host.ansibleInstalled = true
       }
     } catch (e) {
-      echo e.getMessage()
+      script.echo e.getMessage()
       host.error = e.getMessage()
     }
 
@@ -115,24 +117,24 @@ class Provisioner {
     // Prepare the cinch teardown inventory
     if (!host || !host.provisioned) {
       // The provisioning job did not successfully provision a machine, so there is nothing to teardown
-      currentBuild.result = 'SUCCESS'
+      script.currentBuild.result = 'SUCCESS'
       return
     }
 
     // Preform the actual teardown
     try {
-      sh "teardown workspace/inventories/${host.target}.inventory"
+      script.sh "teardown workspace/inventories/${host.target}.inventory"
     } catch (e) {
-      echo e
+      script.echo e
     }
 
     try {
-      sh "linchpin --workspace workspace --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${host.target}"
+      script.sh "linchpin --workspace workspace --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${host.target}"
     } catch (e) {
-      echo e
+      script.echo e
 
       if (host.error) {
-        currentBuild.result = 'FAILURE'
+        script.currentBuild.result = 'FAILURE'
       }
     }
   }
