@@ -68,7 +68,7 @@ class Test {
 
                 // If the provision failed, there will be an error
                 if (host.error) {
-                  error host.error
+                  script.error host.error
                 }
               }
 
