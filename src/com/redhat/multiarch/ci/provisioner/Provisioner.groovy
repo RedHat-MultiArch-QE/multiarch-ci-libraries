@@ -2,7 +2,7 @@ package com.redhat.multiarch.ci.provisioner
 
 class Provisioner {
   ProvisioningConfig config
-  
+
   Provisioner(ProvisioningConfig config) {
     this.config = config
   }
@@ -113,7 +113,7 @@ class Provisioner {
    */
   def teardown(Host host, String arch) {
     // Prepare the cinch teardown inventory
-    if (!host.provisioned) {
+    if (!host || !host.provisioned) {
       // The provisioning job did not successfully provision a machine, so there is nothing to teardown
       currentBuild.result = 'SUCCESS'
       return
