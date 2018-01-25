@@ -1,4 +1,4 @@
-package com.redhat.multarch.ci.test
+package com.redhat.multiarch.ci.test
 
 import com.redhat.multiarch.ci.provisioner.Provisioner
 import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
