@@ -38,6 +38,8 @@ class MultiArchTest extends Test {
         parallelTasks,
         { params ->
           this.arch = params.arch
+          println this.arch
+          println this.class.name
           return {
             println this.class.name
             println owner.class.name
