@@ -22,8 +22,7 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials([file(credentialsId: config.KEYTABCREDENTIALID,
-                                   variable: 'KEYTAB')]) {
+      script.withCredentials([file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
         script.sh "kinit ${config.krbPrincipal} -k -t ${KEYTAB}"
 
         // Test to make sure we can authenticate.
@@ -77,10 +76,8 @@ class Provisioner {
           host.connectedToMaster = true
         }
       } else {
-        script.withCredentials([file(credentialsId: config.SSHPRIVKEYCREDENTIALID,
-                                     variable: 'SSHPRIVKEY'),
-                                file(credentialsId: config.SSHPUBKEYCREDENTIALID,
-                                     variable: 'SSHPUBKEY')])
+        script.withCredentials([file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+                                file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
         {
           script.env.HOME = "/home/jenkins"
           script.sh """
