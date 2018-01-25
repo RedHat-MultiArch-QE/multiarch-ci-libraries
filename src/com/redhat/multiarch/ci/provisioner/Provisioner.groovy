@@ -120,13 +120,13 @@ class Provisioner {
 
     // Preform the actual teardown
     try {
-      script.sh "teardown workspace/inventories/${host.target}.inventory"
+      script.sh "teardown ${host.inventory}"
     } catch (e) {
       script.echo e
     }
 
     try {
-      script.sh "linchpin --workspace workspace --template-data \'{ arch: $arch, job_group: $config.jobgroup }\' --verbose destroy ${host.target}"
+      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'{ arch: ${arch}, job_group: ${config.jobgroup} }\' --verbose destroy ${host.target}"
     } catch (e) {
       script.echo e
 
