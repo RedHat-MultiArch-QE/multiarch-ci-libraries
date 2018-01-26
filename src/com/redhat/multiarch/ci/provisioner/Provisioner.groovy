@@ -52,6 +52,20 @@ class Provisioner {
         """).trim()
       host.provisioned = true
 
+      // Install ssh keys so that either cinch or direct ssh will connect
+      script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+                              script.file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
+      {
+        script.env.HOME = "/home/jenkins"
+        script.sh """
+            mkdir -p ~/.ssh
+            cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+            cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
+            chmod 600 ~/.ssh/id_rsa
+            chmod 644 ~/.ssh/id_rsa.pub
+          """
+      }
+
       if (config.runOnSlave) {
         script.withCredentials([
           [
@@ -77,20 +91,8 @@ class Provisioner {
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
           host.connectedToMaster = true
         }
-      } else {
-        script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-                                script.file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
-        {
-          script.env.HOME = "/home/jenkins"
-          script.sh """
-            mkdir -p ~/.ssh
-            cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
-            cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
-            chmod 600 ~/.ssh/id_rsa
-            chmod 644 ~/.ssh/id_rsa.pub
-          """
-        }
       }
+
       if (config.installAnsible) {
         script.node (host.name) {
           script.sh 'sudo yum install python-devel openssl-devel libffi-devel -y'
