@@ -54,7 +54,7 @@ class Provisioner {
 
       // Install ssh keys so that either cinch or direct ssh will connect
       script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-                              script.file(credentialsId: config.sshPrubKeyCredentialId, variable: 'SSHPUBKEY')])
+                              script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')])
       {
         script.env.HOME = "/home/jenkins"
         script.sh """
@@ -101,7 +101,7 @@ class Provisioner {
         host.ansibleInstalled = true
       }
     } catch (e) {
-      script.echo e.getMessage()
+      script.echo "${e}"
       host.error = e.getMessage()
     }
 
@@ -126,13 +126,13 @@ class Provisioner {
     try {
       script.sh "teardown ${host.inventory}"
     } catch (e) {
-      script.echo e
+      script.echo "${e}"
     }
 
     try {
       script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(arch)}\' --verbose destroy ${host.target}"
     } catch (e) {
-      script.echo e
+      script.echo "${e}"
 
       if (host.error) {
         script.currentBuild.result = 'FAILURE'
