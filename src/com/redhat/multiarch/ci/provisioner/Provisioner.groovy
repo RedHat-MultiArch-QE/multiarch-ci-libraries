@@ -58,12 +58,12 @@ class Provisioner {
       {
         script.env.HOME = "/home/jenkins"
         script.sh """
-            mkdir -p ~/.ssh
-            cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
-            cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
-            chmod 600 ~/.ssh/id_rsa
-            chmod 644 ~/.ssh/id_rsa.pub
-          """
+          mkdir -p ~/.ssh
+          cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+          cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 644 ~/.ssh/id_rsa.pub
+        """
       }
 
       if (config.runOnSlave) {
@@ -76,16 +76,16 @@ class Provisioner {
           ]
         ]) {
           def extraVars = "'{" +
-            "rpm_key_imports:[]," +
-            "jenkins_master_repositories:[]," +
-            "jenkins_master_download_repositories:[]," +
-            "jslave_name:\"${host.name}\"," +
-            "jslave_label:\"${host.name}\"," +
-            "arch:\"${host.arch}\"," +
-            "jenkins_master_url:\"${config.jenkinsMasterUrl}\"," +
-            "jenkins_slave_username:\"${script.JENKINS_SLAVE_USERNAME}\"," +
-            "jenkins_slave_password:\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-            "jswarm_extra_args:\"${config.jswarmExtraArgs}\"" +
+            "\"rpm_key_imports\":[]," +
+            "\"jenkins_master_repositories\":[]," +
+            "\"jenkins_master_download_repositories\":[]," +
+            "\"jslave_name\":\"${host.name}\"," +
+            "\"jslave_label\":\"${host.name}\"," +
+            "\"arch\":\"${host.arch}\"," +
+            "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+            "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+            "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"" +
             "}'"
 
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
