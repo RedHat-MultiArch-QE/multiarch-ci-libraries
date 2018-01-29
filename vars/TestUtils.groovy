@@ -17,8 +17,8 @@ class TestUtils {
    * @param script WorkflowScript that the test will run in.
    * @param arch String specifying the arch to run tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Slave used by the test.
-   * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
+   * @param test Closure that takes the Host used by the test.
+   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
   static def runTest(
     WorkflowScript script,
@@ -37,8 +37,8 @@ class TestUtils {
    * @param script WorkflowScript that this test will run in.
    * @param arches List<String> specifying the arches to run single host tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Slave used by the test.
-   * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
+   * @param test Closure that takes the Host used by the test.
+   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
   static def runParallelMultiArchTest(
     WorkflowScript script,

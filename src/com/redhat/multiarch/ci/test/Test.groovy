@@ -15,8 +15,8 @@ class Test {
    * @param script WorkflowScript that the test will run in.
    * @param arch String specifying the arch to run tests on.
    * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Slave used by the test.
-   * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
+   * @param test Closure that takes the Host used by the test.
+   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
   Test(def script, String arch, ProvisioningConfig config, Closure test, Closure onTestFailure) {
     this.script = script
@@ -58,7 +58,7 @@ class Test {
 
             Host host
             try {
-              script.stage('Provision Slave') {
+              script.stage('Provision Host') {
                 host = provisioner.provision(arch)
 
                 // Property validity check
@@ -84,7 +84,7 @@ class Test {
               onTestFailure(e, host)
             } finally {
               // Ensure teardown runs before the pipeline exits
-              script.stage ('Teardown Slave') {
+              script.stage ('Teardown Host') {
                 provisioner.teardown(host, arch)
               }
             }
