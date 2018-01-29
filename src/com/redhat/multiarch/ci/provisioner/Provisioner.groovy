@@ -123,7 +123,7 @@ class Provisioner {
     }
 
     // Preform the actual teardown
-    if (host.connectedToMaster) {
+    if (config.runOnSlave) {
       try {
         script.sh "teardown ${host.inventory}"
       } catch (e) {
