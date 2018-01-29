@@ -122,8 +122,8 @@ class Provisioner {
       return
     }
 
-    // Preform the actual teardown
-    if (config.runOnSlave) {
+    // Run cinch teardown if runOnSlave was attempted with a provisioned host
+    if (config.runOnSlave && host.provisioned) {
       try {
         script.sh "teardown ${host.inventory}"
       } catch (e) {
