@@ -34,8 +34,8 @@ class Test {
     Provisioner provisioner = new Provisioner(script, config)
 
     script.podTemplate(
-      name: "provisioner-${version}",
-      label: "provisioner-${version}",
+      name: "provisioner-${config.version}",
+      label: "provisioner-${config.version}",
       cloud: 'openshift',
       serviceAccount: 'jenkins',
       idleMinutes: 0,
@@ -54,7 +54,7 @@ class Test {
     ) {
       script.ansiColor('xterm') {
         script.timestamps {
-          script.node("provisioner-${version}") {
+          script.node("provisioner-${config.version}") {
 
             Host host
             try {

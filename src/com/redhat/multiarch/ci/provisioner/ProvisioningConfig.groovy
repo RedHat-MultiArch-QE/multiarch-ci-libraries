@@ -1,6 +1,8 @@
 package com.redhat.multiarch.ci.provisioner
 
 class ProvisioningConfig {
+  // Provisioner version
+  String version = 'v0.2-beta'
   // Job group for Beaker provisioning.
   String jobgroup = 'multiarch-qe'
   // Host requirements to pass to linchpin
