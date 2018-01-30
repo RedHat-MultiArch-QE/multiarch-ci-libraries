@@ -36,7 +36,7 @@ class Test {
     script.podTemplate(
       name: "provisioner-${config.version}",
       label: "provisioner-${config.version}",
-      cloud: 'openshift',
+      cloud: config.cloudName,
       serviceAccount: 'jenkins',
       idleMinutes: 0,
       namespace: config.tenant,
