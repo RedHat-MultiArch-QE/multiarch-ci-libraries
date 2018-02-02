@@ -96,12 +96,11 @@ class Provisioner {
       if (config.installAnsible) {
         script.node (host.name) {
           script.sh '''
-            sudo yum install python-devel openssl-devel libffi-devel -y;
-            echo ${USER}
-            sudo chown --recursive jenkins:jenkins /home/jenkins;
-            pip install --upgrade pip;
-            pip install --upgrade setuptools;
-            pip install --upgrade ansible;
+            sudo yum install python-devel openssl-devel libffi-devel -y &&
+            mkdir /home/jenkins &&
+            pip install --upgrade pip &&
+            pip install --upgrade setuptools &&
+            pip install --upgrade ansible
           '''
           //   echo "[defaults]" | tee -a ~/.ansible.cfg
           //   echo "remote_tmp = /tmp/${USER}/ansible" | tee -a ~/.ansible.cfg
