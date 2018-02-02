@@ -95,14 +95,14 @@ class Provisioner {
 
       if (config.installAnsible) {
         script.node (host.name) {
-          script.sh """
+          script.sh '''
             sudo yum install python-devel openssl-devel libffi-devel -y;
             pip install --upgrade pip;
             pip install --upgrade setuptools;
             pip install --upgrade ansible;
-            curl --output ~/.ansible.cfg \
-              https://github.com/RedHat-MultiArch-QE/multiarch-ci-libraries/blob/${config.version}/resources/ansible.cfg
-          """
+            echo "[defaults]" | tee -a ~/.ansible.cfg
+            echo "remote_tmp = /tmp/${USER}/ansible" | tee -a ~/.ansible.cfg
+          '''
         }
         host.ansibleInstalled = true
       }
