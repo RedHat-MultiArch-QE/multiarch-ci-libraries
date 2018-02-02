@@ -99,9 +99,9 @@ class Provisioner {
             sudo yum install python-devel openssl-devel libffi-devel -y &&
             sudo mkdir /home/jenkins &&
             sudo chown --recursive ${USER}:${USER} /home/jenkins &&
-            pip install --upgrade pip --user &&
-            pip install --upgrade setuptools --user &&
-            pip install --upgrade ansible --user
+            sudo pip install --upgrade pip &&
+            sudo pip install --upgrade setuptools &&
+            sudo pip install --upgrade ansible
           '''
           //   echo "[defaults]" | tee -a ~/.ansible.cfg
           //   echo "remote_tmp = /tmp/${USER}/ansible" | tee -a ~/.ansible.cfg
