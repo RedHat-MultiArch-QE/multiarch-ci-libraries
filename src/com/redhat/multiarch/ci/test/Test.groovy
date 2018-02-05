@@ -75,8 +75,8 @@ class Test {
               if (config.runOnSlave) {
                 script.node(host.name) {
                   test(host, config)
-                  return
                 }
+                return
               }
 
               test(host, config)
