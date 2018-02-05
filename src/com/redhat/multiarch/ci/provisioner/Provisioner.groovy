@@ -39,7 +39,7 @@ class Provisioner {
       }
 
       // Attempt provisioning
-      host.provisioning = true
+      host.initialized = true
       script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
 
       // We need to scan for inventory file. Please see the following for reasoning:
@@ -125,7 +125,7 @@ class Provisioner {
    */
   def teardown(Host host, String arch) {
     // Prepare the cinch teardown inventory
-    if (!host || !host.provisioning) {
+    if (!host || !host.initialized) {
       // The provisioning job did not successfully provision a machine, so there is nothing to teardown
       script.currentBuild.result = 'SUCCESS'
       return
@@ -140,7 +140,7 @@ class Provisioner {
       }
     }
 
-    if (host.provisioning) {
+    if (host.initialized) {
       try {
         script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(arch)}\' --verbose destroy ${host.target}"
       } catch (e) {
