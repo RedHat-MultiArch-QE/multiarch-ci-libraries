@@ -2,7 +2,7 @@ package com.redhat.multiarch.ci.provisioner
 
 class ProvisioningConfig {
   // Provisioner version
-  String version = 'v0.2-beta'
+  String version = 'v0.2'
   // Jenkins kubernetes cloud name
   String cloudName = 'openshift'
   // Job group for Beaker provisioning.
