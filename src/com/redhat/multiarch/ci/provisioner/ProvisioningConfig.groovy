@@ -8,7 +8,7 @@ class ProvisioningConfig {
   // Job group for Beaker provisioning.
   String jobgroup = 'multiarch-qe'
   // Host requirements to pass to linchpin
-  List<HashMap> hostrequires = null
+  List<HashMap> hostrequires = []
   // name of Openshift tenant to pull provisioning image from.
   String tenant = 'redhat-multiarch-qe'
   // docker url to pull provisioning image from.
