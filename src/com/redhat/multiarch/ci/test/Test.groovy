@@ -44,7 +44,7 @@ class Test {
         // This adds the custom provisioner slave container to the pod. Must be first with name 'jnlp'
         script.containerTemplate(
           name: 'jnlp',
-          image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}",
+          image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}-${config.version}",
           ttyEnabled: false,
           args: '${computer.jnlpmac} ${computer.name}',
           command: '',
