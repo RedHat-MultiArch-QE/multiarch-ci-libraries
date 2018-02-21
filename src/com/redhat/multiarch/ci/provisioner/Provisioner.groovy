@@ -92,22 +92,22 @@ class Provisioner {
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
           host.connectedToMaster = true
         }
-      }
 
-      if (config.installAnsible) {
-        script.node (host.name) {
-          script.sh '''
-            sudo yum install python-devel openssl-devel libffi-devel -y &&
-            sudo mkdir /home/jenkins &&
-            sudo chown --recursive ${USER}:${USER} /home/jenkins &&
-            sudo pip install --upgrade pip &&
-            sudo pip install --upgrade setuptools &&
-            sudo pip install --upgrade ansible
-          '''
-          //   echo "[defaults]" | tee -a ~/.ansible.cfg
-          //   echo "remote_tmp = /tmp/${USER}/ansible" | tee -a ~/.ansible.cfg
+        // We only care if the install ansible flag is set when we are running on the provisioned host
+        // This is because if we are running on the centos container, ansible has been installed already to support linchpin & cinch
+        if (config.installAnsible) {
+          script.node (host.name) {
+            script.sh '''
+              sudo yum install python-devel openssl-devel libffi-devel -y &&
+              sudo mkdir /home/jenkins &&
+              sudo chown --recursive ${USER}:${USER} /home/jenkins &&
+              sudo pip install --upgrade pip &&
+              sudo pip install --upgrade setuptools &&
+              sudo pip install --upgrade ansible
+            '''
+          }
+          host.ansibleInstalled = true
         }
-        host.ansibleInstalled = true
       }
     } catch (e) {
       script.echo "${e}"
