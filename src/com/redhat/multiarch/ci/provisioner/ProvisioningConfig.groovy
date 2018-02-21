@@ -48,6 +48,9 @@ class ProvisioningConfig {
   // Whether the closure should be run on directly on the provisioned host.
   Boolean runOnSlave = true
   // Whether Ansible should be installed on the provisioned host.
+  // This will only be respected if runOnSlave is also set to true,
+  // since jobs that are run via ssh already have access to ansible in the
+  // provisioning container.
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
