@@ -45,7 +45,16 @@ class Provisioner {
       script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
                               script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')])
       {
-        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
+        script.env.HOME = "/home/jenkins"
+        script.sh """
+          mkdir -p ~/.ssh
+          cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+          cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 644 ~/.ssh/id_rsa.pub
+        """
+        
+	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
 
         // We need to scan for inventory file. Please see the following for reasoning:
         // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
@@ -57,15 +66,6 @@ class Provisioner {
           readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
           """).trim()
         host.provisioned = true
-
-        script.env.HOME = "/home/jenkins"
-        script.sh """
-          mkdir -p ~/.ssh
-          cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
-          cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa
-          chmod 644 ~/.ssh/id_rsa.pub
-        """
       }
 
       if (config.runOnSlave) {
