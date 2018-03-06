@@ -90,7 +90,7 @@ class Provisioner {
             "}'"
 
           script.sh """
-            yum install epel-release && 
+            sudo yum install epel-release && 
             cinch ${host.inventory} --extra-vars ${extraVars}
           """
           host.connectedToMaster = true
