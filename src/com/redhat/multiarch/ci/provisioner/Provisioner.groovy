@@ -89,10 +89,7 @@ class Provisioner {
             "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"" +
             "}'"
 
-          script.sh """
-            sudo yum install epel-release && 
-            cinch ${host.inventory} --extra-vars ${extraVars}
-          """
+          script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
           host.connectedToMaster = true
         }
 
