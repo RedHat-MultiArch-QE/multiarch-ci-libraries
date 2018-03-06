@@ -159,6 +159,7 @@ class Provisioner {
     templateData.arch = arch
     templateData.job_group = config.jobgroup
     templateData.hostrequires = config.hostrequires
+    templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
 
     def templateDataJson = JsonOutput.toJson(templateData)
     script.echo templateDataJson
