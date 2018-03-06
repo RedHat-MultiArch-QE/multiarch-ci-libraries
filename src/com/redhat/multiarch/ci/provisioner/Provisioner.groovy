@@ -40,23 +40,24 @@ class Provisioner {
 
       // Attempt provisioning
       host.initialized = true
-      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
-
-      // We need to scan for inventory file. Please see the following for reasoning:
-      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
-      // Possible solutions to not require the scan:
-      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
-      // - overriding [evars] section and specifying inventory_file
-      //
-      host.inventory = script.sh (returnStdout: true, script: """
-        readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
-        """).trim()
-      host.provisioned = true
-
+      
       // Install ssh keys so that either cinch or direct ssh will connect
       script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
                               script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')])
       {
+        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
+
+        // We need to scan for inventory file. Please see the following for reasoning:
+        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
+        // Possible solutions to not require the scan:
+        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
+        // - overriding [evars] section and specifying inventory_file
+        //
+        host.inventory = script.sh (returnStdout: true, script: """
+          readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
+          """).trim()
+        host.provisioned = true
+
         script.env.HOME = "/home/jenkins"
         script.sh """
           mkdir -p ~/.ssh
