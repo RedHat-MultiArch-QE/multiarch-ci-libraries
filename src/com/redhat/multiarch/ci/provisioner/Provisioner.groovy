@@ -87,7 +87,8 @@ class Provisioner {
             "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
             "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
             "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"" +
+            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+            "\"jenkins_slave_repositories\":\"[{ \"name\": \"epel\", \"mirrorlist\": \"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7\"}]\"
             "}'"
 
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
@@ -160,7 +161,7 @@ class Provisioner {
     templateData.arch = arch
     templateData.job_group = config.jobgroup
     templateData.hostrequires = config.hostrequires
-    templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+    //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
 
     def templateDataJson = JsonOutput.toJson(templateData)
     script.echo templateDataJson
