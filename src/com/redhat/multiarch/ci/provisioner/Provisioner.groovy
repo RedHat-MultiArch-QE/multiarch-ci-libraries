@@ -88,7 +88,7 @@ class Provisioner {
             "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
             "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
             "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-            "\"jenkins_slave_repositories\":[{ \"name\": \"epel\", \"mirrorlist\": \"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7\"}]" +
+            '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
             "}'"
 
           script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
