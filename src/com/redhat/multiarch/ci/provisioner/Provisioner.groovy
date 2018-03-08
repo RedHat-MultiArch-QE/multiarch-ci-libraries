@@ -42,8 +42,16 @@ class Provisioner {
       host.initialized = true
       
       // Install ssh keys so that either cinch or direct ssh will connect
-      script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-                              script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')])
+      script.withCredentials(
+        [
+          script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+          script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY'),
+          [ 
+            $class: 'UsernamePasswordMultiBinding', credentialsId: config.jenkinsSlaveCredentialId,
+            usernameVariable: 'JENKINS_SLAVE_USERNAME', passwordVariable: 'JENKINS_SLAVE_PASSWORD'
+          ]
+        ]
+      ) 
       {
         script.env.HOME = "/home/jenkins"
         script.sh """
@@ -69,31 +77,7 @@ class Provisioner {
       }
 
       if (config.runOnSlave) {
-        script.withCredentials([
-          [
-            $class: 'UsernamePasswordMultiBinding',
-            credentialsId: config.jenkinsSlaveCredentialId,
-            usernameVariable: 'JENKINS_SLAVE_USERNAME',
-            passwordVariable: 'JENKINS_SLAVE_PASSWORD'
-          ]
-        ]) {
-          def extraVars = "'{" +
-            "\"rpm_key_imports\":[]," +
-            "\"jenkins_master_repositories\":[]," +
-            "\"jenkins_master_download_repositories\":[]," +
-            "\"jslave_name\":\"${host.name}\"," +
-            "\"jslave_label\":\"${host.name}\"," +
-            "\"arch\":\"${host.arch}\"," +
-            "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-            "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-            "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-            '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-            "}'"
-
-          script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
-          host.connectedToMaster = true
-        }
+        host.connectedToMaster = true
 
         // We only care if the install ansible flag is set when we are running on the provisioned host
         // This is because if we are running on the centos container, ansible has been installed already to support linchpin & cinch
