@@ -62,7 +62,7 @@ class Provisioner {
           chmod 644 ~/.ssh/id_rsa.pub
         """
 
-        def extraVars = "{" +
+        def extraVars = "'{" +
             "\"rpm_key_imports\":[]," +
             "\"jenkins_master_repositories\":[]," +
             "\"jenkins_master_download_repositories\":[]," +
@@ -74,7 +74,7 @@ class Provisioner {
             "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
             "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
             '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-            "}"
+            "}'"
         
         script.env.EXTRA_VARS = "${extraVars}"
 	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
