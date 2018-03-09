@@ -62,9 +62,7 @@ class Provisioner {
           chmod 644 ~/.ssh/id_rsa.pub
         """
 
-        def templateData = getTemplateData(host, script)
-        
-	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${templateData}\' --verbose up ${host.target}"
+	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}"
 
         // We need to scan for inventory file. Please see the following for reasoning:
         // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
@@ -130,7 +128,7 @@ class Provisioner {
 
     if (host.initialized) {
       try {
-        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(arch)}\' --verbose destroy ${host.target}"
+        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}"
       } catch (e) {
         script.echo "${e}"
       }
@@ -141,7 +139,7 @@ class Provisioner {
     }
   }
 
-  String getTemplateData(Host host, def script) {
+  String getTemplateData(Host host) {
     // Build template data
     def templateData = [:]
     templateData.arch = host.arch
