@@ -62,22 +62,22 @@ class Provisioner {
           chmod 644 ~/.ssh/id_rsa.pub
         """
 
-        def extraVars = "'{" +
-            "\"rpm_key_imports\":[]," +
-            "\"jenkins_master_repositories\":[]," +
-            "\"jenkins_master_download_repositories\":[]," +
-            "\"jslave_name\":\"${host.name}\"," +
-            "\"jslave_label\":\"${host.name}\"," +
-            "\"arch\":\"${host.arch}\"," +
-            "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-            "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-            "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-            '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-            "}'"
+        def templateData = getTemplateData(host.arch)
+        templateData['extra_vars'] = "{" +
+          "\"rpm_key_imports\":[]," +
+          "\"jenkins_master_repositories\":[]," +
+          "\"jenkins_master_download_repositories\":[]," +
+          "\"jslave_name\":\"${host.name}\"," +
+          "\"jslave_label\":\"${host.name}\"," +
+          "\"arch\":\"${host.arch}\"," +
+          "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+          "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+          "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+          "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+          '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+          "}"
         
-        script.env.EXTRA_VARS = "${extraVars}"
-	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
+	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${templateData}\' --verbose up ${host.target}"
 
         // We need to scan for inventory file. Please see the following for reasoning:
         // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
