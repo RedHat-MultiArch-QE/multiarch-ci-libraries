@@ -63,7 +63,7 @@ class Provisioner {
         """
 
         def templateData = getTemplateData(host.arch)
-        templateData['extra_vars'] = "{" +
+        templateData.extra_vars = "{" +
           "\"rpm_key_imports\":[]," +
           "\"jenkins_master_repositories\":[]," +
           "\"jenkins_master_download_repositories\":[]," +
