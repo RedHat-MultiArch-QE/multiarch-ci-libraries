@@ -62,7 +62,7 @@ class Provisioner {
           chmod 644 ~/.ssh/id_rsa.pub
         """
 
-        def templateData = getTemplateData(host.arch)
+        def templateData = getTemplateData(host, script)
         
 	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${templateData}\' --verbose up ${host.target}"
 
@@ -141,10 +141,10 @@ class Provisioner {
     }
   }
 
-  String getTemplateData(String arch) {
+  String getTemplateData(Host host, def script) {
     // Build template data
     def templateData = [:]
-    templateData.arch = arch
+    templateData.arch = host.arch
     templateData.job_group = config.jobgroup
     templateData.hostrequires = config.hostrequires
     //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
