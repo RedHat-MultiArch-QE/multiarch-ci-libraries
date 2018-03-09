@@ -45,11 +45,7 @@ class Provisioner {
       script.withCredentials(
         [
           script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-          script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY'),
-          [ 
-            $class: 'UsernamePasswordMultiBinding', credentialsId: config.jenkinsSlaveCredentialId,
-            usernameVariable: 'JENKINS_SLAVE_USERNAME', passwordVariable: 'JENKINS_SLAVE_PASSWORD'
-          ]
+          script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
         ]
       ) 
       {
@@ -140,30 +136,40 @@ class Provisioner {
   }
 
   String getTemplateData(Host host) {
-    // Build template data
-    def templateData = [:]
-    templateData.arch = host.arch
-    templateData.job_group = config.jobgroup
-    templateData.hostrequires = config.hostrequires
-    //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
-    templateData.extra_vars = "{" +
-      "\"rpm_key_imports\":[]," +
-      "\"jenkins_master_repositories\":[]," +
-      "\"jenkins_master_download_repositories\":[]," +
-      "\"jslave_name\":\"${host.name}\"," +
-      "\"jslave_label\":\"${host.name}\"," +
-      "\"arch\":\"${host.arch}\"," +
-      "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-      "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-      "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-      "\"jswarm_version\":\"3.9\"," +
-      "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-      '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-      "}"
+    script.withCredentials(
+      [
+        [ 
+          $class: 'UsernamePasswordMultiBinding', credentialsId: config.jenkinsSlaveCredentialId,
+          usernameVariable: 'JENKINS_SLAVE_USERNAME', passwordVariable: 'JENKINS_SLAVE_PASSWORD'
+        ]
+      ]
+    ) 
+    {
+      // Build template data
+      def templateData = [:]
+      templateData.arch = host.arch
+      templateData.job_group = config.jobgroup
+      templateData.hostrequires = config.hostrequires
+      //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+      templateData.extra_vars = "{" +
+        "\"rpm_key_imports\":[]," +
+        "\"jenkins_master_repositories\":[]," +
+        "\"jenkins_master_download_repositories\":[]," +
+        "\"jslave_name\":\"${host.name}\"," +
+        "\"jslave_label\":\"${host.name}\"," +
+        "\"arch\":\"${host.arch}\"," +
+        "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+        "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+        "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+        "\"jswarm_version\":\"3.9\"," +
+        "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+        '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+        "}"
 
-    def templateDataJson = JsonOutput.toJson(templateData)
-    script.echo templateDataJson
+      def templateDataJson = JsonOutput.toJson(templateData)
+      script.echo templateDataJson
 
-    templateDataJson
+      templateDataJson
+    }
   }
 }
