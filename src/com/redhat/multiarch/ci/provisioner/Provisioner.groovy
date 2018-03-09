@@ -63,19 +63,6 @@ class Provisioner {
         """
 
         def templateData = getTemplateData(host.arch)
-        templateData.extra_vars = "{" +
-          "\"rpm_key_imports\":[]," +
-          "\"jenkins_master_repositories\":[]," +
-          "\"jenkins_master_download_repositories\":[]," +
-          "\"jslave_name\":\"${host.name}\"," +
-          "\"jslave_label\":\"${host.name}\"," +
-          "\"arch\":\"${host.arch}\"," +
-          "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-          "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-          "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-          "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-          '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-          "}"
         
 	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${templateData}\' --verbose up ${host.target}"
 
@@ -161,6 +148,19 @@ class Provisioner {
     templateData.job_group = config.jobgroup
     templateData.hostrequires = config.hostrequires
     //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+    templateData.extra_vars = "{" +
+      "\"rpm_key_imports\":[]," +
+      "\"jenkins_master_repositories\":[]," +
+      "\"jenkins_master_download_repositories\":[]," +
+      "\"jslave_name\":\"${host.name}\"," +
+      "\"jslave_label\":\"${host.name}\"," +
+      "\"arch\":\"${host.arch}\"," +
+      "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+      "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+      "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+      "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+      '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+      "}"
 
     def templateDataJson = JsonOutput.toJson(templateData)
     script.echo templateDataJson
