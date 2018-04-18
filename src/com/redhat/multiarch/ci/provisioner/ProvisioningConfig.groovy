@@ -27,15 +27,15 @@ class ProvisioningConfig {
   // Kerberos principal for Beaker authentication.
   String krbPrincipal = 'jenkins/multiarch-qe-jenkins.rhev-ci-vms.eng.rdu2.redhat.com'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
-  String keytabCredentialId = 'KEYTAB'
+  String keytabCredentialId = 'redhat-multiarch-qe-keytab'
   // ID of Jenkins credential for SSH private key to will be
   // copied to provisioned resource.
   // *** This must be the same as what was added to Beaker ***
-  String sshPrivKeyCredentialId = 'SSHPRIVKEY'
+  String sshPrivKeyCredentialId = 'redhat-multiarch-qe-sshprivkey'
   // ID of Jenkins credential for SSH public key to will be
   // copied to provisioned resource
   // *** This must be the same as what was added to Beaker ***
-  String sshPubKeyCredentialId = 'SSHPUBKEY'
+  String sshPubKeyCredentialId = 'redhat-multiarch-qe-sshpubkey'
   // ID of the Jenkins credential for the username and password
   // used by cinch to connect the provisioned host to the Jenkins master
   String jenkinsSlaveCredentialId = 'JENKINS_SLAVE_CREDENTIALS'
