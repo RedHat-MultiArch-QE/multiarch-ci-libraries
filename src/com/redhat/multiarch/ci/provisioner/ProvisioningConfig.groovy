@@ -38,7 +38,7 @@ class ProvisioningConfig {
   String sshPubKeyCredentialId = 'redhat-multiarch-qe-sshpubkey'
   // ID of the Jenkins credential for the username and password
   // used by cinch to connect the provisioned host to the Jenkins master
-  String jenkinsSlaveCredentialId = 'JENKINS_SLAVE_CREDENTIALS'
+  String jenkinsSlaveCredentialId = 'jenkins-slave-credentials'
   // URL of the Jenkins master that cinch will use to connect the provisioned
   // host as a slave.
   String jenkinsMasterUrl = ""
