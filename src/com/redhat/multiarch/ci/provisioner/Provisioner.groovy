@@ -24,10 +24,11 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials(
-        [script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')],
-        [script.string(credentialsId: config.krbPrincipalCredentialId, variable: 'KRB_PRINCIPAL')]
-      ) {
+      script.withCredentials([
+        script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
+        script.usernamePassword(credentialsId: config.krbPrincipalCredentialId, 
+	  usernameVariable: 'KRB_PRINCIPAL', passwordVariable: '')
+      ]) {
         script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
 
         // Test to make sure we can authenticate.
@@ -61,7 +62,7 @@ class Provisioner {
           chmod 644 ~/.ssh/id_rsa.pub
         """
 
-	script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}"
+        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}"
 
         // We need to scan for inventory file. Please see the following for reasoning:
         // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
@@ -139,15 +140,11 @@ class Provisioner {
   }
 
   String getTemplateData(Host host) {
-    script.withCredentials(
-      [
-        [
-          $class: 'UsernamePasswordMultiBinding', credentialsId: config.jenkinsSlaveCredentialId,
-          usernameVariable: 'JENKINS_SLAVE_USERNAME', passwordVariable: 'JENKINS_SLAVE_PASSWORD'
-        ]
-      ]
-    )
-    {
+    script.withCredentials([
+      usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
+                       usernameVariable: 'JENKINS_SLAVE_USERNAME',
+                       passwordVariable: 'JENKINS_SLAVE_PASSWORD')
+    ]) {
       // Build template data
       def templateData = [:]
       templateData.arch = host.arch
