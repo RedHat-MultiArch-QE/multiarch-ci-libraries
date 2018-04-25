@@ -2,7 +2,7 @@ package com.redhat.multiarch.ci.provisioner
 
 class ProvisioningConfig {
   // Provisioner version
-  String version = 'v0.3'
+  String version = 'v0.4'
   // Jenkins kubernetes cloud name
   String cloudName = 'openshift'
   // Job group for Beaker provisioning.
@@ -54,6 +54,7 @@ class ProvisioningConfig {
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
+    this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ? : this.krbPrincipalCredentialsId
     this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
     this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
     this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
