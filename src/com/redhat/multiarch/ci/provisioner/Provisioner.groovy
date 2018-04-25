@@ -24,8 +24,11 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials([script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
-        script.sh "kinit ${config.krbPrincipal} -k -t ${script.KEYTAB}"
+      script.withCredentials(
+        [script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')],
+        [script.string(credentialsId: config.krbPrincipalCredentialId, variable: 'KRB_PRINCIPAL')]
+      ) {
+        script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
 
         // Test to make sure we can authenticate.
         script.sh 'bkr whoami'
@@ -40,14 +43,14 @@ class Provisioner {
 
       // Attempt provisioning
       host.initialized = true
-      
+
       // Install ssh keys so that either cinch or direct ssh will connect
       script.withCredentials(
         [
           script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
           script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
         ]
-      ) 
+      )
       {
         script.env.HOME = "/home/jenkins"
         script.sh """
@@ -138,19 +141,19 @@ class Provisioner {
   String getTemplateData(Host host) {
     script.withCredentials(
       [
-        [ 
+        [
           $class: 'UsernamePasswordMultiBinding', credentialsId: config.jenkinsSlaveCredentialId,
           usernameVariable: 'JENKINS_SLAVE_USERNAME', passwordVariable: 'JENKINS_SLAVE_PASSWORD'
         ]
       ]
-    ) 
+    )
     {
       // Build template data
       def templateData = [:]
       templateData.arch = host.arch
       templateData.job_group = config.jobgroup
       templateData.hostrequires = config.hostrequires
-      //templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+      templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
       templateData.extra_vars = "{" +
         "\"rpm_key_imports\":[]," +
         "\"jenkins_master_repositories\":[]," +
