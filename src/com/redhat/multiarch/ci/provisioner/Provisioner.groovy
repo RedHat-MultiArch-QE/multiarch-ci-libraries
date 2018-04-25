@@ -27,7 +27,8 @@ class Provisioner {
       script.withCredentials([
         script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
         script.usernamePassword(credentialsId: config.krbPrincipalCredentialId, 
-	  usernameVariable: 'KRB_PRINCIPAL', passwordVariable: '')
+	                        usernameVariable: 'KRB_PRINCIPAL', 
+                                passwordVariable: '')
       ]) {
         script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
 
@@ -141,9 +142,9 @@ class Provisioner {
 
   String getTemplateData(Host host) {
     script.withCredentials([
-      usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
-                       usernameVariable: 'JENKINS_SLAVE_USERNAME',
-                       passwordVariable: 'JENKINS_SLAVE_PASSWORD')
+      script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
+                              usernameVariable: 'JENKINS_SLAVE_USERNAME',
+                              passwordVariable: 'JENKINS_SLAVE_PASSWORD')
     ]) {
       // Build template data
       def templateData = [:]
