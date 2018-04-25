@@ -54,7 +54,7 @@ class ProvisioningConfig {
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
-    this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ? : this.krbPrincipalCredentialsId
+    this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ?: this.krbPrincipalCredentialsId
     this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
     this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
     this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
