@@ -24,8 +24,8 @@ class ProvisioningConfig {
   // or it can reference a relative path that already exists
   // in the current directory
   String provisioningWorkspaceDir = 'workspace'
-  // Kerberos principal for Beaker authentication.
-  String krbPrincipal = 'jenkins/multiarch-qe-jenkins.rhev-ci-vms.eng.rdu2.redhat.com'
+  // ID of Jenkins credential for kerberos principal needed for Beaker authentication.
+  String krbPrincipalCredentialId = 'redhat-multiarch-qe-krbprincipal'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
   String keytabCredentialId = 'redhat-multiarch-qe-keytab'
   // ID of Jenkins credential for SSH private key to will be
