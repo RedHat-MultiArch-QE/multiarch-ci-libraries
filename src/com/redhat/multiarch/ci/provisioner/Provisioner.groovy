@@ -24,8 +24,13 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials([script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB')]) {
-        script.sh "kinit ${config.krbPrincipal} -k -t ${script.KEYTAB}"
+      script.withCredentials([
+        script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
+        script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
+                                usernameVariable: 'KRB_PRINCIPAL',
+                                passwordVariable: '')
+      ]) {
+        script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
 
         // Test to make sure we can authenticate.
         script.sh 'bkr whoami'
@@ -40,22 +45,14 @@ class Provisioner {
 
       // Attempt provisioning
       host.initialized = true
-      script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host.arch)}\' --verbose up ${host.target}"
-
-      // We need to scan for inventory file. Please see the following for reasoning:
-      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
-      // Possible solutions to not require the scan:
-      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
-      // - overriding [evars] section and specifying inventory_file
-      //
-      host.inventory = script.sh (returnStdout: true, script: """
-        readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
-        """).trim()
-      host.provisioned = true
 
       // Install ssh keys so that either cinch or direct ssh will connect
-      script.withCredentials([script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-                              script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')])
+      script.withCredentials(
+        [
+          script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+          script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
+        ]
+      )
       {
         script.env.HOME = "/home/jenkins"
         script.sh """
@@ -65,49 +62,46 @@ class Provisioner {
           chmod 600 ~/.ssh/id_rsa
           chmod 644 ~/.ssh/id_rsa.pub
         """
+
+        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}"
+
+        // We need to scan for inventory file. Please see the following for reasoning:
+        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
+        // Possible solutions to not require the scan:
+        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
+        // - overriding [evars] section and specifying inventory_file
+        //
+        host.inventory = script.sh(returnStdout: true, script: """
+          readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
+          """).trim()
+
+        // Now that we have the inventory file, we should populate the hostName
+        // With the name of the master node
+        host.hostName = script.sh(returnStdout: true, script: """
+          awk '/\\[master_node\\]/{getline; print}' ${host.inventory}
+          """).trim()
+
+        host.provisioned = true
       }
 
       if (config.runOnSlave) {
-        script.withCredentials([
-          [
-            $class: 'UsernamePasswordMultiBinding',
-            credentialsId: config.jenkinsSlaveCredentialId,
-            usernameVariable: 'JENKINS_SLAVE_USERNAME',
-            passwordVariable: 'JENKINS_SLAVE_PASSWORD'
-          ]
-        ]) {
-          def extraVars = "'{" +
-            "\"rpm_key_imports\":[]," +
-            "\"jenkins_master_repositories\":[]," +
-            "\"jenkins_master_download_repositories\":[]," +
-            "\"jslave_name\":\"${host.name}\"," +
-            "\"jslave_label\":\"${host.name}\"," +
-            "\"arch\":\"${host.arch}\"," +
-            "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-            "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-            "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-            "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"" +
-            "}'"
+        host.connectedToMaster = true
 
-          script.sh "cinch ${host.inventory} --extra-vars ${extraVars}"
-          host.connectedToMaster = true
+        // We only care if the install ansible flag is set when we are running on the provisioned host
+        // This is because if we are running on the centos container, ansible has been installed already to support linchpin & cinch
+        if (config.installAnsible) {
+          script.node (host.name) {
+            script.sh '''
+              sudo yum install python-devel openssl-devel libffi-devel -y &&
+              sudo mkdir /home/jenkins &&
+              sudo chown --recursive ${USER}:${USER} /home/jenkins &&
+              sudo pip install --upgrade pip &&
+              sudo pip install --upgrade setuptools &&
+              sudo pip install --upgrade ansible
+            '''
+          }
+          host.ansibleInstalled = true
         }
-      }
-
-      if (config.installAnsible) {
-        script.node (host.name) {
-          script.sh '''
-            sudo yum install python-devel openssl-devel libffi-devel -y &&
-            sudo mkdir /home/jenkins &&
-            sudo chown --recursive ${USER}:${USER} /home/jenkins &&
-            sudo pip install --upgrade pip &&
-            sudo pip install --upgrade setuptools &&
-            sudo pip install --upgrade ansible
-          '''
-          //   echo "[defaults]" | tee -a ~/.ansible.cfg
-          //   echo "remote_tmp = /tmp/${USER}/ansible" | tee -a ~/.ansible.cfg
-        }
-        host.ansibleInstalled = true
       }
     } catch (e) {
       script.echo "${e}"
@@ -142,7 +136,7 @@ class Provisioner {
 
     if (host.initialized) {
       try {
-        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(arch)}\' --verbose destroy ${host.target}"
+        script.sh "linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}"
       } catch (e) {
         script.echo "${e}"
       }
@@ -153,16 +147,38 @@ class Provisioner {
     }
   }
 
-  String getTemplateData(String arch) {
-    // Build template data
-    def templateData = [:]
-    templateData.arch = arch
-    templateData.job_group = config.jobgroup
-    templateData.hostrequires = config.hostrequires
+  String getTemplateData(Host host) {
+    script.withCredentials([
+      script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
+                              usernameVariable: 'JENKINS_SLAVE_USERNAME',
+                              passwordVariable: 'JENKINS_SLAVE_PASSWORD')
+    ]) {
+      // Build template data
+      def templateData = [:]
+      templateData.arch = host.arch
+      templateData.job_group = config.jobgroup
+      templateData.hostrequires = config.hostrequires
+      templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+      templateData.extra_vars = "{" +
+        "\"rpm_key_imports\":[]," +
+        "\"jenkins_master_repositories\":[]," +
+        "\"jenkins_master_download_repositories\":[]," +
+        "\"jslave_name\":\"${host.name}\"," +
+        "\"jslave_label\":\"${host.name}\"," +
+        "\"arch\":\"${host.arch}\"," +
+        "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+        "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+        "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+        "\"jswarm_version\":\"3.9\"," +
+        "\"jswarm_filename\":\"swarm-client-{{ jswarm_version }}.jar\"," +
+        "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+        '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+        "}"
 
-    def templateDataJson = JsonOutput.toJson(templateData)
-    script.echo templateDataJson
+      def templateDataJson = JsonOutput.toJson(templateData)
+      script.echo templateDataJson
 
-    templateDataJson
+      templateDataJson
+    }
   }
 }

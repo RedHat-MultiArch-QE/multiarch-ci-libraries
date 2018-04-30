@@ -2,7 +2,7 @@ package com.redhat.multiarch.ci.provisioner
 
 class ProvisioningConfig {
   // Provisioner version
-  String version = 'v0.3'
+  String version = 'v1.0'
   // Jenkins kubernetes cloud name
   String cloudName = 'openshift'
   // Job group for Beaker provisioning.
@@ -24,21 +24,21 @@ class ProvisioningConfig {
   // or it can reference a relative path that already exists
   // in the current directory
   String provisioningWorkspaceDir = 'workspace'
-  // Kerberos principal for Beaker authentication.
-  String krbPrincipal = 'jenkins/multiarch-qe-jenkins.rhev-ci-vms.eng.rdu2.redhat.com'
+  // ID of Jenkins credential for kerberos principal needed for Beaker authentication.
+  String krbPrincipalCredentialId = 'redhat-multiarch-qe-krbprincipal'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
-  String keytabCredentialId = 'KEYTAB'
+  String keytabCredentialId = 'redhat-multiarch-qe-keytab'
   // ID of Jenkins credential for SSH private key to will be
   // copied to provisioned resource.
   // *** This must be the same as what was added to Beaker ***
-  String sshPrivKeyCredentialId = 'SSHPRIVKEY'
+  String sshPrivKeyCredentialId = 'redhat-multiarch-qe-sshprivkey'
   // ID of Jenkins credential for SSH public key to will be
   // copied to provisioned resource
   // *** This must be the same as what was added to Beaker ***
-  String sshPubKeyCredentialId = 'SSHPUBKEY'
+  String sshPubKeyCredentialId = 'redhat-multiarch-qe-sshpubkey'
   // ID of the Jenkins credential for the username and password
   // used by cinch to connect the provisioned host to the Jenkins master
-  String jenkinsSlaveCredentialId = 'JENKINS_SLAVE_CREDENTIALS'
+  String jenkinsSlaveCredentialId = 'jenkins-slave-credentials'
   // URL of the Jenkins master that cinch will use to connect the provisioned
   // host as a slave.
   String jenkinsMasterUrl = ""
@@ -48,9 +48,13 @@ class ProvisioningConfig {
   // Whether the closure should be run on directly on the provisioned host.
   Boolean runOnSlave = true
   // Whether Ansible should be installed on the provisioned host.
+  // This will only be respected if runOnSlave is also set to true,
+  // since jobs that are run via ssh already have access to ansible in the
+  // provisioning container.
   Boolean installAnsible = true
 
   ProvisioningConfig(params, env) {
+    this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ?: this.krbPrincipalCredentialId
     this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
     this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
     this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
