@@ -71,9 +71,16 @@ class Provisioner {
         // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
         // - overriding [evars] section and specifying inventory_file
         //
-        host.inventory = script.sh (returnStdout: true, script: """
+        host.inventory = script.sh(returnStdout: true, script: """
           readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
           """).trim()
+
+        // Now that we have the inventory file, we should populate the hostName
+        // With the name of the master node
+        host.hostName = script.sh(returnStdout: true, script: """
+          awk '/\[master_node\]/{getline; print}' ${host.inventory}
+          """).trim()
+
         host.provisioned = true
       }
 
