@@ -26,8 +26,8 @@ class Provisioner {
     try {
       script.withCredentials([
         script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
-        script.usernamePassword(credentialsId: config.krbPrincipalCredentialId, 
-	                        usernameVariable: 'KRB_PRINCIPAL', 
+        script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
+                                usernameVariable: 'KRB_PRINCIPAL',
                                 passwordVariable: '')
       ]) {
         script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
