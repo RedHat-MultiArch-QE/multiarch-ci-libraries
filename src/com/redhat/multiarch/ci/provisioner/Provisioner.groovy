@@ -78,7 +78,7 @@ class Provisioner {
         // Now that we have the inventory file, we should populate the hostName
         // With the name of the master node
         host.hostName = script.sh(returnStdout: true, script: """
-          awk '/\[master_node\]/{getline; print}' ${host.inventory}
+          awk '/\\[master_node\\]/{getline; print}' ${host.inventory}
           """).trim()
 
         host.provisioned = true
