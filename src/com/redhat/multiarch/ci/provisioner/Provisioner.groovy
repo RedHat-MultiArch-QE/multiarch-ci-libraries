@@ -64,7 +64,7 @@ class Provisioner {
         """
 
         script.sh """
-          source /home/jenkins/envs/provisioner/bin/activate
+          . /home/jenkins/envs/provisioner/bin/activate
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
         """
 
@@ -132,7 +132,7 @@ class Provisioner {
     if (config.runOnSlave && host.provisioned) {
       try {
         script.sh """
-          source /home/jenkins/envs/provisioner/bin/activate
+          . /home/jenkins/envs/provisioner/bin/activate
           teardown ${host.inventory}
         """
       } catch (e) {
@@ -143,7 +143,7 @@ class Provisioner {
     if (host.initialized) {
       try {
         script.sh """
-          source /home/jenkins/envs/provisioner/bin/activate
+          . /home/jenkins/envs/provisioner/bin/activate
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
         """
       } catch (e) {
