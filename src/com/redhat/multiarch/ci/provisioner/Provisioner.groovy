@@ -64,7 +64,7 @@ class Provisioner {
         """
 
         script.sh """
-          source $(which virtualenvwrapper.sh)
+          source \$(which virtualenvwrapper.sh)
           workon provisioner
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
         """
@@ -133,7 +133,7 @@ class Provisioner {
     if (config.runOnSlave && host.provisioned) {
       try {
         script.sh """
-          source $(which virtualenvwrapper.sh)
+          source \$(which virtualenvwrapper.sh)
           workon provisioner
           teardown ${host.inventory}
         """
@@ -145,7 +145,7 @@ class Provisioner {
     if (host.initialized) {
       try {
         script.sh """
-          source $(which virtualenvwrapper.sh)
+          source \$(which virtualenvwrapper.sh)
           workon provisioner
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}"
         """
