@@ -49,7 +49,7 @@ class TestUtils {
     (new MultiArchTest(script, arches, config, test, onTestFailure)).run()
   }
 
-  static def downloadTests(def params) {
+  static def downloadTests(def params, def scm) {
     if (params.TEST_REPO) {
       git url: params.TEST_REPO, branch: params.TEST_REF, changelog: false
     }
