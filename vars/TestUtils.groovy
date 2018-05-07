@@ -20,7 +20,7 @@ class TestUtils {
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
-  static def test(
+  static def runTest(
     WorkflowScript script,
     String arch,
     ProvisioningConfig config,
@@ -28,7 +28,6 @@ class TestUtils {
     Closure onTestFailure) {
     (new Test(arch, config, test, onTestFailure)).run()
   }
-
 
   /**
    * Runs @test on a multi-arch provisioned host for each arch in arches param.
@@ -40,52 +39,12 @@ class TestUtils {
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
-  static def parallelMultiArchTest(
+  static def runParallelMultiArchTest(
     WorkflowScript script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
     Closure onTestFailure) {
     (new MultiArchTest(script, arches, config, test, onTestFailure)).run()
-  }
-
-  static def downloadTests(def params, def scm) {
-    if (params.TEST_REPO) {
-      git url: params.TEST_REPO, branch: params.TEST_REF, changelog: false
-    }
-    else {
-      checkout scm
-    }
-  }
-
-  static def runTests(def params, Host host) {
-    // Cinch Mode
-    if (config.runOnSlave) {
-      sh "ansible-playbook -i 'localhost,' -c local ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml"
-      sh "for i in ${params.TEST_DIR}/scripts/*/test.sh; do bash \$i; done"
-
-      return
-    }
-
-    // SSH Mode
-    sh ". /home/jenkins/envs/provisioner/bin/activate; ansible-playbook -i '${host.inventory}' ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml"
-    sh "for i in ${params.TEST_DIR}/scripts/*/test.sh; do ssh root@${host.hostName} < \$i; done"
-  }
-
-  static def archiveOutput(def params) {
-    try {
-      archiveArtifacts allowEmptyArchive: true, artifacts: "${params.TEST_DIR}/ansible-playbooks/**/artifacts/*", fingerprint: true
-      junit "${params.TEST_DIR}/ansible-playbooks/**/reports/*.xml"
-    }
-    catch (e) {
-      // We don't care if this step fails
-    }
-    try {
-      archiveArtifacts allowEmptyArchive: true, artifacts: "${params.TEST_DIR}/scripts/**/artifacts/*", fingerprint: true
-      junit "${params.TEST_DIR}/scripts/**/reports/*.xml"
-    }
-    catch (e) {
-      // We don't care if this step fails
-    }
   }
 }
