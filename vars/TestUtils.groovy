@@ -49,7 +49,7 @@ class TestUtils {
     (new MultiArchTest(script, arches, config, test, onTestFailure)).run()
   }
 
-  static def downloadTests() {
+  static def downloadTests(def params) {
     if (params.TEST_REPO) {
       git url: params.TEST_REPO, branch: params.TEST_REF, changelog: false
     }
@@ -58,7 +58,7 @@ class TestUtils {
     }
   }
 
-  static def runTests(Host host) {
+  static def runTests(def params, Host host) {
     // Cinch Mode
     if (config.runOnSlave) {
       sh "ansible-playbook -i 'localhost,' -c local ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml"
@@ -72,7 +72,7 @@ class TestUtils {
     sh "for i in ${params.TEST_DIR}/scripts/*/test.sh; do ssh root@${host.hostName} < \$i; done"
   }
 
-  static def archiveOutput() {
+  static def archiveOutput(def params) {
     try {
       archiveArtifacts allowEmptyArchive: true, artifacts: "${params.TEST_DIR}/ansible-playbooks/**/artifacts/*", fingerprint: true
       junit "${params.TEST_DIR}/ansible-playbooks/**/reports/*.xml"
