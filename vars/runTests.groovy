@@ -1,6 +1,6 @@
 import com.redhat.multiarch.ci.provisioner.*
 
-def call(ProvisioningConfig config) {
+def call(ProvisioningConfig config, Host host) {
   // Cinch Mode
   if (config.runOnSlave) {
     sh "ansible-playbook -i 'localhost,' -c local ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml"
