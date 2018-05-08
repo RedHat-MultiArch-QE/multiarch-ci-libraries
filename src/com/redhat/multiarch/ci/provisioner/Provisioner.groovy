@@ -30,10 +30,10 @@ class Provisioner {
                                 usernameVariable: 'KRB_PRINCIPAL',
                                 passwordVariable: '')
       ]) {
-        script.sh "kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}"
-
-        // Test to make sure we can authenticate.
-        script.sh 'bkr whoami'
+        script.sh """
+          kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
+          bkr whoami
+        """
       }
 
       if (config.provisioningRepoUrl != null) {
@@ -61,9 +61,7 @@ class Provisioner {
           cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa
           chmod 644 ~/.ssh/id_rsa.pub
-        """
-
-        script.sh """
+          
           . /home/jenkins/envs/provisioner/bin/activate
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
         """
