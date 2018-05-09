@@ -84,6 +84,7 @@ class Provisioner {
         // It's already installed on the provisioning container
         if (config.installCredentials) {
           script.node (host.name) {
+            script.sh "sudo yum install -y krb5-workstation"
             installCredentials(script)
           }
         }
@@ -115,9 +116,9 @@ class Provisioner {
     if (config.runOnSlave && host.provisioned) {
       try {
         script.sh """
-        . /home/jenkins/envs/provisioner/bin/activate
-        teardown ${host.inventory}
-      """
+          . /home/jenkins/envs/provisioner/bin/activate
+          teardown ${host.inventory}
+        """
       } catch (e) {
         script.echo "${e}"
       }
@@ -126,9 +127,9 @@ class Provisioner {
     if (host.initialized) {
       try {
         script.sh """
-        . /home/jenkins/envs/provisioner/bin/activate
-        linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
-      """
+          . /home/jenkins/envs/provisioner/bin/activate
+          linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
+        """
       } catch (e) {
         script.echo "${e}"
       }
@@ -185,7 +186,6 @@ class Provisioner {
     ]) {
       script.env.HOME = "/home/jenkins"
       script.sh """
-      sudo yum install -y krb5-workstation
       kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
       mkdir -p ~/.ssh
       cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
