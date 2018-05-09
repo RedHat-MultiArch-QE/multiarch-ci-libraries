@@ -179,7 +179,7 @@ class Provisioner {
       script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
       script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
                               usernameVariable: 'KRB_PRINCIPAL',
-                              passwordVariable: '')
+                              passwordVariable: ''),
       script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
       script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
     ]) {
