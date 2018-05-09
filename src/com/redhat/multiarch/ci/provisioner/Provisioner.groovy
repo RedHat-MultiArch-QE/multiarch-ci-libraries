@@ -38,9 +38,9 @@ class Provisioner {
 
       // Install ssh keys so that either cinch or direct ssh will connect
       script.sh """
-          . /home/jenkins/envs/provisioner/bin/activate
-          linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
-        """
+        . /home/jenkins/envs/provisioner/bin/activate
+        linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
+      """
 
 
       // We need to scan for inventory file. Please see the following for reasoning:
@@ -60,16 +60,15 @@ class Provisioner {
           """).trim()
 
       host.provisioned = true
-    }
 
-    if (config.runOnSlave) {
-      host.connectedToMaster = true
+      if (config.runOnSlave) {
+        host.connectedToMaster = true
 
-      // We only care if the install ansible flag is set when we are running on the provisioned host
-      // It's already installed on the provisioning container
-      if (config.installAnsible) {
-        script.node (host.name) {
-          script.sh '''
+        // We only care if the install ansible flag is set when we are running on the provisioned host
+        // It's already installed on the provisioning container
+        if (config.installAnsible) {
+          script.node (host.name) {
+            script.sh '''
               sudo yum install python-devel openssl-devel libffi-devel -y &&
               sudo mkdir /home/jenkins &&
               sudo chown --recursive ${USER}:${USER} /home/jenkins &&
@@ -77,18 +76,19 @@ class Provisioner {
               sudo pip install --upgrade setuptools &&
               sudo pip install --upgrade ansible
             '''
+          }
+          host.ansibleInstalled = true
         }
-        host.ansibleInstalled = true
-      }
 
-      // We only care if the install credentials flag is set when we are running on the provisioned host
-      // It's already installed on the provisioning container
-      if (config.installCredentials) {
-        script.node (host.name) {
-          installCredentials(script)
+        // We only care if the install credentials flag is set when we are running on the provisioned host
+        // It's already installed on the provisioning container
+        if (config.installCredentials) {
+          script.node (host.name) {
+            installCredentials(script)
+          }
         }
+        host.credentialsInstalled = true
       }
-      host.credentialsInstalled = true
     }
   } catch (e) {
     script.echo "${e}"
@@ -116,9 +116,9 @@ def teardown(Host host, String arch) {
   if (config.runOnSlave && host.provisioned) {
     try {
       script.sh """
-          . /home/jenkins/envs/provisioner/bin/activate
-          teardown ${host.inventory}
-        """
+        . /home/jenkins/envs/provisioner/bin/activate
+        teardown ${host.inventory}
+      """
     } catch (e) {
       script.echo "${e}"
     }
@@ -127,9 +127,9 @@ def teardown(Host host, String arch) {
   if (host.initialized) {
     try {
       script.sh """
-          . /home/jenkins/envs/provisioner/bin/activate
-          linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
-        """
+        . /home/jenkins/envs/provisioner/bin/activate
+        linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
+      """
     } catch (e) {
       script.echo "${e}"
     }
