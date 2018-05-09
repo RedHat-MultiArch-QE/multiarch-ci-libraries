@@ -24,17 +24,7 @@ class Provisioner {
     )
 
     try {
-      script.withCredentials([
-        script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
-        script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
-                                usernameVariable: 'KRB_PRINCIPAL',
-                                passwordVariable: '')
-      ]) {
-        script.sh """
-          kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
-          bkr whoami
-        """
-      }
+      installCredentials(script)
 
       if (config.provisioningRepoUrl != null) {
         // Get linchpin workspace
@@ -47,52 +37,39 @@ class Provisioner {
       host.initialized = true
 
       // Install ssh keys so that either cinch or direct ssh will connect
-      script.withCredentials(
-        [
-          script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-          script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
-        ]
-      )
-      {
-        script.env.HOME = "/home/jenkins"
-        script.sh """
-          mkdir -p ~/.ssh
-          cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
-          cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa
-          chmod 644 ~/.ssh/id_rsa.pub
-          
+      script.sh """
           . /home/jenkins/envs/provisioner/bin/activate
           linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
         """
 
-        // We need to scan for inventory file. Please see the following for reasoning:
-        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
-        // Possible solutions to not require the scan:
-        // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
-        // - overriding [evars] section and specifying inventory_file
-        //
-        host.inventory = script.sh(returnStdout: true, script: """
+
+      // We need to scan for inventory file. Please see the following for reasoning:
+      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
+      // Possible solutions to not require the scan:
+      // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
+      // - overriding [evars] section and specifying inventory_file
+      //
+      host.inventory = script.sh(returnStdout: true, script: """
           readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory
           """).trim()
 
-        // Now that we have the inventory file, we should populate the hostName
-        // With the name of the master node
-        host.hostName = script.sh(returnStdout: true, script: """
+      // Now that we have the inventory file, we should populate the hostName
+      // With the name of the master node
+      host.hostName = script.sh(returnStdout: true, script: """
           awk '/\\[master_node\\]/{getline; print}' ${host.inventory}
           """).trim()
 
-        host.provisioned = true
-      }
+      host.provisioned = true
+    }
 
-      if (config.runOnSlave) {
-        host.connectedToMaster = true
+    if (config.runOnSlave) {
+      host.connectedToMaster = true
 
-        // We only care if the install ansible flag is set when we are running on the provisioned host
-        // This is because if we are running on the centos container, ansible has been installed already to support linchpin & cinch
-        if (config.installAnsible) {
-          script.node (host.name) {
-            script.sh '''
+      // We only care if the install ansible flag is set when we are running on the provisioned host
+      // It's already installed on the provisioning container
+      if (config.installAnsible) {
+        script.node (host.name) {
+          script.sh '''
               sudo yum install python-devel openssl-devel libffi-devel -y &&
               sudo mkdir /home/jenkins &&
               sudo chown --recursive ${USER}:${USER} /home/jenkins &&
@@ -100,92 +77,124 @@ class Provisioner {
               sudo pip install --upgrade setuptools &&
               sudo pip install --upgrade ansible
             '''
-          }
-          host.ansibleInstalled = true
+        }
+        host.ansibleInstalled = true
+      }
+
+      // We only care if the install credentials flag is set when we are running on the provisioned host
+      // It's already installed on the provisioning container
+      if (config.installCredentials) {
+        script.node (host.name) {
+          installCredentials(script)
         }
       }
-    } catch (e) {
-      script.echo "${e}"
-      host.error = e.getMessage()
+      host.credentialsInstalled = true
     }
-
-    host
+  } catch (e) {
+    script.echo "${e}"
+    host.error = e.getMessage()
   }
 
-  /**
-   * Runs a teardown for provisioned host.
-   *
-   * @param host Provisioned host to be torn down.
-   * @param arch String specifying the arch to run tests on.
-   */
-  def teardown(Host host, String arch) {
-    // Prepare the cinch teardown inventory
-    if (!host || !host.initialized) {
-      // The provisioning job did not successfully provision a machine, so there is nothing to teardown
-      script.currentBuild.result = 'SUCCESS'
-      return
-    }
+  host
+}
 
-    // Run cinch teardown if runOnSlave was attempted with a provisioned host
-    if (config.runOnSlave && host.provisioned) {
-      try {
-        script.sh """
+/**
+ * Runs a teardown for provisioned host.
+ *
+ * @param host Provisioned host to be torn down.
+ * @param arch String specifying the arch to run tests on.
+ */
+def teardown(Host host, String arch) {
+  // Prepare the cinch teardown inventory
+  if (!host || !host.initialized) {
+    // The provisioning job did not successfully provision a machine, so there is nothing to teardown
+    script.currentBuild.result = 'SUCCESS'
+    return
+  }
+
+  // Run cinch teardown if runOnSlave was attempted with a provisioned host
+  if (config.runOnSlave && host.provisioned) {
+    try {
+      script.sh """
           . /home/jenkins/envs/provisioner/bin/activate
           teardown ${host.inventory}
         """
-      } catch (e) {
-        script.echo "${e}"
-      }
-    }
-
-    if (host.initialized) {
-      try {
-        script.sh """
-          . /home/jenkins/envs/provisioner/bin/activate
-          linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
-        """
-      } catch (e) {
-        script.echo "${e}"
-      }
-    }
-
-    if (host.error) {
-      script.currentBuild.result = 'FAILURE'
+    } catch (e) {
+      script.echo "${e}"
     }
   }
 
-  String getTemplateData(Host host) {
-    script.withCredentials([
-      script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
-                              usernameVariable: 'JENKINS_SLAVE_USERNAME',
-                              passwordVariable: 'JENKINS_SLAVE_PASSWORD')
-    ]) {
-      // Build template data
-      def templateData = [:]
-      templateData.arch = host.arch
-      templateData.job_group = config.jobgroup
-      templateData.hostrequires = config.hostrequires
-      templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
-      templateData.extra_vars = "{" +
-        "\"rpm_key_imports\":[]," +
-        "\"jenkins_master_repositories\":[]," +
-        "\"jenkins_master_download_repositories\":[]," +
-        "\"jslave_name\":\"${host.name}\"," +
-        "\"jslave_label\":\"${host.name}\"," +
-        "\"arch\":\"${host.arch}\"," +
-        "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-        "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-        "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-        "\"jswarm_version\":\"3.9\"," +
-        "\"jswarm_filename\":\"swarm-client-{{ jswarm_version }}.jar\"," +
-        "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-        '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-        "}"
-
-      def templateDataJson = JsonOutput.toJson(templateData)
-      script.echo templateDataJson
-
-      templateDataJson
+  if (host.initialized) {
+    try {
+      script.sh """
+          . /home/jenkins/envs/provisioner/bin/activate
+          linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose destroy ${host.target}
+        """
+    } catch (e) {
+      script.echo "${e}"
     }
+  }
+
+  if (host.error) {
+    script.currentBuild.result = 'FAILURE'
+  }
+}
+
+String getTemplateData(Host host) {
+  script.withCredentials([
+    script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
+                            usernameVariable: 'JENKINS_SLAVE_USERNAME',
+                            passwordVariable: 'JENKINS_SLAVE_PASSWORD')
+  ]) {
+    // Build template data
+    def templateData = [:]
+    templateData.arch = host.arch
+    templateData.job_group = config.jobgroup
+    templateData.hostrequires = config.hostrequires
+    templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
+    templateData.extra_vars = "{" +
+      "\"rpm_key_imports\":[]," +
+      "\"jenkins_master_repositories\":[]," +
+      "\"jenkins_master_download_repositories\":[]," +
+      "\"jslave_name\":\"${host.name}\"," +
+      "\"jslave_label\":\"${host.name}\"," +
+      "\"arch\":\"${host.arch}\"," +
+      "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
+      "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
+      "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
+      "\"jswarm_version\":\"3.9\"," +
+      "\"jswarm_filename\":\"swarm-client-{{ jswarm_version }}.jar\"," +
+      "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
+      '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+      "}"
+
+    def templateDataJson = JsonOutput.toJson(templateData)
+    script.echo templateDataJson
+
+    templateDataJson
+  }
+}
+
+void installCredentials(WorkflowScript script) {
+  script.withCredentials([
+    script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
+    script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
+                            usernameVariable: 'KRB_PRINCIPAL',
+                            passwordVariable: '')
+    script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
+    script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
+  ]) {
+    script.env.HOME = "/home/jenkins"
+    script.sh """
+      sudo yum install -y krb5-workstation
+      kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
+      mkdir -p ~/.ssh
+      cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+      cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
+      chmod 600 ~/.ssh/id_rsa
+      chmod 644 ~/.ssh/id_rsa.pub
+      eval "\$(ssh-agent -s)"
+      ssh-add ~/.ssh/id_rsa
+    """
   }
 }
