@@ -174,7 +174,7 @@ class Provisioner {
     }
   }
 
-  void installCredentials(WorkflowScript script) {
+  void installCredentials(def script) {
     script.withCredentials([
       script.file(credentialsId: config.keytabCredentialId, variable: 'KEYTAB'),
       script.usernamePassword(credentialsId: config.krbPrincipalCredentialId,
