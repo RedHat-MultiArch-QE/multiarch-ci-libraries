@@ -188,11 +188,11 @@ class Provisioner {
     ]) {
       script.env.HOME = "/home/jenkins"
       script.sh """
-        cp ${script.KRBCONF} /etc/krb5.conf
-        mkdir -p /etc/beaker
-        cp ${script.BKRCONF} /etc/beaker/client.conf
-        chmod 644 /etc/krb5.conf
-        chmod 644 /etc/beaker/client.conf
+        sudo cp ${script.KRBCONF} /etc/krb5.conf || cp ${script.KRBCONF} /etc/krb5.conf
+        sudo mkdir -p /etc/beaker || mkdir -p /etc/beaker
+        sudo cp ${script.BKRCONF} /etc/beaker/client.conf || cp ${script.BKRCONF} /etc/beaker/client.conf
+        sudo chmod 644 /etc/krb5.conf || chmod 644 /etc/krb5.conf
+        sudo chmod 644 /etc/beaker/client.conf || chmod 644 /etc/beaker/client.conf
         kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
         mkdir -p ~/.ssh
         cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
