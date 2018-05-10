@@ -21,4 +21,6 @@ class Host {
   Boolean connectedToMaster = false
   // Whether installing Ansible on the host was successful
   Boolean ansibleInstalled = false
+  // Whether installing credentials on the host was successful
+  Boolean credentialsInstalled = false
 }
