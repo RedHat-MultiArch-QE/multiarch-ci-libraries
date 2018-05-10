@@ -182,19 +182,26 @@ class Provisioner {
                               usernameVariable: 'KRB_PRINCIPAL',
                               passwordVariable: ''),
       script.file(credentialsId: config.sshPrivKeyCredentialId, variable: 'SSHPRIVKEY'),
-      script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY')
+      script.file(credentialsId: config.sshPubKeyCredentialId, variable: 'SSHPUBKEY'),
+      script.file(credentialsId: config.krbConfCredentialId, variable: 'KRBCONF'),
+      script.file(credentialsId: config.bkrConfCredentialId, variable: 'BKRCONF')
     ]) {
       script.env.HOME = "/home/jenkins"
       script.sh """
-      kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
-      mkdir -p ~/.ssh
-      cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
-      cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
-      chmod 600 ~/.ssh/id_rsa
-      chmod 644 ~/.ssh/id_rsa.pub
-      eval "\$(ssh-agent -s)"
-      ssh-add ~/.ssh/id_rsa
-    """
+        cp ${script.KRBCONF} /etc/krb5.conf
+        mkdir -p /etc/beaker
+        cp ${script.BKRCONF} /etc/beaker/client.conf
+        chmod 644 /etc/krb5.conf
+        chmod 644 /etc/beaker/client.conf
+        kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
+        mkdir -p ~/.ssh
+        cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
+        cp ${script.SSHPUBKEY} ~/.ssh/id_rsa.pub
+        chmod 600 ~/.ssh/id_rsa
+        chmod 644 ~/.ssh/id_rsa.pub
+        eval "\$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
+      """
     }
   }
 }
