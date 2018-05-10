@@ -28,6 +28,10 @@ class ProvisioningConfig {
   String krbPrincipalCredentialId = 'redhat-multiarch-qe-krbprincipal'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
   String keytabCredentialId = 'redhat-multiarch-qe-keytab'
+  // ID of the Jenkins credential for the krb conf needed for Beaker authentication.
+  String krbConfCredentialId = 'redhat-multiarch-qe-krbconf'
+  // ID of the Jenkins credential for the bkr conf needed for Beaker authentication.
+  String bkrConfCredentialId = 'redhat-multiarch-qe-bkrconf'
   // ID of Jenkins credential for SSH private key to will be
   // copied to provisioned resource.
   // *** This must be the same as what was added to Beaker ***
