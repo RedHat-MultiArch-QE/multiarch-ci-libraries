@@ -1,15 +1,17 @@
+import org.junit.Test
 import com.lesfurets.jenkins.unit.BasePipelineTest
+import static com.lesfurets.jenkins.unit.global.lib.LibraryConfiguration.library
+import static com.lesfurets.jenkins.unit.global.lib.LocalSource.localSource
 
 public class LibraryTest extends BasePipelineTest {
 
   @Test
   void should_load_library() throws Exception {
-    String clonePath = 'https://github.com/jaypoulz/multiarch-ci-libraries'
 
     def library = library()
       .name('multiarch-ci-libraries')
-      .retriever(gitSource('git@gitlab.admin.courtanet.net:devteam/lesfurets-jenkins-shared.git'))
-      .targetPath(clonePath)
+      .retriever(localSource(''))
+      .targetPath('build/libs')
       .defaultVersion("master")
       .allowOverride(true)
       .implicit(false)
