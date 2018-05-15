@@ -93,7 +93,7 @@ class Provisioner {
           script.node (host.name) {
             script.sh '''
               sudo yum install python-devel openssl-devel libffi-devel -y &&
-              sudo mkdir /home/jenkins &&
+              sudo mkdir -p /home/jenkins &&
               sudo chown --recursive ${USER}:${USER} /home/jenkins &&
               sudo pip install --upgrade pip &&
               sudo pip install --upgrade setuptools &&
