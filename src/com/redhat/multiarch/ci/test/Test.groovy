@@ -48,7 +48,8 @@ class Test {
           ttyEnabled: false,
           args: '${computer.jnlpmac} ${computer.name}',
           command: '',
-          workingDir: '/tmp'
+          workingDir: '/tmp',
+          privileged: true  
         )
       ]
     ) {
