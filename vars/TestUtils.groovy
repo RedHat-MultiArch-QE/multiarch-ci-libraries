@@ -19,14 +19,16 @@ class TestUtils {
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
+   * @param postTest Closure that is run after the tests
    */
   static def runTest(
     WorkflowScript script,
     String arch,
     ProvisioningConfig config,
     Closure test,
-    Closure onTestFailure) {
-    (new Test(arch, config, test, onTestFailure)).run()
+    Closure onTestFailure,
+    Closure postTest) {
+    (new Test(arch, config, test, onTestFailure, postTest)).run()
   }
 
   /**
@@ -38,13 +40,15 @@ class TestUtils {
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
+   * @param postTest Closure that is run after the tests
    */
   static def runParallelMultiArchTest(
     WorkflowScript script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
-    Closure onTestFailure) {
-    (new MultiArchTest(script, arches, config, test, onTestFailure)).run()
+    Closure onTestFailure,
+    Closure postTest) {
+    (new MultiArchTest(script, arches, config, test, onTestFailure, postTest)).run()
   }
 }
