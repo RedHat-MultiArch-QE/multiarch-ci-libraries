@@ -73,20 +73,43 @@ class Test {
                   script.error host.error
                 }
               }
+            } catch (e) {
+              onTestFailure(e, host)
 
-              if (config.runOnSlave) {
-                script.node(host.name) {
-                  test(host, config)
-                }
-                return
+              // Ensure teardown runs before the pipeline exits
+              script.stage ('Teardown Host') {
+                provisioner.teardown(host, arch)
               }
 
+              return
+            }
+
+
+            if (config.runOnSlave) {
+              script.node(host.name) {
+                try {
+                  test(host, config)
+                } catch (e) {
+                  onTestFailure(e, host)
+                } finally {
+                  postTest()
+
+                  // Ensure teardown runs before the pipeline exits
+                  script.stage ('Teardown Host') {
+                    provisioner.teardown(host, arch)
+                  }
+                }
+              }
+              return
+            }
+
+            try {
               test(host, config)
             } catch (e) {
               onTestFailure(e, host)
             } finally {
               postTest()
- 
+
               // Ensure teardown runs before the pipeline exits
               script.stage ('Teardown Host') {
                 provisioner.teardown(host, arch)
