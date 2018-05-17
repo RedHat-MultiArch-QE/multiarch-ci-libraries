@@ -23,4 +23,6 @@ class Host {
   Boolean ansibleInstalled = false
   // Whether installing credentials on the host was successful
   Boolean credentialsInstalled = false
+  // Wheater installing rhpkg on the host was successful
+  Boolean rhpkgInstall = false
 }
