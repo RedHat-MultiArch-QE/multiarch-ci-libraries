@@ -84,12 +84,19 @@ class Provisioner {
         // It's already installed on the provisioning container
         if (config.installCredentials) {
           script.node (host.name) {
-            script.sh "sudo yum install -y krb5-workstation"
+            script.sh "
             installCredentials(script)
           }
         }
         host.credentialsInstalled = true
       }
+
+      if (config.installRhpkg) {
+        script.node(host.name) {
+          installRhpkg(script)
+        }
+      }
+      host.rhpkgInstalled = true
     } catch (e) {
       script.echo "${e}"
       host.error = e.getMessage()
@@ -188,6 +195,7 @@ class Provisioner {
     ]) {
       script.env.HOME = "/home/jenkins"
       script.sh """
+        sudo yum install -y krb5-workstation || yum install -y krb5-workstation
         sudo cp ${script.KRBCONF} /etc/krb5.conf || cp ${script.KRBCONF} /etc/krb5.conf
         sudo mkdir -p /etc/beaker || mkdir -p /etc/beaker
         sudo cp ${script.BKRCONF} /etc/beaker/client.conf || cp ${script.BKRCONF} /etc/beaker/client.conf
@@ -203,5 +211,20 @@ class Provisioner {
         ssh-add ~/.ssh/id_rsa
       """
     }
+  }
+
+  void installRhpkg(def script) {
+    script.sh """
+      echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | sudo tee -a /etc/ssh/ssh_known_hosts
+
+      echo "Host pkgs.devel.redhat.com" | sudo tee -a /etc/ssh/ssh_config
+      echo "IdentityFile /home/jenkins/.ssh/id_rsa" | sudo tee -a /etc/ssh/ssh_config
+
+      sudo yum install -y yum-utils git
+      curl -L -O http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo
+      sudo yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
+      sudo yum install -y rhpkg
+      git config --global user.name "jenkins"
+    """
   }
 }
