@@ -84,7 +84,6 @@ class Provisioner {
         // It's already installed on the provisioning container
         if (config.installCredentials) {
           script.node (host.name) {
-            script.sh "
             installCredentials(script)
           }
         }
