@@ -56,9 +56,12 @@ class ProvisioningConfig {
   // since jobs that are run via ssh already have access to ansible in the
   // provisioning container.
   Boolean installAnsible = true
-  // Wheather the ssh keypair and kerberos keytab should be installed on the provisioned host
+  // Whether the ssh keypair and kerberos keytab should be installed on the provisioned host
   // These are already installed on the provisioning container
   Boolean installCredentials = true
+  // Whether rhpkg should be installed on the provisioned host
+  // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
+  Boolean installRhpkg = false
 
   ProvisioningConfig(params, env) {
     this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ?: this.krbPrincipalCredentialId
