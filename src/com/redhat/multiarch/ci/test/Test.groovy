@@ -10,6 +10,7 @@ class Test {
   ProvisioningConfig config
   Closure test
   Closure onTestFailure
+  Closure postTest
 
   /**
    * @param script WorkflowScript that the test will run in.
@@ -18,12 +19,13 @@ class Test {
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
    */
-  Test(def script, String arch, ProvisioningConfig config, Closure test, Closure onTestFailure) {
+  Test(def script, String arch, ProvisioningConfig config, Closure test, Closure onTestFailure, Closure postTest) {
     this.script = script
     this.arch = arch
     this.config = config
     this.test = test
     this.onTestFailure = onTestFailure
+    this.postTest = postTest
   }
 
   /*
@@ -83,6 +85,8 @@ class Test {
             } catch (e) {
               onTestFailure(e, host)
             } finally {
+              postTest()
+ 
               // Ensure teardown runs before the pipeline exits
               script.stage ('Teardown Host') {
                 provisioner.teardown(host, arch)
