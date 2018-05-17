@@ -11,6 +11,7 @@ class MultiArchTest {
   ProvisioningConfig config
   Closure test
   Closure onTestFailure
+  Closure postTest
 
   /**
    * @param script WorkflowScript that the test will run in.
@@ -20,12 +21,13 @@ class MultiArchTest {
    * @param onTestFailure Closure that take the Slave used by the test and the Exception that occured.
    */
   MultiArchTest(def script, List<String> arches, ProvisioningConfig config,
-                Closure test, Closure onTestFailure) {
+                Closure test, Closure onTestFailure, Closure postTest) {
     this.script = script
     this.arches = arches
     this.config = config
     this.test = test
     this.onTestFailure = onTestFailure
+    this.postTest = postTest
   }
 
   /**
@@ -44,7 +46,7 @@ class MultiArchTest {
       Task.parallelizeTaskList(
         parallelTasks,
         { params ->
-          Test test = new Test(script, params.arch, config, test, onTestFailure)
+          Test test = new Test(script, params.arch, config, test, onTestFailure, postTest)
           return { test.run() }
         }
       )
