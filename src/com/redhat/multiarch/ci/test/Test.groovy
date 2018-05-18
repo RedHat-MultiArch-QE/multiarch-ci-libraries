@@ -93,13 +93,14 @@ class Test {
                   onTestFailure(e, host)
                 } finally {
                   postTest()
-
-                  // Ensure teardown runs before the pipeline exits
-                  script.stage ('Teardown Host') {
-                    provisioner.teardown(host, arch)
-                  }
                 }
               }
+             
+              // Ensure teardown runs before the pipeline exits
+              script.stage ('Teardown Host') {
+                provisioner.teardown(host, arch)
+              }
+              
               return
             }
 
