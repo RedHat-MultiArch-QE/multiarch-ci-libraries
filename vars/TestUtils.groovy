@@ -28,7 +28,9 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest) {
-    (new Test(arch, config, test, onTestFailure, postTest)).run()
+    testWrapper {
+      (new Test(arch, config, test, onTestFailure, postTest)).run()
+    }
   }
 
   /**
@@ -49,6 +51,8 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest) {
-    (new MultiArchTest(script, arches, config, test, onTestFailure, postTest)).run()
+    testWrapper {
+      (new MultiArchTest(script, arches, config, test, onTestFailure, postTest)).run()
+    }
   }
 }
