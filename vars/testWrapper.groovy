@@ -1,5 +1,7 @@
-def call(Closure test) {
-  script.podTemplate(
+import com.redhat.multiarch.ci.provisioner.ProvisioningConfig
+
+def call(ProvisioningConfig config, Closure test) {
+  podTemplate(
     name: "provisioner-${config.version}",
     label: "provisioner-${config.version}",
     cloud: config.cloudName,
@@ -8,7 +10,7 @@ def call(Closure test) {
     namespace: config.tenant,
     containers: [
       // This adds the custom provisioner slave container to the pod. Must be first with name 'jnlp'
-      script.containerTemplate(
+      containerTemplate(
         name: 'jnlp',
         image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}-${config.version}",
         ttyEnabled: false,
@@ -19,9 +21,9 @@ def call(Closure test) {
       )
     ]
   ) {
-    script.ansiColor('xterm') {
-      script.timestamps {
-        script.node("provisioner-${config.version}") {
+    ansiColor('xterm') {
+      timestamps {
+        node("provisioner-${config.version}") {
           test()
         }
       }
