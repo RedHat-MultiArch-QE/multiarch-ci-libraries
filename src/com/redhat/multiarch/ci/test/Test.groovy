@@ -75,12 +75,7 @@ class Test {
               }
             } catch (e) {
               onTestFailure(e, host)
-
-              // Ensure teardown runs before the pipeline exits
-              script.stage ('Teardown Host') {
-                provisioner.teardown(host, arch)
-              }
-
+              teardown(provisioner, host)
               return
             }
 
@@ -95,12 +90,8 @@ class Test {
                   postTest()
                 }
               }
-             
-              // Ensure teardown runs before the pipeline exits
-              script.stage ('Teardown Host') {
-                provisioner.teardown(host, arch)
-              }
-              
+
+              teardown(provisioner, host)
               return
             }
 
@@ -110,15 +101,22 @@ class Test {
               onTestFailure(e, host)
             } finally {
               postTest()
-
-              // Ensure teardown runs before the pipeline exits
-              script.stage ('Teardown Host') {
-                provisioner.teardown(host, arch)
-              }
+              teardown(provisioner, host)
             }
           }
         }
       }
     }
   }
+  
+  void teardown(Provisioner provisioner, Host host) {
+    try {
+      // Ensure teardown runs before the pipeline exits
+      script.stage ('Teardown Host') {
+        provisioner.teardown(host, arch)
+      }
+    } catch (e) {
+    }
+  }
 }
+
