@@ -46,10 +46,12 @@ class MultiArchTest {
       Task.parallelizeTaskList(
         parallelTasks,
         { params ->
-          Test test = new Test(script, params.arch, config, test, onTestFailure, postTest)
+          Test test = new Test(script, params.arch, config, test, onTestFailure, {})
           return { test.run() }
         }
       )
     )
+
+    postTest()
   }
 }

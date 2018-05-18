@@ -34,81 +34,53 @@ class Test {
    */
   def run() {
     Provisioner provisioner = new Provisioner(script, config)
+    Host host
+    try {
+      script.stage('Provision Host') {
+        host = provisioner.provision(arch)
 
-    script.podTemplate(
-      name: "provisioner-${config.version}",
-      label: "provisioner-${config.version}",
-      cloud: config.cloudName,
-      serviceAccount: 'jenkins',
-      idleMinutes: 0,
-      namespace: config.tenant,
-      containers: [
-        // This adds the custom provisioner slave container to the pod. Must be first with name 'jnlp'
-        script.containerTemplate(
-          name: 'jnlp',
-          image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}-${config.version}",
-          ttyEnabled: false,
-          args: '${computer.jnlpmac} ${computer.name}',
-          command: '',
-          workingDir: '/tmp'
-        )
-      ]
-    ) {
-      script.ansiColor('xterm') {
-        script.timestamps {
-          script.node("provisioner-${config.version}") {
+        // Property validity check
+        if (!host.name || !host.arch) {
+          script.error "Invalid provisioned host: ${host}"
+        }
 
-            Host host
-            try {
-              script.stage('Provision Host') {
-                host = provisioner.provision(arch)
-
-                // Property validity check
-                if (!host.name || !host.arch) {
-                  script.error "Invalid provisioned host: ${host}"
-                }
-
-                // If the provision failed, there will be an error
-                if (host.error) {
-                  script.error host.error
-                }
-              }
-            } catch (e) {
-              onTestFailure(e, host)
-              teardown(provisioner, host)
-              return
-            }
-
-
-            if (config.runOnSlave) {
-              script.node(host.name) {
-                try {
-                  test(host, config)
-                } catch (e) {
-                  onTestFailure(e, host)
-                } finally {
-                  postTest()
-                }
-              }
-
-              teardown(provisioner, host)
-              return
-            }
-
-            try {
-              test(host, config)
-            } catch (e) {
-              onTestFailure(e, host)
-            } finally {
-              postTest()
-              teardown(provisioner, host)
-            }
-          }
+        // If the provision failed, there will be an error
+        if (host.error) {
+          script.error host.error
         }
       }
+    } catch (e) {
+      onTestFailure(e, host)
+      teardown(provisioner, host)
+      return
+    }
+
+
+    if (config.runOnSlave) {
+      script.node(host.name) {
+        try {
+          test(host, config)
+        } catch (e) {
+          onTestFailure(e, host)
+        } finally {
+          postTest()
+        }
+      }
+
+      teardown(provisioner, host)
+      return
+    }
+
+    try {
+      test(host, config)
+    } catch (e) {
+      onTestFailure(e, host)
+    } finally {
+      postTest()
+      teardown(provisioner, host)
     }
   }
-  
+
   void teardown(Provisioner provisioner, Host host) {
     try {
       // Ensure teardown runs before the pipeline exits
@@ -119,4 +91,3 @@ class Test {
     }
   }
 }
-
