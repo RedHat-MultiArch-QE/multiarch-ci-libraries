@@ -1,7 +1,6 @@
 import com.redhat.multiarch.ci.provisioner.*
 import com.redhat.multiarch.ci.test.*
 import com.redhat.multiarch.ci.task.*
-import org.csanchez.jenkins.plugins.kubernetes.*
 
 class TestUtils {
   static ProvisioningConfig config = null
@@ -30,6 +29,7 @@ class TestUtils {
     Closure onTestFailure,
     Closure postTest) {
     testWrapper(
+      script,
       config,
       {
         (new Test(arch, config, test, onTestFailure, postTest)).run()
@@ -56,6 +56,7 @@ class TestUtils {
     Closure onTestFailure,
     Closure postTest) {
     testWrapper(
+      script,
       config,
       {
         (new MultiArchTest(script, arches, config, test, onTestFailure, postTest)).run()
@@ -63,8 +64,8 @@ class TestUtils {
     )
   }
 
-  static def testWrapper(ProvisioningConfig config, Closure test) {
-    podTemplate(
+  static def testWrapper(WorkflowScript script, ProvisioningConfig config, Closure test) {
+    script.podTemplate(
       name: "provisioner-${config.version}",
       label: "provisioner-${config.version}",
       cloud: config.cloudName,
@@ -73,7 +74,7 @@ class TestUtils {
       namespace: config.tenant,
       containers: [
         // This adds the custom provisioner slave container to the pod. Must be first with name 'jnlp'
-        containerTemplate(
+        script.containerTemplate(
           name: 'jnlp',
           image: "${config.dockerUrl}/${config.tenant}/${config.provisioningImage}-${config.version}",
           ttyEnabled: false,
