@@ -175,8 +175,6 @@ class Provisioner {
         "}"
 
       def templateDataJson = JsonOutput.toJson(templateData)
-      script.echo templateDataJson
-
       templateDataJson
     }
   }
