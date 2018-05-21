@@ -47,7 +47,11 @@ class MultiArchTest {
         parallelTasks,
         { params ->
           Test test = new Test(script, params.arch, config, test, onTestFailure, {})
-          return { test.run() }
+          return {
+            script.node("provisioner-${config.version}") {
+              test.run()
+            }
+          }
         }
       )
     )
