@@ -1,6 +1,7 @@
 import com.redhat.multiarch.ci.provisioner.*
 import com.redhat.multiarch.ci.test.*
 import com.redhat.multiarch.ci.task.*
+import org.csanchez.jenkins.plugins.kubernetes.*
 
 class TestUtils {
   static ProvisioningConfig config = null
