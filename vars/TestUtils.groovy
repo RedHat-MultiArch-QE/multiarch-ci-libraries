@@ -28,7 +28,7 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest) {
-    testWrapper(
+    TestUtils.testWrapper(
       script,
       config,
       {
@@ -55,7 +55,7 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest) {
-    testWrapper(
+    TestUtils.testWrapper(
       script,
       config,
       {
