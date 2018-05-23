@@ -28,6 +28,10 @@ class ProvisioningConfig {
   String krbPrincipalCredentialId = 'redhat-multiarch-qe-krbprincipal'
   // ID of Jenkins credential for keytab needed for Beaker authentication.
   String keytabCredentialId = 'redhat-multiarch-qe-keytab'
+  // ID of the Jenkins credential for the krb conf needed for Beaker authentication.
+  String krbConfCredentialId = 'redhat-multiarch-qe-krbconf'
+  // ID of the Jenkins credential for the bkr conf needed for Beaker authentication.
+  String bkrConfCredentialId = 'redhat-multiarch-qe-bkrconf'
   // ID of Jenkins credential for SSH private key to will be
   // copied to provisioned resource.
   // *** This must be the same as what was added to Beaker ***
@@ -52,6 +56,12 @@ class ProvisioningConfig {
   // since jobs that are run via ssh already have access to ansible in the
   // provisioning container.
   Boolean installAnsible = true
+  // Whether the ssh keypair and kerberos keytab should be installed on the provisioned host
+  // These are already installed on the provisioning container
+  Boolean installCredentials = true
+  // Whether rhpkg should be installed on the provisioned host
+  // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
+  Boolean installRhpkg = false
 
   ProvisioningConfig(params, env) {
     this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ?: this.krbPrincipalCredentialId
