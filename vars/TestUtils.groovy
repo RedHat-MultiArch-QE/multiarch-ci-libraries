@@ -87,9 +87,7 @@ class TestUtils {
     ) {
       script.ansiColor('xterm') {
         script.timestamps {
-          script.node("provisioner-${config.version}") {
-            test()
-          }
+          test()
         }
       }
     }

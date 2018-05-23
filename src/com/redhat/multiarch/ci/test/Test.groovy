@@ -33,51 +33,53 @@ class Test {
    * Runs @onTestFailure if it encounters an Exception.
    */
   def run() {
-    Provisioner provisioner = new Provisioner(script, config)
-    Host host
-    try {
-      script.stage('Provision Host') {
-        host = provisioner.provision(arch)
+    script.node("provisioner-${config.version}") {
+      Provisioner provisioner = new Provisioner(script, config)
+      Host host
+      try {
+        script.stage('Provision Host') {
+          host = provisioner.provision(arch)
 
-        // Property validity check
-        if (!host.name || !host.arch) {
-          script.error "Invalid provisioned host: ${host}"
+          // Property validity check
+          if (!host.name || !host.arch) {
+            script.error "Invalid provisioned host: ${host}"
+          }
+
+          // If the provision failed, there will be an error
+          if (host.error) {
+            script.error host.error
+          }
         }
-
-        // If the provision failed, there will be an error
-        if (host.error) {
-          script.error host.error
-        }
-      }
-    } catch (e) {
-      onTestFailure(e, host)
-      teardown(provisioner, host)
-      return
-    }
-
-
-    if (config.runOnSlave) {
-      script.node(host.name) {
-        try {
-          test(host, config)
-        } catch (e) {
-          onTestFailure(e, host)
-        } finally {
-          postTest()
-        }
+      } catch (e) {
+        onTestFailure(e, host)
+        teardown(provisioner, host)
+        return
       }
 
-      teardown(provisioner, host)
-      return
-    }
 
-    try {
-      test(host, config)
-    } catch (e) {
-      onTestFailure(e, host)
-    } finally {
-      postTest()
-      teardown(provisioner, host)
+      if (config.runOnSlave) {
+        script.node(host.name) {
+          try {
+            test(host, config)
+          } catch (e) {
+            onTestFailure(e, host)
+          } finally {
+            postTest()
+          }
+        }
+
+        teardown(provisioner, host)
+        return
+      }
+
+      try {
+        test(host, config)
+      } catch (e) {
+        onTestFailure(e, host)
+      } finally {
+        postTest()
+        teardown(provisioner, host)
+      }
     }
   }
 

@@ -48,14 +48,14 @@ class MultiArchTest {
         { params ->
           Test test = new Test(script, params.arch, config, test, onTestFailure, {})
           return {
-            script.node("provisioner-${config.version}") {
-              test.run()
-            }
+            test.run()
           }
         }
       )
     )
 
-    postTest()
+    script.node("provisioner-${config.version}") {
+      postTest()
+    }
   }
 }
