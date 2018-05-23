@@ -21,4 +21,8 @@ class Host {
   Boolean connectedToMaster = false
   // Whether installing Ansible on the host was successful
   Boolean ansibleInstalled = false
+  // Whether installing credentials on the host was successful
+  Boolean credentialsInstalled = false
+  // Wheater installing rhpkg on the host was successful
+  Boolean rhpkgInstalled = false
 }
