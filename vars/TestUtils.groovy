@@ -80,8 +80,7 @@ class TestUtils {
           ttyEnabled: false,
           args: '${computer.jnlpmac} ${computer.name}',
           command: '',
-          workingDir: '/tmp',
-          privileged: true
+          workingDir: '/tmp'
         )
       ]
     ) {
