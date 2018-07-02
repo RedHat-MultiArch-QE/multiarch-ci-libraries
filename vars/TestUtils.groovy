@@ -1,6 +1,6 @@
-import com.redhat.multiarch.ci.provisioner.*
-import com.redhat.multiarch.ci.test.*
-import com.redhat.multiarch.ci.task.*
+import com.redhat.ci.provisioner.*
+import com.redhat.ci.Task
+import com.redhat.ci.host.TargetHost
 
 class TestUtils {
   static ProvisioningConfig config = null
@@ -28,11 +28,13 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest = {}) {
+    TargetHost host = new TargetHost()
+    host.arch = arch
     TestUtils.testWrapper(
       script,
       config,
       {
-        (new Test(script, arch, config, test, onTestFailure, postTest)).run()
+        (new Task(script, [ host ], config, test, onTestFailure, postTest)).run()
       }
     )
   }
@@ -42,7 +44,7 @@ class TestUtils {
    * Runs @onTestFailure if it encounters an Exception.
    *
    * @param script WorkflowScript that the test will run in.
-   * @param testTargets List<TestTarget> List of specifications for target hosts that your test will run on.
+   * @param hosts  List<TargetHost> List of specifications for target hosts that your test will run on.
    * @param config ProvisioningConfig Configuration for provisioning.
    * @param test Closure that takes the Host used by the test.
    * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
@@ -50,7 +52,7 @@ class TestUtils {
    */
   static def runTest(
     WorkflowScript script,
-    List<TestTarget> testTargets,
+    List<TargetHost> hosts,
     ProvisioningConfig config,
     Closure test,
     Closure onTestFailure,
@@ -59,7 +61,7 @@ class TestUtils {
       script,
       config,
       {
-        (new MultiHostTest(script, testTargets, config, test, onTestFailure, postTest)).run()
+        (new Task(script, hosts, config, test, onTestFailure, postTest)).run()
       }
     )
   }
@@ -82,11 +84,15 @@ class TestUtils {
     Closure test,
     Closure onTestFailure,
     Closure postTest = {}) {
+    List<TargetHost> hosts = []
+    for (arch in arches) {
+      hosts.push(new TargetHost(arch: arch))
+    }      
     TestUtils.testWrapper(
       script,
       config,
       {
-        (new MultiArchTest(script, arches, config, test, onTestFailure, postTest)).run()
+        (new Task(script, hosts, config, test, onTestFailure, postTest)).run()
       }
     )
   }
