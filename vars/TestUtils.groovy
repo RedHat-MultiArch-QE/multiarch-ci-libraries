@@ -38,6 +38,33 @@ class TestUtils {
   }
 
   /**
+   * Runs @test on a multi-arch provisioned host for the specified arch.
+   * Runs @onTestFailure if it encounters an Exception.
+   *
+   * @param script WorkflowScript that the test will run in.
+   * @param testTargets List<TestTarget> List of specifications for target hosts that your test will run on.
+   * @param config ProvisioningConfig Configuration for provisioning.
+   * @param test Closure that takes the Host used by the test.
+   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
+   * @param postTest Closure that is run after the tests
+   */
+  static def runTest(
+    WorkflowScript script,
+    List<TestTarget> testTargets,
+    ProvisioningConfig config,
+    Closure test,
+    Closure onTestFailure,
+    Closure postTest = {}) {
+    TestUtils.testWrapper(
+      script,
+      config,
+      {
+        (new MultiHostTest(script, testTargets, config, test, onTestFailure, postTest)).run()
+      }
+    )
+  }
+
+  /**
    * Runs @test on a multi-arch provisioned host for each arch in arches param.
    * Runs @onTestFailure if it encounters an Exception.
    *

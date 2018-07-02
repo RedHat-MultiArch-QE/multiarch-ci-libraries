@@ -1,4 +1,4 @@
-package com.redhat.multiarch.ci.provisioner
+package com.redhat.ci.provisioner
 
 class ProvisioningConfig {
   // Provisioner version
@@ -51,6 +51,7 @@ class ProvisioningConfig {
   String jswarmExtraArgs = ""
   // Whether the closure should be run on directly on the provisioned host.
   Boolean runOnSlave = true
+  Mode mode = null
   // Whether Ansible should be installed on the provisioned host.
   // This will only be respected if runOnSlave is also set to true,
   // since jobs that are run via ssh already have access to ansible in the
@@ -64,6 +65,7 @@ class ProvisioningConfig {
   Boolean installRhpkg = false
 
   ProvisioningConfig(params, env) {
+    this()
     this.krbPrincipalCredentialId = params.KRBPRINCPALCREDENTIALID ?: this.krbPrincipalCredentialId
     this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
     this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
@@ -72,4 +74,13 @@ class ProvisioningConfig {
     this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
     this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
   }
+
+  ProvisioningConfig() {
+    this.mode = Mode.CINCH
+  }
+
+  void setRunOnSlave(Boolean runOnSlave) {
+    this.runOnSlave = runOnSlave
+    this.mode = runOnSlave ? Mode.CINCH : Mode.SSH
+  }  
 }
