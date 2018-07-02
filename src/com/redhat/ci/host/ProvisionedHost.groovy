@@ -1,16 +1,10 @@
-package com.redhat.multiarch.ci.provisioner
+package com.redhat.ci.host
 
-class Host {
-  // Architecture of the host
-  String arch = null
-  // Name of the host
-  String hostName = null
+class ProvisionedHost extends TargetHost {
   // Any error that occurred during provisioning
   String error = null
   // Name of the host as it will appear in Jenkins
-  String name = null
-  // Target of the Linchpin PinFile
-  String target = null
+  String displayName = null
   // Full path to the inventory file
   String inventory = null
   // Whether provisioning initialization was successful

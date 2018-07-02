@@ -1,6 +1,8 @@
-package com.redhat.multiarch.ci.provisioner
+package com.redhat.ci.provisioner
 
 import groovy.json.*
+import com.redhat.ci.host.TargetHost
+import com.redhat.ci.host.ProvisionedHost
 
 class Provisioner {
   def script
@@ -16,11 +18,11 @@ class Provisioner {
    *
    * @param arch String representing architecture of the host to provision.
    */
-  Host provision(String arch) {
-    Host host = new Host(
-      arch: arch,
+  ProvisionedHost provision(TargetHost target) {
+    ProvisionedHost host = new ProvisionedHost(
+      arch: target.arch,
       target: 'jenkins-slave',
-      name: "${arch}-slave"
+      displayName: "${target.arch}-slave"
     )
 
     try {
@@ -67,7 +69,7 @@ class Provisioner {
         // We only care if the install ansible flag is set when we are running on the provisioned host
         // It's already installed on the provisioning container
         if (config.installAnsible) {
-          script.node (host.name) {
+          script.node (host.displayName) {
             script.sh '''
               sudo yum install python-devel openssl-devel libffi-devel -y &&
               sudo mkdir -p /home/jenkins &&
@@ -83,7 +85,7 @@ class Provisioner {
         // We only care if the install credentials flag is set when we are running on the provisioned host
         // It's already installed on the provisioning container
         if (config.installCredentials) {
-          script.node (host.name) {
+          script.node (host.displayName) {
             installCredentials(script)
           }
         }
@@ -108,9 +110,8 @@ class Provisioner {
    * Runs a teardown for provisioned host.
    *
    * @param host Provisioned host to be torn down.
-   * @param arch String specifying the arch to run tests on.
    */
-  def teardown(Host host, String arch) {
+  def teardown(ProvisionedHost host) {
     // Prepare the cinch teardown inventory
     if (!host || !host.initialized) {
       // The provisioning job did not successfully provision a machine, so there is nothing to teardown
@@ -146,7 +147,7 @@ class Provisioner {
     }
   }
 
-  String getTemplateData(Host host) {
+  String getTemplateData(ProvisionedHost host) {
     script.withCredentials([
       script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
                               usernameVariable: 'JENKINS_SLAVE_USERNAME',
@@ -162,8 +163,8 @@ class Provisioner {
         "\"rpm_key_imports\":[]," +
         "\"jenkins_master_repositories\":[]," +
         "\"jenkins_master_download_repositories\":[]," +
-        "\"jslave_name\":\"${host.name}\"," +
-        "\"jslave_label\":\"${host.name}\"," +
+        "\"jslave_name\":\"${host.displayName}\"," +
+        "\"jslave_label\":\"${host.displayName}\"," +
         "\"arch\":\"${host.arch}\"," +
         "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
         "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
