@@ -1,6 +1,6 @@
-import com.redhat.ci.provisioner.*
+import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.Task
-import com.redhat.ci.host.TargetHost
+import com.redhat.ci.hosts.TargetHost
 
 class TestUtils {
   static ProvisioningConfig config = null
@@ -11,92 +11,129 @@ class TestUtils {
   }
 
   /**
-   * Runs @test on a multi-arch provisioned host for the specified arch.
-   * Runs @onTestFailure if it encounters an Exception.
+   * Runs @test on a provisioned host for the specified arch.
+   * Runs @onFailure if it encounters an Exception.
    *
-   * @param script WorkflowScript that the test will run in.
-   * @param arch String specifying the arch to run tests on.
-   * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Host used by the test.
-   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
-   * @param postTest Closure that is run after the tests
+   * @param script    WorkflowScript     Script that the test will run in.
+   * @param arch      String             The arch to run the test on.
+   * @param config    ProvisioningConfig Configuration for provisioning.
+   * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
+   * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
+   * @param postRun   Closure            Closure that is run after the test.
    */
   static def runTest(
     WorkflowScript script,
     String arch,
     ProvisioningConfig config,
     Closure test,
-    Closure onTestFailure,
-    Closure postTest = {}) {
-    TargetHost host = new TargetHost()
-    host.arch = arch
-    TestUtils.testWrapper(
+    Closure onFailure,
+    Closure postRun = {})  {
+    TargetHost target = new TargetHost()
+    target.arch = arch
+    TestUtils.runTest(
       script,
+      [ target ],
       config,
-      {
-        (new Task(script, [ host ], config, test, onTestFailure, postTest)).run()
-      }
+      test,
+      onFailure,
+      postRun
     )
   }
 
   /**
-   * Runs @test on a multi-arch provisioned host for the specified arch.
-   * Runs @onTestFailure if it encounters an Exception.
+   * Runs @test on a provisioned host for each arch in @arches.
+   * Runs @onFailure if it encounters an Exception.
    *
-   * @param script WorkflowScript that the test will run in.
-   * @param hosts  List<TargetHost> List of specifications for target hosts that your test will run on.
-   * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Host used by the test.
-   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
-   * @param postTest Closure that is run after the tests
-   */
-  static def runTest(
-    WorkflowScript script,
-    List<TargetHost> hosts,
-    ProvisioningConfig config,
-    Closure test,
-    Closure onTestFailure,
-    Closure postTest = {}) {
-    TestUtils.testWrapper(
-      script,
-      config,
-      {
-        (new Task(script, hosts, config, test, onTestFailure, postTest)).run()
-      }
-    )
-  }
-
-  /**
-   * Runs @test on a multi-arch provisioned host for each arch in arches param.
-   * Runs @onTestFailure if it encounters an Exception.
-   *
-   * @param script WorkflowScript that this test will run in.
-   * @param arches List<String> specifying the arches to run single host tests on.
-   * @param config ProvisioningConfig Configuration for provisioning.
-   * @param test Closure that takes the Host used by the test.
-   * @param onTestFailure Closure that take the Host used by the test and the Exception that occured.
-   * @param postTest Closure that is run after the tests
+   * @param script    WorkflowScript     Script that the test will run in.
+   * @param arches    List<String>       List of arches to run test on.
+   * @param config    ProvisioningConfig Configuration for provisioning.
+   * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
+   * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
+   * @param postRun   Closure            Closure that is run after the tests
    */
   static def runParallelMultiArchTest(
     WorkflowScript script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
-    Closure onTestFailure,
-    Closure postTest = {}) {
-    List<TargetHost> hosts = []
+    Closure onFailure,
+    Closure postRun = {}) {
+    List<TargetHost> targets = []
     for (arch in arches) {
-      hosts.push(new TargetHost(arch: arch))
-    }      
+      targets.push(new TargetHost(arch: arch))
+    }
+    runTest(
+      script,
+      targets,
+      config,
+      test,
+      onFailure,
+      postRun
+    )
+  }
+
+  /**
+   * Runs @test on a provisioned host for the specified arch.
+   * Runs @onFailure if it encounters an Exception.
+   *
+   * @param script    WorkflowScript     Script that the test will run in.
+   * @param target    TargetHost         Host that the test will run on.
+   * @param config    ProvisioningConfig Configuration for provisioning.
+   * @param test      Closure            Closure that takes the ProvisoinedHost used by the test.
+   * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
+   * @param postRun   Closure            Closure that is run after the test.
+   */
+  static def runTest(
+    WorkflowScript script,
+    TargetHost target,
+    ProvisioningConfig config,
+    Closure test,
+    Closure onFailure,
+    Closure postRun = {}) {
+    runTest(
+      script,
+      [ target ],
+      config,
+      test,
+      onFailure,
+      postRun
+    )
+  }
+
+  /**
+   * Runs @test on a provisioned host for each specified TargetHost.
+   * Runs @onFailure if it encounters an Exception.
+   *
+   * @param script    WorkflowScript     Script that the test will run in.
+   * @param hosts     List<TargetHost>   List of specifications for target hosts that the test will run on.
+   * @param config    ProvisioningConfig Configuration for provisioning.
+   * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
+   * @param onFailure Closure            Closure that takes the Provisioned used by the test and the Exception that occured.
+   * @param postRun   Closure            Closure that is run after the tests.
+   */
+  static def runTest(
+    WorkflowScript script,
+    List<TargetHost> targets,
+    ProvisioningConfig config,
+    Closure test,
+    Closure onFailure,
+    Closure postRun = {}) {
     TestUtils.testWrapper(
       script,
       config,
       {
-        (new Task(script, hosts, config, test, onTestFailure, postTest)).run()
+        (new Task(script, targets, config, test, onFailure, postRun)).run()
       }
     )
   }
 
+  /**
+   * Runs @test in ProvisioningConfig defined container as part of a WorkflowScript.
+   *
+   * @param script WorkflowScript     Script the test wrapper will run in.
+   * @param config ProvisioningConfig Configuration defining the container.
+   * @param test   Closure            Closure that will run on the container.
+   */
   static def testWrapper(WorkflowScript script, ProvisioningConfig config, Closure test) {
     script.podTemplate(
       name: "provisioner-${config.version}",
