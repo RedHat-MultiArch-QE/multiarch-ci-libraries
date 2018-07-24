@@ -1,4 +1,4 @@
-package com.redhat.ci.host
+package com.redhat.ci.hosts
 
 class ProvisionedHost extends TargetHost {
   // Any error that occurred during provisioning
@@ -6,12 +6,12 @@ class ProvisionedHost extends TargetHost {
   // Name of the host as it will appear in Jenkins
   String displayName = null
   // Full path to the inventory file
-  String inventory = null
+  String inventoryPath = null
   // Whether provisioning initialization was successful
   Boolean initialized = false
   // Whether provisioning was successful
   Boolean provisioned = false
-  // Whether connecting the host to Jenkins via Cinch was successful
+  // Whether connecting the host to Jenkins via JNLP was successful
   Boolean connectedToMaster = false
   // Whether installing Ansible on the host was successful
   Boolean ansibleInstalled = false

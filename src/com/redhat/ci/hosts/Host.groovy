@@ -1,15 +1,17 @@
-package com.redhat.ci.host
+package com.redhat.ci.hosts
+
+import com.redhat.ci.host.Type
 
 /**
  * Host primitives.
  */
 class Host {
   // ID for the host
-  String id = null
+  String id = java.util.UUID.randomUUID()
   // Hostname of the host
   String hostname = null
   // Host type specification (Baremetal, VM, container)
-  Type type = null
+  Type type = Type.CONTAINER
   // Architecture of the target
-  String arch = null
+  String arch = "x86_64"
 }

@@ -1,8 +1,10 @@
-import com.redhat.multiarch.ci.provisioner.*
+import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.hosts.ProvisionedHost
+import com.redhat.ci.provisioner.Mode
 
-def call(ProvisioningConfig config, Host host) {
-  // Cinch Mode
-  if (config.runOnSlave) {
+def call(ProvisioningConfig config, ProvisionedHost host) {
+  // JNLP Mode
+  if (config.mode == Mode.JNLP) {
     sh "ansible-playbook -i 'localhost,' -c local ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml"
     sh "for i in ${params.TEST_DIR}/scripts/*/test.sh; do bash \$i; done"
 

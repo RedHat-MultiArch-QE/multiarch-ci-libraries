@@ -2,8 +2,9 @@ package com.redhat.ci
 
 import com.redhat.ci.provisioner.Provisioner
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.host.ProvisionedHost
-import com.redhat.ci.host.TargetHost
+import com.redhat.ci.provisioners.LinchPinProvisioner
+import com.redhat.ci.hosts.ProvisionedHost
+import com.redhat.ci.hosts.TargetHost
 
 class Task {
   def script
@@ -80,7 +81,7 @@ class Task {
 
   private void runTask(TargetHost targetHost) {
     // Create an instance of the provisioner
-    Provisioner provisioner = new Provisioner(script, config)
+    Provisioner provisioner = new LinchPinProvisioner(script, config)
 
     script.node("provisioner-${config.version}") {
       ProvisionedHost host = null
