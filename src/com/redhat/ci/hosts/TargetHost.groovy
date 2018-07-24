@@ -1,4 +1,4 @@
-package com.redhat.ci.host
+package com.redhat.ci.hosts
 
 import com.redhat.ci.provisioner.Type
 
@@ -7,7 +7,7 @@ import com.redhat.ci.provisioner.Type
  */
 class TargetHost extends Host {
   // Provisioner enum specification
-  com.redhat.ci.provisioner.Type provisionerType = null
+  Type provisionerType = Type.OPENSHIFT
   // Target of the PinFile if provisioner is type LINCHPIN
-  String linchpinTarget = null
+  String linchpinTarget = "beaker-slave"
 }

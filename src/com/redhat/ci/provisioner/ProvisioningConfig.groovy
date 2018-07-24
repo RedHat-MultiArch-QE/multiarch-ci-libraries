@@ -19,7 +19,7 @@ class ProvisioningConfig {
   String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-test-template'
   // Provisioning repo ref
   String provisioningRepoRef = this.version
-  // Provisioning workspace location (needed for Linchpin)
+  // Provisioning workspace location (needed for LinchPin)
   // This can reference a relative path in the above repo
   // or it can reference a relative path that already exists
   // in the current directory
@@ -41,15 +41,15 @@ class ProvisioningConfig {
   // *** This must be the same as what was added to Beaker ***
   String sshPubKeyCredentialId = 'redhat-multiarch-qe-sshpubkey'
   // ID of the Jenkins credential for the username and password
-  // used by cinch to connect the provisioned host to the Jenkins master
+  // used by JNLP to connect the provisioned host to the Jenkins master
   String jenkinsSlaveCredentialId = 'jenkins-slave-credentials'
-  // URL of the Jenkins master that cinch will use to connect the provisioned
+  // URL of the Jenkins master that JNLP will use to connect the provisioned
   // host as a slave.
   String jenkinsMasterUrl = ""
   // Extra arguments passed to the jswarm call.
   // Allows for the connection to be tunneled in the case of an OpenShift hosted Jenkins.
   String jswarmExtraArgs = ""
-  // Whether the closure should be run on directly on the provisioned host.
+  // Determines whether connection to the provisioned host should be over JNLP or SSH.
   Boolean runOnSlave = true
   Mode mode = null
   // Whether Ansible should be installed on the provisioned host.
@@ -76,11 +76,16 @@ class ProvisioningConfig {
   }
 
   ProvisioningConfig() {
-    this.mode = Mode.CINCH
+    this.mode = Mode.JNLP
   }
 
   void setRunOnSlave(Boolean runOnSlave) {
     this.runOnSlave = runOnSlave
-    this.mode = runOnSlave ? Mode.CINCH : Mode.SSH
-  }  
+    this.mode = runOnSlave ? Mode.JNLP : Mode.SSH
+  }
+
+  void setMode(Mode mode) {
+    this.mode = mode
+    this.runOnSlave = (mode == Mode.JNLP)
+  } 
 }

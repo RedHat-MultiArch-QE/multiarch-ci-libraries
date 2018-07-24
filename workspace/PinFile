@@ -1,7 +1,7 @@
 ---
-jenkins-slave:
+beaker-slave:
   topology:
-    topology_name: jenkins-slave
+    topology_name: beaker-slave
     resource_groups:
     - resource_group_name: beaker-slaves
       resource_group_type: beaker
