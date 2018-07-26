@@ -9,6 +9,7 @@
 plugins {
     // Apply the groovy plugin to add support for Groovy
     id 'groovy'
+    id 'codenarc'
     id 'com.bmuschko.clover' version '2.2.1'
     id 'com.dorongold.task-tree' version '1.3'
 }
