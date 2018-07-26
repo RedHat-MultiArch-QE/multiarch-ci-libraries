@@ -2,6 +2,7 @@ import org.junit.Test
 import com.lesfurets.jenkins.unit.BasePipelineTest
 import static com.lesfurets.jenkins.unit.global.lib.LibraryConfiguration.library
 import static com.lesfurets.jenkins.unit.global.lib.LocalSource.localSource
+import com.redhat.ci.provisioner.ProvisioningConfig
 
 public class LibraryTest extends BasePipelineTest {
 
@@ -18,5 +19,13 @@ public class LibraryTest extends BasePipelineTest {
       .build()
     helper.registerSharedLibrary(library)
     printCallStack()
+  }
+
+  @Test
+  void should_load_configuration() {
+    def script = [:]
+    script.env = [:]
+    script.params = [:]
+    ProvisioningConfig config = TestUtils.getProvisioningConfig(script)
   }
 }
