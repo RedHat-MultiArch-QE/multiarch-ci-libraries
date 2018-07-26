@@ -5,7 +5,15 @@ import com.redhat.ci.hosts.TargetHost
 class TestUtils {
   static ProvisioningConfig config = null
 
-  static ProvisioningConfig getProvisioningConfig(WorkflowScript script) {
+  /**
+   * Singleton that generates and retreives the ProvisioningConfiguration 
+   * based on a Jenkins script's environment variables and parameters.
+   *
+   * @param script def          Jenkins script that the configuration belongs to.
+   *
+   * @return ProvisioningConfig Configuration file for provisioning.
+   */
+  static ProvisioningConfig getProvisioningConfig(def script) {
     if (!config) config = new ProvisioningConfig(script.params, script.env)
     config
   }
@@ -14,15 +22,15 @@ class TestUtils {
    * Runs @test on a provisioned host for the specified arch.
    * Runs @onFailure if it encounters an Exception.
    *
-   * @param script    WorkflowScript     Script that the test will run in.
+   * @param script    def                Jenkins script that the test will run in.
    * @param arch      String             The arch to run the test on.
    * @param config    ProvisioningConfig Configuration for provisioning.
    * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
    * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
    * @param postRun   Closure            Closure that is run after the test.
    */
-  static def runTest(
-    WorkflowScript script,
+  static void runTest(
+    def script,
     String arch,
     ProvisioningConfig config,
     Closure test,
@@ -44,15 +52,15 @@ class TestUtils {
    * Runs @test on a provisioned host for each arch in @arches.
    * Runs @onFailure if it encounters an Exception.
    *
-   * @param script    WorkflowScript     Script that the test will run in.
+   * @param script    def                Jenkins script that the test will run in.
    * @param arches    List<String>       List of arches to run test on.
    * @param config    ProvisioningConfig Configuration for provisioning.
    * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
    * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
    * @param postRun   Closure            Closure that is run after the tests
    */
-  static def runParallelMultiArchTest(
-    WorkflowScript script,
+  static void runParallelMultiArchTest(
+    def script,
     List<String> arches,
     ProvisioningConfig config,
     Closure test,
@@ -76,15 +84,15 @@ class TestUtils {
    * Runs @test on a provisioned host for the specified arch.
    * Runs @onFailure if it encounters an Exception.
    *
-   * @param script    WorkflowScript     Script that the test will run in.
+   * @param script    def                Jenkins script that the test will run in.
    * @param target    TargetHost         Host that the test will run on.
    * @param config    ProvisioningConfig Configuration for provisioning.
    * @param test      Closure            Closure that takes the ProvisoinedHost used by the test.
    * @param onFailure Closure            Closure that takes the ProvisionedHost used by the test and the Exception that occured.
    * @param postRun   Closure            Closure that is run after the test.
    */
-  static def runTest(
-    WorkflowScript script,
+  static void runTest(
+    def script,
     TargetHost target,
     ProvisioningConfig config,
     Closure test,
@@ -104,15 +112,15 @@ class TestUtils {
    * Runs @test on a provisioned host for each specified TargetHost.
    * Runs @onFailure if it encounters an Exception.
    *
-   * @param script    WorkflowScript     Script that the test will run in.
+   * @param script    def                Jenkins script that the test will run in.
    * @param hosts     List<TargetHost>   List of specifications for target hosts that the test will run on.
    * @param config    ProvisioningConfig Configuration for provisioning.
    * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
    * @param onFailure Closure            Closure that takes the Provisioned used by the test and the Exception that occured.
    * @param postRun   Closure            Closure that is run after the tests.
    */
-  static def runTest(
-    WorkflowScript script,
+  static void runTest(
+    def script,
     List<TargetHost> targets,
     ProvisioningConfig config,
     Closure test,
@@ -128,13 +136,13 @@ class TestUtils {
   }
 
   /**
-   * Runs @test in ProvisioningConfig defined container as part of a WorkflowScript.
+   * Runs @test in ProvisioningConfig defined container as part of a Jenkins script.
    *
-   * @param script WorkflowScript     Script the test wrapper will run in.
+   * @param script def                Jenkins script the test wrapper will run in.
    * @param config ProvisioningConfig Configuration defining the container.
    * @param test   Closure            Closure that will run on the container.
    */
-  static def testWrapper(WorkflowScript script, ProvisioningConfig config, Closure test) {
+  static void testWrapper(def script, ProvisioningConfig config, Closure test) {
     script.podTemplate(
       name: "provisioner-${config.version}",
       label: "provisioner-${config.version}",
