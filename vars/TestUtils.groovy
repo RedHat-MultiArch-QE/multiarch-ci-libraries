@@ -3,19 +3,17 @@ import com.redhat.ci.Task
 import com.redhat.ci.hosts.TargetHost
 
 class TestUtils {
-  static ProvisioningConfig config = null
 
   /**
-   * Singleton that generates and retreives the ProvisioningConfiguration 
+   * Generates and retreives a new ProvisioningConfiguration 
    * based on a Jenkins script's environment variables and parameters.
    *
-   * @param script def          Jenkins script that the configuration belongs to.
+   * @param script def Jenkins script that the configuration belongs to.
    *
    * @return ProvisioningConfig Configuration file for provisioning.
    */
   static ProvisioningConfig getProvisioningConfig(def script) {
-    if (!config) config = new ProvisioningConfig(script.params, script.env)
-    config
+      new ProvisioningConfig(script.params, script.env)
   }
 
   /**
