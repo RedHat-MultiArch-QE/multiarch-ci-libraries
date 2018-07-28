@@ -1,14 +1,13 @@
-import groovy.json.*
+void call(String message='', String arch='') {
+    final String CI_MESSAGE_FILE = 'message.json'
+    echo("CI_MESSAGE=${message}")
+    writeFile(file:CI_MESSAGE_FILE, text:message)
 
-def call(String message='', String arch='') {
-  println "CI_MESSAGE=${message}"
-  writeFile file: "message.json", text: message
-
-  def json = readJSON file: 'message.json'
-  json['rpms'][arch].each { rpm ->
-    println "downloading: ${rpm}"
-    sh """
-      brew download-build --rpm ${rpm}
-    """
-  }
+    Map json = readJSON(file:CI_MESSAGE_FILE)
+    json['rpms'][arch].each { rpm ->
+        echo("downloading: ${rpm}")
+        sh """
+           brew download-build --rpm ${rpm}
+        """
+    }
 }
