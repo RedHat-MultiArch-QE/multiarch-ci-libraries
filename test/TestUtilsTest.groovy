@@ -1,6 +1,7 @@
 import static com.lesfurets.jenkins.unit.global.lib.LibraryConfiguration.library
 import static com.lesfurets.jenkins.unit.global.lib.LocalSource.localSource
 import org.junit.Test
+import org.junit.Before
 import com.lesfurets.jenkins.unit.BasePipelineTest
 import com.lesfurets.jenkins.unit.global.lib.LibraryConfiguration
 
@@ -9,19 +10,38 @@ import com.lesfurets.jenkins.unit.global.lib.LibraryConfiguration
  */
 class TestUtilsTest extends BasePipelineTest {
 
-    @Test
-    void should_load_library() {
-        LibraryConfiguration library = library()
+    private LibraryConfiguration library = null
+
+    @Before
+    void setUp() {
+        library = library()
             .name('multiarch-ci-libraries')
-            .retriever(localSource(''))
+            .retriever(localSource('build/libs'))
             .targetPath('build/libs')
             .defaultVersion('master')
-            .allowOverride(true)
+            .allowOverride(false)
             .implicit(false)
             .build()
         helper.registerSharedLibrary(library)
-        printCallStack()
 
+        helper.baseScriptRoot = 'test/jobs/'
+        helper.scriptRoots += 'vars'
+        helper.registerAllowedMethod('checkout', [LinkedHashMap]) { m -> }
+        super.setUp()
+        binding.setVariable('params', [:])
+        binding.setVariable('env', [:])
+        binding.setVariable('scm', [:])
+    }
+
+    @Test
+    void shouldLoadLibrary() {
         assert(library != null)
+    }
+
+    @Test
+    void canRunBasicPipeline() {
+        runScript('test/jobs/basicPipeline.jenkins')
+        printCallStack()
+        assertJobStatusSuccess()
     }
 }

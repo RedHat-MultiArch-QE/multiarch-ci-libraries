@@ -12,11 +12,11 @@ class TestUtils {
      * Generates and retreives a new ProvisioningConfiguration
      * based on a Jenkins script's environment variables and parameters.
      *
-     * @param script Map Jenkins script that the configuration belongs to.
+     * @param script Script Jenkins script that the configuration belongs to.
      *
      * @return ProvisioningConfig Configuration file for provisioning.
      */
-    static ProvisioningConfig getProvisioningConfig(Map script) {
+    static ProvisioningConfig getProvisioningConfig(Script script) {
         new ProvisioningConfig(script.params, script.env)
     }
 
