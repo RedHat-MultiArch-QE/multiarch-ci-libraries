@@ -5,6 +5,7 @@
  * For more details take a look at the Groovy Quickstart chapter in the Gradle
  * user guide available at https://docs.gradle.org/4.7/userguide/tutorial_groovy_projects.html
  */
+import java.nio.file.Files
 
 plugins {
     // Apply the groovy plugin to add support for Groovy
@@ -17,13 +18,23 @@ plugins {
 sourceSets {
     main {
         groovy {
-            srcDirs = ['src', 'vars']
+            srcDirs = ['src']
         }
     }
-
     test {
         groovy {
             srcDirs = ['test']
+        }
+    }
+    vars {
+        groovy {
+            srcDirs = ['vars']
+            include 'build.gradle'
+        }
+    }
+    clover {
+        groovy {
+            srcDirs = ['src', 'vars']
         }
     }
 }
@@ -31,7 +42,7 @@ sourceSets {
 dependencies {
     // Use the latest Groovy version for building this library
     compile 'org.codehaus.groovy:groovy-all:2.4.13'
-    testCompile group:'com.lesfurets', name:'jenkins-pipeline-unit', version:'1.0'
+    testCompile group:'com.lesfurets', name:'jenkins-pipeline-unit', version:'1.1'
     testCompile group:'junit',         name:'junit',                 version: '4.11'
     clover 'org.openclover:clover:4.2.0'
 }
@@ -43,8 +54,8 @@ clover {
     }
 
     additionalSourceSet {
-        srcDirs = sourceSets.main.groovy.srcDirs
-        classesDir = sourceSets.main.groovy.outputDir
+        srcDirs = sourceSets.clover.groovy.srcDirs
+        classesDir = sourceSets.clover.groovy.outputDir
     }
 
     targetPercentage = '50%'
@@ -62,6 +73,24 @@ build.dependsOn cloverGenerateReport
 
 codenarc {
     config = resources.text.fromFile("${project.projectDir}/config/codenarc/codenarc.groovy")
-
     toolVersion = '1.2'
+    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.vars]
 }
+
+task createLibrarySymlink {
+    doLast {
+        File folder = new File("${buildDir}/libs")
+        if(!folder.exists()) {
+            folder.mkdirs()
+        }
+        File linkTarget = new File("${buildDir}/libs/multiarch-ci-libraries@master")
+        if (!linkTarget.exists()) {
+            Files.createSymbolicLink(
+                linkTarget.toPath(),
+                new File("${projectDir}").toPath()
+            )
+        }
+    }
+}
+test.dependsOn createLibrarySymlink
+
