@@ -24,7 +24,7 @@ class TestUtils {
      * Runs @test on a provisioned host for the specified arch.
      * Runs @onFailure if it encounters an Exception.
      *
-     * @param script    Map                Jenkins script that the test will run in.
+     * @param script    Script             Jenkins script that the test will run in.
      * @param arch      String             The arch to run the test on.
      * @param config    ProvisioningConfig Configuration for provisioning.
      * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
@@ -33,7 +33,7 @@ class TestUtils {
      * @param postRun   Closure            Closure that is run after the test.
      */
     static void runTest(
-        Map script,
+        Script script,
         String arch,
         ProvisioningConfig config,
         Closure test,
@@ -41,7 +41,7 @@ class TestUtils {
         Closure postRun = { })  {
         TargetHost target = new TargetHost()
         target.arch = arch
-        TestUtils.runTest(
+        runTest(
             script,
             [ target ],
             config,
@@ -55,7 +55,7 @@ class TestUtils {
      * Runs @test on a provisioned host for each arch in @arches.
      * Runs @onFailure if it encounters an Exception.
      *
-     * @param script    Map                Jenkins script that the test will run in.
+     * @param script    Script             Jenkins script that the test will run in.
      * @param arches    List<String>       List of arches to run test on.
      * @param config    ProvisioningConfig Configuration for provisioning.
      * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
@@ -64,7 +64,7 @@ class TestUtils {
      * @param postRun   Closure            Closure that is run after the tests
      */
     static void runParallelMultiArchTest(
-        Map script,
+        Script script,
         List<String> arches,
         ProvisioningConfig config,
         Closure test,
@@ -88,7 +88,7 @@ class TestUtils {
      * Runs @test on a provisioned host for the specified arch.
      * Runs @onFailure if it encounters an Exception.
      *
-     * @param script    Map                Jenkins script that the test will run in.
+     * @param script    Script             Jenkins script that the test will run in.
      * @param target    TargetHost         Host that the test will run on.
      * @param config    ProvisioningConfig Configuration for provisioning.
      * @param test      Closure            Closure that takes the ProvisoinedHost used by the test.
@@ -97,7 +97,7 @@ class TestUtils {
      * @param postRun   Closure            Closure that is run after the test.
      */
     static void runTest(
-        Map script,
+        Script script,
         TargetHost target,
         ProvisioningConfig config,
         Closure test,
@@ -117,7 +117,7 @@ class TestUtils {
      * Runs @test on a provisioned host for each specified TargetHost.
      * Runs @onFailure if it encounters an Exception.
      *
-     * @param script    Map                Jenkins script that the test will run in.
+     * @param script    Script             Jenkins script that the test will run in.
      * @param hosts     List<TargetHost>   List of specifications for target hosts that the test will run on.
      * @param config    ProvisioningConfig Configuration for provisioning.
      * @param test      Closure            Closure that takes the ProvisionedHost used by the test.
@@ -126,7 +126,7 @@ class TestUtils {
      * @param postRun   Closure            Closure that is run after the tests.
      */
     static void runTest(
-        Map script,
+        Script script,
         List<TargetHost> targets,
         ProvisioningConfig config,
         Closure test,
@@ -136,7 +136,7 @@ class TestUtils {
             Task job = new Task(script, targets, config, test, onFailure, postRun)
             job.run()
         }
-        TestUtils.testWrapper(
+        testWrapper(
             script,
             config,
             jobRunner
@@ -144,14 +144,14 @@ class TestUtils {
     }
 
     /**
-     * Runs @test in ProvisioningConfig Mapined container as part of a Jenkins script.
+     * Runs @test in ProvisioningConfig defined container as part of a Jenkins script.
      *
-     * @param script Map                Jenkins script the test wrapper will run in.
-     * @param config ProvisioningConfig Configuration Mapining the container.
+     * @param script Script             Jenkins script the test wrapper will run in.
+     * @param config ProvisioningConfig Configuration Defining the container.
      * @param test   Closure            Closure that will run on the container.
      */
     @SuppressWarnings('GStringExpressionWithinString')
-    static void testWrapper(Map script, ProvisioningConfig config, Closure test) {
+    static void testWrapper(Script script, ProvisioningConfig config, Closure test) {
         script.podTemplate(
             name:"provisioner-${config.version}",
             label:"provisioner-${config.version}",

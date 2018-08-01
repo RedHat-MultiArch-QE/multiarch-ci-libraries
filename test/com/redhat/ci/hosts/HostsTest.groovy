@@ -8,19 +8,19 @@ import org.junit.Test
 class HostsTest {
 
     @Test
-    void can_create_host() {
+    void canCreateHost() {
         Host host = new Host()
         assert(host != null)
     }
 
     @Test
-    void can_create_target_host() {
+    void canCreateTargetHost() {
         TargetHost host = new TargetHost()
         assert(host != null)
     }
 
     @Test
-    void can_create_provisioned_host() {
+    void canCreateProvisionedHost() {
         ProvisionedHost host = new ProvisionedHost()
         assert(host != null)
     }

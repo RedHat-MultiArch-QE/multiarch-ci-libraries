@@ -10,15 +10,15 @@ import com.redhat.ci.hosts.TargetHost
  * Represents a job that provisions the resources it needs, and runs a taskBody on them.
  */
 class Task {
-    Map script
+    Script script
     List<TargetHost> targetHosts
     ProvisioningConfig config
     Closure taskBody
     Closure onFailure
-    Closure onCompelete
+    Closure onComplete
 
     /**
-     * @param script      Map                WorkflowScript that the task will run in.
+     * @param script      Script             WorkflowScript that the task will run in.
      * @param targetHosts List<TargetHost>   List of TargetHosts specifying what kinds of hosts the task should run on.
      * @param config      ProvisioningConfig Configuration for provisioning.
      * @param taskBody    Closure            Closure that is run on the TargetHosts.
@@ -26,7 +26,7 @@ class Task {
      * @param onComplete  Closure            Closure that is run after all tasks are completed.
      */
     @SuppressWarnings('ParameterCount')
-    Task(Map script, List<TargetHost> targetHosts, ProvisioningConfig config,
+    Task(Script script, List<TargetHost> targetHosts, ProvisioningConfig config,
          Closure taskBody, Closure onFailure, Closure onComplete) {
         this.script = script
         this.targetHosts = targetHosts
