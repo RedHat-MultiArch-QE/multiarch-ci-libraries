@@ -12,13 +12,13 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
     }
 
     // SSH Mode
-    sh """
+    sh("""
         . /home/jenkins/envs/provisioner/bin/activate;
         ansible-playbook -i '${host.inventory}' ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml
-    """
-    sh """
+    """)
+    sh("""
         for i in ${params.TEST_DIR}/scripts/*/test.sh;
             do ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@${host.hostName} < \$i; 
         done
-    """
+    """)
 }

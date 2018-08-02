@@ -9,10 +9,10 @@ import com.redhat.ci.hosts.ProvisionedHost
  * A base provisioner that defines shared utility methods to perform actions upon a provisioned host.
  */
 abstract class AbstractProvisioner implements Provisioner {
-    Map script
+    Script script
     ProvisioningConfig config
 
-    protected AbstractProvisioner(Map script, ProvisioningConfig config) {
+    protected AbstractProvisioner(Script script, ProvisioningConfig config) {
         this.script = script
         this.config = config
     }
@@ -49,7 +49,7 @@ abstract class AbstractProvisioner implements Provisioner {
             if (h == null) {
                 return
             }
-            h.installedAnsible = true
+            h.ansibleInstalled = true
         }
     }
 

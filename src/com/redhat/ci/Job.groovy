@@ -7,13 +7,13 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.hosts.TargetHost
 
 /**
- * Represents a job that provisions the resources it needs, and runs a taskBody on them.
+ * Represents a job that provisions the resources it needs, and runs @param body on them.
  */
-class Task {
+class Job {
     Script script
     List<TargetHost> targetHosts
     ProvisioningConfig config
-    Closure taskBody
+    Closure body
     Closure onFailure
     Closure onComplete
 
@@ -21,34 +21,34 @@ class Task {
      * @param script      Script             WorkflowScript that the task will run in.
      * @param targetHosts List<TargetHost>   List of TargetHosts specifying what kinds of hosts the task should run on.
      * @param config      ProvisioningConfig Configuration for provisioning.
-     * @param taskBody    Closure            Closure that is run on the TargetHosts.
+     * @param body        Closure            Closure that is run on the TargetHosts.
      * @param onFailure   Closure            Closure that is run if an Exception occurs.
      * @param onComplete  Closure            Closure that is run after all tasks are completed.
      */
     @SuppressWarnings('ParameterCount')
-    Task(Script script, List<TargetHost> targetHosts, ProvisioningConfig config,
-         Closure taskBody, Closure onFailure, Closure onComplete) {
+    Job(Script script, List<TargetHost> targetHosts, ProvisioningConfig config,
+        Closure body, Closure onFailure, Closure onComplete) {
         this.script = script
         this.targetHosts = targetHosts
         this.config = config
-        this.taskBody = taskBody
+        this.body = body
         this.onFailure = onFailure
         this.onComplete = onComplete
     }
 
     /**
-     * Runs @taskBody on each target host.
+     * Runs @body on each target host.
      * Runs @onFailure if it encounters an Exception.
      * Runs @onComplete once the taskBody is run on each targetHost.
      */
     void run() {
-        Map subTasks = [:]
+        Map tasks = [:]
         for (targetHost in targetHosts) {
-            subTasks[targetHost.id] = wrapSubTask(targetHost)
+            tasks[targetHost.id] = taskWrapper(targetHost)
         }
 
         // Run single host task in parallel on each arch
-        script.parallel(subTasks)
+        script.parallel(tasks)
 
         // Run the onComplete closure now that the subTasks have completed
         script.node("provisioner-${config.version}") {
@@ -62,8 +62,8 @@ class Task {
             host = provisioner.provision(targetHost)
 
             // Property validity check
-            if (!host || !host.name || !host.arch || !host.type) {
-                script.error "Invalid provisioned host: ${host}"
+            if (!host || !host.hostname || !host.arch || !host.type) {
+                script.error("Invalid provisioned host: ${host}")
             }
 
             // If the provision failed, there will be an error
@@ -71,27 +71,28 @@ class Task {
                 script.error(host.error)
             }
         }
+        host
     }
 
     private void teardown(Provisioner provisioner, ProvisionedHost host) {
         try {
             // Ensure teardown runs before the pipeline exits
             script.stage ('Teardown Host') {
-                provisioner.teardown(host, arch)
+                provisioner.teardown(host)
             }
         } catch (e) {
             echo("Ignoring exception in teardown: ${e}")
         }
     }
 
-    private void runTask(TargetHost targetHost) {
+    private void runOnTarget(TargetHost targetHost) {
         // Create an instance of the provisioner
         Provisioner provisioner = new LinchPinProvisioner(script, config)
 
         script.node("provisioner-${config.version}") {
             ProvisionedHost host = null
             try {
-                host = provision(targetHost)
+                host = provision(provisioner, targetHost)
             } catch (e) {
                 onFailure(e, host)
                 teardown(provisioner, host)
@@ -99,9 +100,9 @@ class Task {
             }
 
             if (config.runOnSlave) {
-                script.node(host.name) {
+                script.node(host.displayName) {
                     try {
-                        taskBody(host, config)
+                        body(host, config)
                     } catch (e) {
                         onFailure(e, host)
                     }
@@ -112,7 +113,7 @@ class Task {
             }
 
             try {
-                taskBody(host, config)
+                body(host, config)
             } catch (e) {
                 onFailure(e, host)
             } finally {
@@ -121,8 +122,8 @@ class Task {
         }
     }
 
-    private Closure wrapSubTask(TargetHost targetHost) {
-        Closure subTask = { target -> { -> runTask(target) } }
-        subTask(targetHost)
+    private Closure taskWrapper(TargetHost targetHost) {
+        Closure wrapTask = { target -> { -> runOnTarget(target) } }
+        wrapTask(targetHost)
     }
 }
