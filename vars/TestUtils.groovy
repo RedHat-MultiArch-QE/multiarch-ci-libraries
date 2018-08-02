@@ -1,5 +1,5 @@
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.Task
+import com.redhat.ci.Job
 import com.redhat.ci.hosts.TargetHost
 
 /**
@@ -133,7 +133,7 @@ class TestUtils {
         Closure onFailure,
         Closure postRun = { }) {
         Closure jobRunner = {
-            Task job = new Task(script, targets, config, test, onFailure, postRun)
+            Job job = new Job(script, targets, config, test, onFailure, postRun)
             job.run()
         }
         testWrapper(
