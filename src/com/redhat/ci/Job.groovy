@@ -2,7 +2,7 @@ package com.redhat.ci
 
 import com.redhat.ci.provisioner.Provisioner
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.provisioners.LinchPinProvisioner
+import com.redhat.ci.provisioner.ProvisioningService
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.hosts.TargetHost
 
@@ -16,14 +16,15 @@ class Job {
     Closure body
     Closure onFailure
     Closure onComplete
+    ProvisioningService provSvc
 
     /**
-     * @param script      Script             WorkflowScript that the task will run in.
-     * @param targetHosts List<TargetHost>   List of TargetHosts specifying what kinds of hosts the task should run on.
+     * @param script      Script             WorkflowScript that the job will run in.
+     * @param targetHosts List<TargetHost>   List of TargetHosts specifying what kinds of hosts the job should run on.
      * @param config      ProvisioningConfig Configuration for provisioning.
      * @param body        Closure            Closure that is run on the TargetHosts.
      * @param onFailure   Closure            Closure that is run if an Exception occurs.
-     * @param onComplete  Closure            Closure that is run after all tasks are completed.
+     * @param onComplete  Closure            Closure that is run after all jobs are completed.
      */
     @SuppressWarnings('ParameterCount')
     Job(Script script, List<TargetHost> targetHosts, ProvisioningConfig config,
@@ -34,23 +35,24 @@ class Job {
         this.body = body
         this.onFailure = onFailure
         this.onComplete = onComplete
+        this.provSvc = new ProvisioningService(script, config)
     }
 
     /**
      * Runs @body on each target host.
      * Runs @onFailure if it encounters an Exception.
-     * Runs @onComplete once the taskBody is run on each targetHost.
+     * Runs @onComplete once the jobBody is run on each targetHost.
      */
     void run() {
-        Map tasks = [:]
+        Map subJobs = [:]
         for (targetHost in targetHosts) {
-            tasks[targetHost.id] = taskWrapper(targetHost)
+            subJobs[targetHost.id] = jobWrapper(targetHost)
         }
 
-        // Run single host task in parallel on each arch
-        script.parallel(tasks)
+        // Run each single host job in parallel on each specified host
+        script.parallel(subJobs)
 
-        // Run the onComplete closure now that the subTasks have completed
+        // Run the onComplete closure now that the subJobs have completed
         script.node("provisioner-${config.version}") {
             onComplete()
         }
@@ -86,8 +88,8 @@ class Job {
     }
 
     private void runOnTarget(TargetHost targetHost) {
-        // Create an instance of the provisioner
-        Provisioner provisioner = new LinchPinProvisioner(script, config)
+        // Retreive an appropriate provisioner from the provisioning service
+        Provisioner provisioner = provSvc.getProvisioner(targetHost)
 
         script.node("provisioner-${config.version}") {
             ProvisionedHost host = null
@@ -122,8 +124,8 @@ class Job {
         }
     }
 
-    private Closure taskWrapper(TargetHost targetHost) {
-        Closure wrapTask = { target -> { -> runOnTarget(target) } }
-        wrapTask(targetHost)
+    private Closure jobWrapper(TargetHost targetHost) {
+        Closure wrapJob = { target -> { -> runOnTarget(target) } }
+        wrapJob(targetHost)
     }
 }

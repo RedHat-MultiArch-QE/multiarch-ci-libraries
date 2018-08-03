@@ -4,6 +4,7 @@ import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
+import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
 
 /**
@@ -14,6 +15,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     LinchPinProvisioner(Script script, ProvisioningConfig config) {
         super(script, config)
+        this.available = true
+        this.type = Type.LINCHPIN
     }
 
     ProvisionedHost provision(TargetHost target) {
