@@ -2,6 +2,7 @@ package com.redhat.ci.provisioners
 
 import com.redhat.ci.provisioner.Provisioner
 import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.provisioner.Type
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 
@@ -11,6 +12,8 @@ import com.redhat.ci.hosts.ProvisionedHost
 abstract class AbstractProvisioner implements Provisioner {
     Script script
     ProvisioningConfig config
+    Boolean available = false
+    Type type = null
 
     protected AbstractProvisioner(Script script, ProvisioningConfig config) {
         this.script = script

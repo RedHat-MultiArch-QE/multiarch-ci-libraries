@@ -43,7 +43,7 @@ class TestUtils {
         target.arch = arch
         runTest(
             script,
-            [ target ],
+            target,
             config,
             test,
             onFailure,
