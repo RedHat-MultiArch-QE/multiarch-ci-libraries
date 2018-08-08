@@ -16,7 +16,7 @@ class ProvisioningConfig {
   // name of provisioning image. Can include tag name.
   String provisioningImage = 'provisioner'
   // Provisioning repo url
-  String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-libraries'
+  String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-test-template'
   // Provisioning repo ref
   String provisioningRepoRef = this.version
   // Provisioning workspace location (needed for Linchpin)
