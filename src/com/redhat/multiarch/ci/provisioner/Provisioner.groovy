@@ -28,7 +28,7 @@ class Provisioner {
 
       if (config.provisioningRepoUrl != null) {
         // Get linchpin workspace
-        script.git(url: config.provisioningRepoUrl, branch: config.provisioningRepoRef)
+        script.checkout(script.scm([$class: 'GitSCM', userRemoteConfigs: [[url: config.provisioningRepoUrl]], branches: [[name: config.provisioningRepoRef]]], poll: false))
       } else {
         script.checkout script.scm
       }
