@@ -32,7 +32,7 @@ class TestUtils {
       script,
       config,
       {
-        (new Test(arch, config, test, onTestFailure, postTest)).run()
+        (new Test(script, arch, config, test, onTestFailure, postTest)).run()
       }
     )
   }
