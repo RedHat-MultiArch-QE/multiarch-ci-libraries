@@ -2,7 +2,7 @@ package com.redhat.multiarch.ci.provisioner
 
 class ProvisioningConfig {
   // Provisioner version
-  String version = 'v1.0'
+  String version = 'v1.1'
   // Jenkins kubernetes cloud name
   String cloudName = 'openshift'
   // Job group for Beaker provisioning.
@@ -16,9 +16,9 @@ class ProvisioningConfig {
   // name of provisioning image. Can include tag name.
   String provisioningImage = 'provisioner'
   // Provisioning repo url
-  String provisioningRepoUrl = null
+  String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-test-template'
   // Provisioning repo ref
-  String provisioningRepoRef = null
+  String provisioningRepoRef = this.version
   // Provisioning workspace location (needed for Linchpin)
   // This can reference a relative path in the above repo
   // or it can reference a relative path that already exists
