@@ -13,7 +13,7 @@ class ProvisioningConfig {
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
 
     // Provisioner version
-    String version = 'v1.1'
+    String version = 'v2.0'
     // Jenkins kubernetes cloud name
     String cloudName = 'openshift'
     // Job group for Beaker provisioning.
@@ -27,7 +27,7 @@ class ProvisioningConfig {
     // name of provisioning image. Can include tag name.
     String provisioningImage = 'provisioner'
     // Provisioning repo url
-    String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-test-template'
+    String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-libraries'
     // Provisioning repo ref
     String provisioningRepoRef = this.version
     // Provisioning workspace location (needed for LinchPin)
