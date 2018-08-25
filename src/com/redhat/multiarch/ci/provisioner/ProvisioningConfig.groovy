@@ -6,7 +6,7 @@ class ProvisioningConfig {
   // Jenkins kubernetes cloud name
   String cloudName = 'openshift'
   // Job group for Beaker provisioning.
-  String jobgroup = 'multiarch-qe'
+  String jobgroup = ''
   // Host requirements to pass to linchpin
   List<HashMap> hostrequires = []
   // name of Openshift tenant to pull provisioning image from.
