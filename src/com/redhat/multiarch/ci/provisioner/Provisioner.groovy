@@ -62,7 +62,7 @@ class Provisioner {
       script.sh("cat ${host.inventory}")
       script.sh("""
         . /home/jenkins/envs/provisioner/bin/activate
-        cinch ${host.inventory} --extra-vars=${getExtraVars(host)}
+        cinch ${host.inventory} -vvvv --extra-vars=${getExtraVars(host)}
       """)
 
       host.provisioned = true
