@@ -165,7 +165,7 @@ class Provisioner {
       templateData.job_group = config.jobgroup
       templateData.hostrequires = config.hostrequires
       templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
-      templateData.extra_vars = '{' +
+      templateData.extra_vars = '\'{' +
         '"rpm_key_imports":[],' +
         '"jenkins_master_repositories":[],' +
         '"jenkins_master_download_repositories":[],' +
@@ -178,8 +178,8 @@ class Provisioner {
         '"jswarm_version":"3.9",' +
         '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
         '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" + '",' +
-        '"jenkins_slave_repositories":[{"name":"epel","mirrorlist":"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
-        '}'
+        '"jenkins_slave_repositories":[{"name":"epel","mirrorlist":\"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7\"}]' +
+        '}\''
 
       def templateDataJson = JsonOutput.toJson(templateData)
       templateDataJson
@@ -207,6 +207,7 @@ class Provisioner {
         "jswarm_version":"3.9",
         "jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",
         "jswarm_extra_args":"${config.jswarmExtraArgs}",
+        "jenkins_slave_repositories":[["name":"epel","mirrorlist":'https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7']]
       ] 
       def extraVarsJson = JsonOutput.toJson(extraVars)
       extraVarsJson
