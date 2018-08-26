@@ -206,7 +206,7 @@ class Provisioner {
         "jswarm_version":"3.9",
         "jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",
         "jswarm_extra_args":"${config.jswarmExtraArgs}",
-        "jenkins_slave_repositories":[["name":"epel","mirrorlist":"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"]]
+        "jenkins_slave_repositories":[["name":"epel","mirrorlist":'https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7']]
       ] 
       def extraVarsJson = JsonOutput.toJson(extraVars)
       extraVarsJson
