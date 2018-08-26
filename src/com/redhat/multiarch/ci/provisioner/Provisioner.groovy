@@ -176,8 +176,8 @@ class Provisioner {
         '"jenkins_slave_password":"' + "${script.JENKINS_SLAVE_PASSWORD}" + '",' +
         '"jswarm_version":"3.9",' +
         '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
-        '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" + '"' + //," +
-        //'"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+        '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" + '",' +
+        '"jenkins_slave_repositories":[{"name":"epel","mirrorlist":"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
         '}'
 
       def templateDataJson = JsonOutput.toJson(templateData)
@@ -206,7 +206,7 @@ class Provisioner {
         '"jswarm_version":"3.9",' +
         '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
         '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" +           '",' +
-        '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+        '"jenkins_slave_repositories":["{{ all_repositories.epel }}"]' +
         '}'
       extra_vars
     }
