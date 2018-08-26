@@ -62,7 +62,7 @@ class Provisioner {
       script.sh("cat ${host.inventory}")
       script.sh("""
         . /home/jenkins/envs/provisioner/bin/activate
-        cinch ${host.inventory} -vvvv --extra-vars=${getExtraVars(host)}
+        cinch ${host.inventory} -vvv --extra-vars=${getExtraVars(host)}
       """)
 
       host.provisioned = true
@@ -193,22 +193,23 @@ class Provisioner {
                               passwordVariable: 'JENKINS_SLAVE_PASSWORD')
     ]) {
       // Build template data
-      def extra_vars = '{' +
-        '"rpm_key_imports":[],' +
-        '"jenkins_master_repositories":[],' +
-        '"jenkins_master_download_repositories":[],' +
-        '"jslave_name":"' + "${host.name}"                                + '",' +
-        '"jslave_label":"' + "${host.name}"                               + '",' +
-        '"arch":"' + "${host.arch}"                                       + '",' +
-        '"jenkins_master_url":"' + "${config.jenkinsMasterUrl}"           + '",' +
-        '"jenkins_slave_username":"' + "${script.JENKINS_SLAVE_USERNAME}" + '",' +
-        '"jenkins_slave_password":"' + "${script.JENKINS_SLAVE_PASSWORD}" + '",' +
-        '"jswarm_version":"3.9",' +
-        '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
-        '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" +           '",' +
-        '"jenkins_slave_repositories":["{{ all_repositories.epel }}"]' +
-        '}'
-      extra_vars
+      def extraVars = [
+        "rpm_key_imports":[],
+        "jenkins_master_repositories":[],
+        "jenkins_master_download_repositories":[],
+        "jslave_name":"${host.name}",
+        "jslave_label":"${host.name}",
+        "arch":"${host.arch}",
+        "jenkins_master_url":"${config.jenkinsMasterUrl}",
+        "jenkins_slave_username":"${script.JENKINS_SLAVE_USERNAME}",
+        "jenkins_slave_password":"${script.JENKINS_SLAVE_PASSWORD}",
+        "jswarm_version":"3.9",
+        "jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",
+        "jswarm_extra_args":"${config.jswarmExtraArgs}",
+        "jenkins_slave_repositories":[["name":"epel","mirrorlist":"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"]]
+      ] 
+      def extraVarsJson = JsonOutput.toJson(extraVars)
+      extraVarsJson
     }
   }
 
