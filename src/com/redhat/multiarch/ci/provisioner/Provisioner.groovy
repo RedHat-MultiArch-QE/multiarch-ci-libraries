@@ -42,7 +42,6 @@ class Provisioner {
         linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
       """
 
-
       // We need to scan for inventory file. Please see the following for reasoning:
       // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
       // Possible solutions to not require the scan:
@@ -61,6 +60,7 @@ class Provisioner {
 
       // Let's examine this inventory file
       script.sh("cat ${host.inventory}")
+      script.sh("cinch -vvvv -i ${host.inventory} --extra_vars=${getExtraVars(host)}")
 
       host.provisioned = true
 
@@ -179,6 +179,33 @@ class Provisioner {
 
       def templateDataJson = JsonOutput.toJson(templateData)
       templateDataJson
+    }
+  }
+
+
+  String getExtraVars(Host host) {
+    script.withCredentials([
+      script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
+                              usernameVariable: 'JENKINS_SLAVE_USERNAME',
+                              passwordVariable: 'JENKINS_SLAVE_PASSWORD')
+    ]) {
+      // Build template data
+      def extra_vars = '{' +
+        '"rpm_key_imports":[],' +
+        '"jenkins_master_repositories":[],' +
+        '"jenkins_master_download_repositories":[],' +
+        '"jslave_name":"' + "${host.name}"                                + '",' +
+        '"jslave_label":"' + "${host.name}"                               + '",' +
+        '"arch":"' + "${host.arch}"                                       + '",' +
+        '"jenkins_master_url":"' + "${config.jenkinsMasterUrl}"           + '",' +
+        '"jenkins_slave_username":"' + "${script.JENKINS_SLAVE_USERNAME}" + '",' +
+        '"jenkins_slave_password":"' + "${script.JENKINS_SLAVE_PASSWORD}" + '",' +
+        '"jswarm_version":"3.9",' +
+        '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
+        '"jswarm_extra_args":"' + "${config.jswarmExtraArgs}" + '"' + //," +
+        //'"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": "https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]' +
+        '}'
+      extra_vars
     }
   }
 
