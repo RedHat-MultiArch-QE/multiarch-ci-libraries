@@ -38,7 +38,6 @@ class Provisioner {
 
       // Install ssh keys so that either cinch or direct ssh will connect
       script.sh """
-        . /home/jenkins/envs/provisioner/bin/activate
         linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
       """
 
@@ -60,7 +59,10 @@ class Provisioner {
 
       // Let's examine this inventory file
       script.sh("cat ${host.inventory}")
-      script.sh("cinch -vvvv -i ${host.inventory} --extra_vars=${getExtraVars(host)}")
+      script.sh("""
+        . /home/jenkins/envs/provisioner/bin/activate
+        cinch -vvvv -i ${host.inventory} --extra_vars=${getExtraVars(host)}
+      """)
 
       host.provisioned = true
 
