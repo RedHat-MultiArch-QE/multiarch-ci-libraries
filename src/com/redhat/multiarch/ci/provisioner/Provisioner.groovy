@@ -162,10 +162,10 @@ class Provisioner {
         '"rpm_key_imports":[],' +
         '"jenkins_master_repositories":[],' +
         '"jenkins_master_download_repositories":[],' +
-        '"jslave_name":"' + "${host.name}" + '",' +
-        '"jslave_label":"' + "${host.name}" + '",' +
-        '"arch":"' + "${host.arch}" + '",' +
-        '"jenkins_master_url":"' + "${config.jenkinsMasterUrl}" '",' +
+        '"jslave_name":"' + "${host.name}"                                + '",' +
+        '"jslave_label":"' + "${host.name}"                               + '",' +
+        '"arch":"' + "${host.arch}"                                       + '",' +
+        '"jenkins_master_url":"' + "${config.jenkinsMasterUrl}"           + '",' +
         '"jenkins_slave_username":"' + "${script.JENKINS_SLAVE_USERNAME}" + '",' +
         '"jenkins_slave_password":"' + "${script.JENKINS_SLAVE_PASSWORD}" + '",' +
         '"jswarm_version":"3.9",' +
