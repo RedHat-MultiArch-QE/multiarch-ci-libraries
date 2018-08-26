@@ -59,6 +59,9 @@ class Provisioner {
           awk '/\\[master_node\\]/{getline; print}' ${host.inventory}
           """).trim()
 
+      // Let's examine this inventory file
+      script.sh("cat ${host.inventory}")
+
       host.provisioned = true
 
       if (config.runOnSlave) {
