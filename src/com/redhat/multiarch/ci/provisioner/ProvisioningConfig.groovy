@@ -18,7 +18,7 @@ class ProvisioningConfig {
   // Provisioning repo url
   String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-test-template'
   // Provisioning repo ref
-  String provisioningRepoRef = this.version
+  String provisioningRepoRef = 'master'
   // Provisioning workspace location (needed for Linchpin)
   // This can reference a relative path in the above repo
   // or it can reference a relative path that already exists
