@@ -38,6 +38,7 @@ class Provisioner {
 
       // Install ssh keys so that either cinch or direct ssh will connect
       script.sh """
+        . /home/jenkins/envs/provisioner/bin/activate
         linchpin --workspace ${config.provisioningWorkspaceDir} --template-data \'${getTemplateData(host)}\' --verbose up ${host.target}
       """
 
