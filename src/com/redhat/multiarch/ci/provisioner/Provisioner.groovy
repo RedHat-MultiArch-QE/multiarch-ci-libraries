@@ -58,17 +58,13 @@ class Provisioner {
           awk '/\\[master_node\\]/{getline; print}' ${host.inventory}
           """).trim()
 
-      // Let's examine this inventory file
-      script.sh("cat ${host.inventory}")
-      script.echo(getExtraVars(host))
-      script.sh("""
-        . /home/jenkins/envs/provisioner/bin/activate
-        cinch ${host.inventory} --extra-vars='${getExtraVars(host)}'
-      """)
-
       host.provisioned = true
 
       if (config.runOnSlave) {
+        script.sh("""
+          . /home/jenkins/envs/provisioner/bin/activate
+          cinch ${host.inventory} --extra-vars='${getExtraVars(host)}'
+        """)
         host.connectedToMaster = true
 
         // We only care if the install ansible flag is set when we are running on the provisioned host
@@ -154,36 +150,14 @@ class Provisioner {
   }
 
   String getTemplateData(Host host) {
-    script.withCredentials([
-      script.usernamePassword(credentialsId: config.jenkinsSlaveCredentialId,
-                              usernameVariable: 'JENKINS_SLAVE_USERNAME',
-                              passwordVariable: 'JENKINS_SLAVE_PASSWORD')
-    ]) {
-      // Build template data
-      def templateData = [:]
-      templateData.arch = host.arch
-      templateData.job_group = config.jobgroup
-      templateData.hostrequires = config.hostrequires
-      templateData.hooks = [postUp: [connectToMaster: config.runOnSlave]]
-      templateData.extra_vars = [
-        "rpm_key_imports":[],
-        "jenkins_master_repositories":[],
-        "jenkins_master_download_repositories":[],
-        "jslave_name":"${host.name}",
-        "jslave_label":"${host.name}",
-        "arch":"${host.arch}",
-        "jenkins_master_url":"${config.jenkinsMasterUrl}",
-        "jenkins_slave_username":"${script.JENKINS_SLAVE_USERNAME}",
-        "jenkins_slave_password":"${script.JENKINS_SLAVE_PASSWORD}",
-        "jswarm_version":"3.9",
-        "jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",
-        "jswarm_extra_args":"${config.jswarmExtraArgs}",
-        "jenkins_slave_repositories":[["name":"epel","mirrorlist":"https://mirrors.fedoraproject.org/metalink?arch=\$basearch&repo=epel-7"]]
-      ] 
+    // Build template data
+    def templateData = [:]
+    templateData.arch = host.arch
+    templateData.job_group = config.jobgroup
+    templateData.hostrequires = config.hostrequires
 
-      def templateDataJson = JsonOutput.toJson(templateData)
-      templateDataJson
-    }
+    def templateDataJson = JsonOutput.toJson(templateData)
+    templateDataJson
   }
 
 
