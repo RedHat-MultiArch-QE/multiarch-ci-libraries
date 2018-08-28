@@ -1,5 +1,7 @@
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.Rule
+import org.junit.rules.ExpectedException
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.Mock
 import com.redhat.ci.host.Type
@@ -15,6 +17,10 @@ import java.util.logging.Logger
 class TestUtilsTest extends PipelineTestScript {
     private static final Logger LOG = Logger.getLogger('TestUtilsTest')
     private static final String X86_64 = 'x86_64'
+
+    @SuppressWarnings('PublicInstanceField')
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none()
 
     @Mock
     private final ProvisionedHost host
@@ -38,6 +44,7 @@ class TestUtilsTest extends PipelineTestScript {
         LOG.info('onFailure(e, host)')
         LOG.severe(e.toString())
         LOG.severe("Failed on host ${host.id} with exception")
+        throw e
     }
 
     private final Closure onComplete = {
@@ -48,6 +55,12 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldGetProvisioningConfig() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+        assert(config != null)
+    }
+
+    @Test
+    void shouldSupportAPIRef() {
+        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
         assert(config != null)
     }
 
@@ -89,13 +102,9 @@ class TestUtilsTest extends PipelineTestScript {
 
     @Test
     void shouldFailOnRun() {
+        thrown.expect(Exception)
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TestUtils.runTest(this, 'x86_64', config, errorBody, onFailure, onComplete)
         assert(config != null)
-    }
-
-    @Test
-    @ExpectedException
-    void shouldThrowException() {
     }
 }
