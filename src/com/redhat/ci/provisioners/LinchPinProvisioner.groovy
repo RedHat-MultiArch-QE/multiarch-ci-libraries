@@ -1,33 +1,43 @@
 package com.redhat.ci.provisioners
 
+import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
+import java.util.logging.Logger
+import java.util.logging.Level
 
 /**
- * Uses linchpin and the libraries defined workspace to provision resources.
+ * Uses LinchPin and the libraries defined workspace to provision resources.
  */
 class LinchPinProvisioner extends AbstractProvisioner {
     private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate\n'
+    private static final Map<com.redhat.ci.provider.Type, String> LINCHPIN_TARGETS = [
+        (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
+    ]
+    private static final Logger LOG = Logger.getLogger('LinchPinProvisioner')
 
-    LinchPinProvisioner(Script script, ProvisioningConfig config) {
-        super(script, config)
+    LinchPinProvisioner(Script script) {
+        super(script)
         this.available = true
         this.type = Type.LINCHPIN
+        this.supportedHostTypes = [com.redhat.ci.host.Type.VM, com.redhat.ci.host.Type.BAREMETAL]
+        this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
     }
 
-    ProvisionedHost provision(TargetHost target) {
+    ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(
             arch:target.arch,
-            linchpinTarget:target.linchpinTarget,
-            displayName:"${target.arch}-slave"
+            displayName:"${target.arch}-slave",
+            provisioner:target.provisioner,
+            provider:target.provider
         )
 
         try {
-            installCredentials()
+            Utils.installCredentials(script, config)
 
             if (config.provisioningRepoUrl != null) {
                 // Get LinchPin workspace
@@ -47,8 +57,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
             script.sh(
                 ACTIVATE_VIRTUALENV +
                     "linchpin --workspace ${config.provisioningWorkspaceDir} " +
-                    "--template-data \'${getTemplateData(host)}\' " +
-                    "--verbose up ${host.linchpinTarget}"
+                    "--template-data \'${getTemplateData(host, config)}\' " +
+                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
 
             // We need to scan for inventory file. Please see the following for reasoning:
@@ -78,21 +88,22 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 // In JNLP mode, we can install Ansible so the user can run playbooks
                 // (Already installed in SSH mode)
                 if (config.installAnsible) {
-                    installAnsible(host)
+                    Utils.installAnsible(script, host)
                 }
 
                 // In JNLP mode, install provisioning credentials directly on the provisioned host
                 // (Already installed in SSH mode)
                 if (config.installCredentials) {
-                    installCredentials(host)
+                    Utils.installCredentials(script, config, host)
                 }
             }
 
             // We can install the RHPKG tool if the user intends to use it.
             if (config.installRhpkg) {
-                installRhpkg(host)
+                Utils.installRhpkg(script, host)
             }
         } catch (e) {
+            LOG.log(Level.SEVERE, e.message, e)
             script.echo(e)
             host.error = e.message
         }
@@ -105,7 +116,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
      *
      * @param host Provisioned host to be torn down.
      */
-    void teardown(ProvisionedHost host) {
+    void teardown(ProvisionedHost host, ProvisioningConfig config) {
         // Check if the host was provisoned
         if (!host || !host.initialized) {
             // The provisioning job did not successfully provision a machine,
@@ -121,6 +132,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "teardown ${host.inventoryPath}"
                 )
             } catch (e) {
+                LOG.log(Level.SEVERE, e.message, e)
                 script.echo "${e}"
             }
         }
@@ -130,10 +142,11 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 script.sh(
                     ACTIVATE_VIRTUALENV +
                         "linchpin --workspace ${config.provisioningWorkspaceDir} " +
-                        "--template-data \'${getTemplateData(host)}\' " +
-                        "--verbose destroy ${host.linchpinTarget}"
+                        "--template-data \'${getTemplateData(host, config)}\' " +
+                        "--verbose destroy ${LINCHPIN_TARGETS[host.provider]}"
                 )
             } catch (e) {
+                LOG.log(Level.SEVERE, e.message, e)
                 script.echo(e)
             }
         }
@@ -143,7 +156,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         }
     }
 
-    String getTemplateData(ProvisionedHost host) {
+    String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
         script.withCredentials(
             script.usernamePassword(
                 credentialsId:config.jenkinsSlaveCredentialId,

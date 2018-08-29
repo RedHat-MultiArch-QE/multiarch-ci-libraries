@@ -1,6 +1,5 @@
 package com.redhat.ci
 
-import com.redhat.ci.provisioner.Provisioner
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
 import com.redhat.ci.hosts.ProvisionedHost
@@ -35,7 +34,7 @@ class Job {
         this.body = body
         this.onFailure = onFailure
         this.onComplete = onComplete
-        this.provSvc = new ProvisioningService(script, config)
+        this.provSvc = new ProvisioningService()
     }
 
     /**
@@ -58,46 +57,39 @@ class Job {
         }
     }
 
-    private ProvisionedHost provision(Provisioner provisioner, TargetHost targetHost) {
+    private ProvisionedHost provision(TargetHost targetHost) {
         ProvisionedHost host = null
-        script.stage('Provision Host') {
-            host = provisioner.provision(targetHost)
+        host = provSvc.provision(targetHost, config, script)
 
-            // Property validity check
-            if (!host || !host.hostname || !host.arch || !host.type) {
-                script.error("Invalid provisioned host: ${host}")
-            }
+        // Property validity check
+        if (!host || !host.hostname || !host.arch || !host.type) {
+            script.error("Invalid provisioned host: ${host}")
+        }
 
-            // If the provision failed, there will be an error
-            if (host.error) {
-                script.error(host.error)
-            }
+        // If the provision failed, there will be an error
+        if (host.error) {
+            script.error(host.error)
         }
         host
     }
 
-    private void teardown(Provisioner provisioner, ProvisionedHost host) {
+    private void teardown(ProvisionedHost host) {
         try {
             // Ensure teardown runs before the pipeline exits
-            script.stage ('Teardown Host') {
-                provisioner.teardown(host)
-            }
+            provSvc.teardown(host, config, script)
         } catch (e) {
             echo("Ignoring exception in teardown: ${e}")
         }
     }
 
     private void runOnTarget(TargetHost targetHost) {
-        // Retreive an appropriate provisioner from the provisioning service
-        Provisioner provisioner = provSvc.getProvisioner(targetHost)
-
         script.node("provisioner-${config.version}") {
             ProvisionedHost host = null
             try {
-                host = provision(provisioner, targetHost)
+                host = provision(targetHost)
             } catch (e) {
                 onFailure(e, host)
-                teardown(provisioner, host)
+                teardown(host)
                 return
             }
 
@@ -110,7 +102,7 @@ class Job {
                     }
                 }
 
-                teardown(provisioner, host)
+                teardown(host)
                 return
             }
 
@@ -119,7 +111,7 @@ class Job {
             } catch (e) {
                 onFailure(e, host)
             } finally {
-                teardown(provisioner, host)
+                teardown(host)
             }
         }
     }

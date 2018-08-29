@@ -10,17 +10,19 @@ import com.redhat.ci.provisioner.Type
  */
 class KubeVirtProvisioner extends AbstractProvisioner {
 
-    KubeVirtProvisioner(Script script, ProvisioningConfig config) {
-        super(script, config)
+    KubeVirtProvisioner(Script script) {
+        super(script)
         this.type = Type.KUBEVIRT
+        this.supportedHostTypes = [com.redhat.ci.host.Type.VM]
+        this.supportedProviders = [com.redhat.ci.provider.Type.KUBEVIRT]
     }
 
     @Override
-    ProvisionedHost provision(TargetHost target) {
+    ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         null
     }
 
     @Override
-    void teardown(ProvisionedHost host) {
+    void teardown(ProvisionedHost host, ProvisioningConfig config) {
     }
 }

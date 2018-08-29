@@ -21,11 +21,17 @@ class TargetHost extends Host {
         this.providerPriority = config.providerPriority
     }
 
-    // Host type priority List
+    // Host type priority list
     List<com.redhat.ci.host.Type> typePriority = ProvisioningConfig.HOST_TYPE_PRIORITY_DEFAULT
 
-    // Provide type priority list
+    // Selected provider type
+    com.redhat.ci.provider.Type provider = null
+
+    // Provider type priority list
     List<com.redhat.ci.provider.Type> providerPriority = ProvisioningConfig.PROVIDER_PRIORITY_DEFAULT
+
+    // Selected provisioner type
+    Type provisioner = null
 
     // Provisioner type priority list
     List<com.redhat.ci.provisioner.Type> provisionerPriority = ProvisioningConfig.PROVISIONER_PRIORITY_DEFAULT

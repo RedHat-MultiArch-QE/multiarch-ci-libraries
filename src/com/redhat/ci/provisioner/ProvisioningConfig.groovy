@@ -1,8 +1,5 @@
 package com.redhat.ci.provisioner
 
-import com.redhat.ci.host.Type
-import com.redhat.ci.provider.Type
-
 /**
  * Configuration needed to provision resources with a Provisioner.
  */
@@ -18,7 +15,7 @@ class ProvisioningConfig {
     public static final List<com.redhat.ci.host.Type> HOST_TYPE_PRIORITY_DEFAULT = [
         com.redhat.ci.host.Type.CONTAINER,
         com.redhat.ci.host.Type.VM,
-        com.redhat.ci.host.Type.BARE_METAL,
+        com.redhat.ci.host.Type.BAREMETAL,
     ]
 
     public static final List<com.redhat.ci.provider.Type> PROVIDER_PRIORITY_DEFAULT = [
@@ -31,8 +28,9 @@ class ProvisioningConfig {
     ]
 
     public static final List<com.redhat.ci.provisioner.Type> PROVISIONER_PRIORITY_DEFAULT = [
-        com.redhat.ci.provisioner.Type.OPENSHIFT,
-        com.redhat.ci.provisioner.Type.LINCHPIN,
+        Type.OPENSHIFT,
+        Type.KUBEVIRT,
+        Type.LINCHPIN,
     ]
 
     // Provisioner version

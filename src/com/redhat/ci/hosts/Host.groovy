@@ -13,7 +13,7 @@ class Host {
     String hostname = null
 
     // Architecture of the target
-    String arch = 'x86_64'
+    String arch = null
 
     // Host type specification (Baremetal, VM, container)
     Type type = null
