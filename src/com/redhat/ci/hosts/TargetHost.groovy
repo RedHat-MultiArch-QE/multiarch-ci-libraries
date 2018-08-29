@@ -3,6 +3,7 @@ package com.redhat.ci.hosts
 import com.redhat.ci.host.Type
 import com.redhat.ci.provider.Type
 import com.redhat.ci.provisioner.Type
+import com.redhat.ci.provisioner.ProvisioningConfig
 
 /**
  * A target host for provisioning.

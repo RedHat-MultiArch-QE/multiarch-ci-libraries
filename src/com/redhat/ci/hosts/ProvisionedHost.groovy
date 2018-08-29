@@ -11,7 +11,7 @@ class ProvisionedHost extends TargetHost {
     com.redhat.ci.provider.Type providerType = null
 
     // The provisioner the host was provisioned with
-    com.redhat.ci.provisioner.Type provisionerType = null
+    Type provisionerType = null
 
     // Any error that occurred during provisioning
     String error = null

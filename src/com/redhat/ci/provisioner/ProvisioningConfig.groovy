@@ -2,7 +2,6 @@ package com.redhat.ci.provisioner
 
 import com.redhat.ci.host.Type
 import com.redhat.ci.provider.Type
-import com.redhat.ci.provisioner.Type
 
 /**
  * Configuration needed to provision resources with a Provisioner.
