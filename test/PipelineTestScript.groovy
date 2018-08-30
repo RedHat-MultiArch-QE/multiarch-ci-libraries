@@ -11,7 +11,7 @@ class PipelineTestScript extends Script {
     PipelineTestScript() {
         binding.with {
             params = [:]
-            env = [:]
+            env = [environment:[:]]
             ansiColor = {
                 string, body ->
                 LOG.info("ansiColor(${string})")
