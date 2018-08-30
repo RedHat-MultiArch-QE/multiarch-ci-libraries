@@ -34,7 +34,7 @@ class ProvisioningConfig {
     ]
 
     // Provisioner version
-    String version = 'v1.2.0'
+    String version = 'dev-v1.2.0'
 
     // Jenkins kubernetes cloud name
     String cloudName = 'openshift'
@@ -55,7 +55,7 @@ class ProvisioningConfig {
     String provisioningImage = 'provisioner'
 
     // Provisioning repo url
-    String provisioningRepoUrl = 'https://github.com/RedHat-MultiArch-QE/multiarch-ci-libraries'
+    String provisioningRepoUrl = 'https://github.com/jaypoulz/multiarch-ci-libraries'
 
     // Provisioning repo ref
     String provisioningRepoRef = this.version
