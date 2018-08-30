@@ -12,27 +12,6 @@ class ProvisioningConfig {
     private static final String JENKINS_MASTER_URL_DEFAULT = ''
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
 
-    public static final List<com.redhat.ci.host.Type> HOST_TYPE_PRIORITY_DEFAULT = [
-        com.redhat.ci.host.Type.CONTAINER,
-        com.redhat.ci.host.Type.VM,
-        com.redhat.ci.host.Type.BAREMETAL,
-    ]
-
-    public static final List<com.redhat.ci.provider.Type> PROVIDER_PRIORITY_DEFAULT = [
-        com.redhat.ci.provider.Type.OPENSHIFT,
-        com.redhat.ci.provider.Type.KUBEVIRT,
-        com.redhat.ci.provider.Type.OPENSTACK,
-        com.redhat.ci.provider.Type.BEAKER,
-        com.redhat.ci.provider.Type.AWS,
-        com.redhat.ci.provider.Type.DUFFY,
-    ]
-
-    public static final List<com.redhat.ci.provisioner.Type> PROVISIONER_PRIORITY_DEFAULT = [
-        Type.OPENSHIFT,
-        Type.KUBEVIRT,
-        Type.LINCHPIN,
-    ]
-
     // Provisioner version
     String version = 'dev-v1.2.0'
 
@@ -67,13 +46,28 @@ class ProvisioningConfig {
     String provisioningWorkspaceDir = 'workspace'
 
     // The provisioning priority for host types (e.g. containers vs VMs vs bare metal)
-    List<com.redhat.ci.host.Type> hostTypePriority = HOST_TYPE_PRIORITY_DEFAULT
-
-    // The provisioning priority for the underlying provisioner (e.g. OpenShift API vs LinchPin)
-    List<com.redhat.ci.provisioner.Type> provisionerPriority = PROVISIONER_PRIORITY_DEFAULT
+    List<com.redhat.ci.host.Type> hostTypePriority = [
+        com.redhat.ci.host.Type.CONTAINER,
+        com.redhat.ci.host.Type.VM,
+        com.redhat.ci.host.Type.BAREMETAL,
+    ]
 
     // The provisioning priority for the provider type (e.g. OpenShift vs. OpenStack vs. Beaker)
-    List<com.redhat.ci.provider.Type> providerPriority = PROVIDER_PRIORITY_DEFAULT
+    List<com.redhat.ci.provider.Type> providerPriority = [
+        com.redhat.ci.provider.Type.OPENSHIFT,
+        com.redhat.ci.provider.Type.KUBEVIRT,
+        com.redhat.ci.provider.Type.OPENSTACK,
+        com.redhat.ci.provider.Type.BEAKER,
+        com.redhat.ci.provider.Type.AWS,
+        com.redhat.ci.provider.Type.DUFFY,
+    ]
+
+    // The provisioning priority for the underlying provisioner (e.g. OpenShift API vs LinchPin)
+    List<com.redhat.ci.provisioner.Type> provisionerPriority = [
+        Type.OPENSHIFT,
+        Type.KUBEVIRT,
+        Type.LINCHPIN,
+    ]
 
     // ID of Jenkins credential for kerberos principal needed for Beaker authentication.
     String krbPrincipalCredentialId = KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT

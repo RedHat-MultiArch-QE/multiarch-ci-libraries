@@ -87,7 +87,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnBareMetalHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(arch:X86_64, type:Type.BAREMETAL)
+        TargetHost target = new TargetHost(arch:'x86_64', type:Type.BAREMETAL)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assert(config != null)
     }
@@ -95,7 +95,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnVMHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(arch:X86_64, type:Type.VM)
+        TargetHost target = new TargetHost(arch:'x86_64', type:Type.VM)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assert(config != null)
     }
