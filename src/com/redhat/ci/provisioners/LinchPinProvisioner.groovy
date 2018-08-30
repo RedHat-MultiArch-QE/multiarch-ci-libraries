@@ -56,9 +56,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Install keys we can connect via JNLP or SSH
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                    "linchpin --workspace ${config.provisioningWorkspaceDir} " +
-                    "--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                "linchpin --workspace ${config.provisioningWorkspaceDir} " +
+                "--template-data \'${getTemplateData(host, config)}\' " +
+                "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
 
             // We need to scan for inventory file. Please see the following for reasoning:
@@ -141,9 +141,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
             try {
                 script.sh(
                     ACTIVATE_VIRTUALENV +
-                        "linchpin --workspace ${config.provisioningWorkspaceDir} " +
-                        "--template-data \'${getTemplateData(host, config)}\' " +
-                        "--verbose destroy ${LINCHPIN_TARGETS[host.provider]}"
+                    "linchpin --workspace ${config.provisioningWorkspaceDir} " +
+                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]}"
                 )
             } catch (e) {
                 LOG.log(Level.SEVERE, e.message, e)
@@ -170,21 +169,24 @@ class LinchPinProvisioner extends AbstractProvisioner {
             templateData.job_group = config.jobgroup
             templateData.hostrequires = config.hostrequires
             templateData.hooks = [postUp:[connectToMaster:config.mode == Mode.JNLP]]
-            templateData.extra_vars = '{' +
-                '"rpm_key_imports":[],' +
-                '"jenkins_master_repositories":[],' +
-                '"jenkins_master_download_repositories":[],' +
-                "\"jslave_name\":\"${host.displayName}\"," +
-                "\"jslave_label\":\"${host.displayName}\"," +
-                "\"arch\":\"${host.arch}\"," +
-                "\"jenkins_master_url\":\"${config.jenkinsMasterUrl}\"," +
-                "\"jenkins_slave_username\":\"${script.JENKINS_SLAVE_USERNAME}\"," +
-                "\"jenkins_slave_password\":\"${script.JENKINS_SLAVE_PASSWORD}\"," +
-                '"jswarm_version":"3.9",' +
-                '"jswarm_filename":"swarm-client-{{ jswarm_version }}.jar",' +
-                "\"jswarm_extra_args\":\"${config.jswarmExtraArgs}\"," +
-                '"jenkins_slave_repositories":[{ "name": "epel", "mirrorlist": ' +
-                '"https://mirrors.fedoraproject.org/metalink?arch=$basearch&repo=epel-7"}]}'
+            templateData.extra_vars = [
+                'rpm_key_imports':[],
+                'jenkins_master_repositories':[],
+                'jenkins_master_download_repositories':[],
+                'jslave_name':"${host.displayName}",
+                'jslave_label':"${host.displayName}",
+                'arch':"${host.arch}",
+                'jenkins_master_url':"${config.jenkinsMasterUrl}",
+                'jenkins_slave_username':"${script.JENKINS_SLAVE_USERNAME}",
+                'jenkins_slave_password':"${script.JENKINS_SLAVE_PASSWORD}",
+                'jswarm_version':'3.9',
+                'jswarm_filename':'swarm-client-{{ jswarm_version }}.jar',
+                'jswarm_extra_args':"${config.jswarmExtraArgs}",
+                'jenkins_slave_repositories':[[
+                    'name':'epel',
+                    'mirrorlist':'https://mirrors.fedoraproject.org/metalink?arch=\$basearch&repo=epel-7'
+                ]]
+            ]
 
             String templateDataJson = JsonOutput.toJson(templateData)
             templateDataJson
