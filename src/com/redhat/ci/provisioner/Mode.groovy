@@ -5,7 +5,4 @@ package com.redhat.ci.provisioner
  */
 enum Mode {
     JNLP, SSH
-
-    @SuppressWarnings(['UnnecessaryConstructor', 'UnnecessaryPublicModifer'])
-    public Mode() { }
 }
