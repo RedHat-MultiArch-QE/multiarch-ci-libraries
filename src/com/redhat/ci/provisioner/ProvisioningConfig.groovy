@@ -90,7 +90,7 @@ class ProvisioningConfig {
 
     // Determines whether connection to the provisioned host should be over JNLP or SSH.
     Boolean runOnSlave = true
-    Mode mode = Mode.JNLP
+    Mode mode
 
     // Whether Ansible should be installed on the provisioned host.
     // This will only be respected if runOnSlave is also set to true,
@@ -114,6 +114,7 @@ class ProvisioningConfig {
         this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
         this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
         this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+        this.mode = Mode.JNLP
 
         initPriorityLists()
     }
