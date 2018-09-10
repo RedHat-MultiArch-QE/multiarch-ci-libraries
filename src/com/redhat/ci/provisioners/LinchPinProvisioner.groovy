@@ -151,11 +151,13 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
         script.withCredentials(
-            script.usernamePassword(
-                credentialsId:config.jenkinsSlaveCredentialId,
-                usernameVariable:'JENKINS_SLAVE_USERNAME',
-                passwordVariable:'JENKINS_SLAVE_PASSWORD'
-            )
+            [
+                script.usernamePassword(
+                    credentialsId:config.jenkinsSlaveCredentialId,
+                    usernameVariable:'JENKINS_SLAVE_USERNAME',
+                    passwordVariable:'JENKINS_SLAVE_PASSWORD'
+                )
+            ]
         ) {
             // Build template data
             Map templateData = [:]
