@@ -13,7 +13,6 @@ import com.redhat.ci.host.Type
  */
 class ProvisioningService {
     private static final String UNAVAILABLE = 'No available provisioner could provision target host.'
-    private static final Logger LOG = Logger.getLogger(ProvisioningService.name)
 
     class ProvisionerUnavailableException extends RuntimeException {
         ProvisionerUnavailableException(String message) {
