@@ -17,7 +17,7 @@ class TestUtils {
      * @return ProvisioningConfig Configuration file for provisioning.
      */
     static ProvisioningConfig getProvisioningConfig(Script script) {
-        new ProvisioningConfig(script.params, script.env)
+        new ProvisioningConfig(script.params, script.env.environment)
     }
 
     /**
