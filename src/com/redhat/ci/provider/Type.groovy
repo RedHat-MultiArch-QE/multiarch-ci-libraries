@@ -5,7 +5,7 @@ package com.redhat.ci.provider
  *
  * We're not using the Java enum type since it's not supported directly by the groovy security sandbox.
  */
-class Type extends String {
+class Type {
     public static final String AWS = 'AWS'
     public static final String BEAKER = 'BEAKER'
     public static final String DUFFY = 'DUFFY'

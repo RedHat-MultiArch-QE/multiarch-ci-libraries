@@ -5,7 +5,7 @@ package com.redhat.ci.provisioner
  *
  * We're not using the Java enum type since it's not supported directly by the groovy security sandbox.
  */
-class Mode extends String {
+class Mode {
     public static final String JNLP = 'JNLP'
     public static final String SSH  = 'SSH'
 }
