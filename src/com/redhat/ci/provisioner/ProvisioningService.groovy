@@ -6,8 +6,6 @@ import com.redhat.ci.provisioners.OpenShiftProvisioner
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.host.Type
-import java.util.logging.Logger
-import java.util.logging.Level
 
 /**
  * Utilities for smart provisioning.
@@ -75,7 +73,7 @@ class ProvisioningService {
                 for (providerType in host.providerPriority) {
                     // Verify that the selected provisioner supports the selected provider
                     if (!provisioner.supportsProvider(providerType)) {
-                        LOG.warning("Provisioning ${hostType} host " +
+                        script.echo("Provisioning ${hostType} host " +
                                     "with ${provisionerType} provisioner " +
                                     "and ${providerType} provider is not supported.")
                         continue
@@ -86,16 +84,16 @@ class ProvisioningService {
                     host.provider = providerType
 
                     try {
-                        LOG.info("Attempting to provision ${hostType} host " +
+                        script.echo("Attempting to provision ${hostType} host " +
                                  "with ${provisionerType} provisioner " +
                                  "and ${providerType} provider.")
                         return provisioner.provision(host, config)
                     } catch (e) {
                         // Provisioning failed, so try next provider
-                        LOG.warning("Provisioning ${hostType} host " +
+                        script.echo("Provisioning ${hostType} host " +
                                     "with ${provisionerType} provisioner " +
                                     "and ${providerType} provider failed.")
-                        LOG.log(Level.SEVERE, e.message, e)
+                        script.echo(e)
                         continue
                     }
                 }

@@ -7,8 +7,6 @@ import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
-import java.util.logging.Logger
-import java.util.logging.Level
 
 /**
  * Uses LinchPin and the libraries defined workspace to provision resources.
@@ -18,7 +16,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
-    private static final Logger LOG = Logger.getLogger(LinchPinProvisioner.name)
 
     LinchPinProvisioner(Script script) {
         super(script)
@@ -103,7 +100,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, host)
             }
         } catch (e) {
-            LOG.log(Level.SEVERE, e.message, e)
             script.echo(e)
             host.error = e.message
         }
@@ -132,7 +128,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "teardown ${host.inventoryPath}"
                 )
             } catch (e) {
-                LOG.log(Level.SEVERE, e.message, e)
                 script.echo "${e}"
             }
         }
@@ -145,7 +140,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]}"
                 )
             } catch (e) {
-                LOG.log(Level.SEVERE, e.message, e)
                 script.echo(e)
             }
         }
