@@ -57,13 +57,13 @@ class ProvisioningService {
 
                 // Check if provisioner is available
                 if (!provisioner.available) {
-                    LOG.warning("Provisioner ${provisionerType} is not available.")
+                    script.echo("Provisioner ${provisionerType} is not available.")
                     continue
                 }
 
                 // Check if provisioner supports host type
                 if (!provisioner.supportsHostType(hostType)) {
-                    LOG.warning("Provisioning ${hostType} host " +
+                    script.echo("Provisioning ${hostType} host " +
                                 "with ${provisionerType} provisioner is not supported.")
                     continue
                 }
