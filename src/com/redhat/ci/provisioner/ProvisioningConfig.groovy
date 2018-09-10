@@ -46,28 +46,13 @@ class ProvisioningConfig {
     String provisioningWorkspaceDir = 'workspace'
 
     // The provisioning priority for host types (e.g. containers vs VMs vs bare metal)
-    List<com.redhat.ci.host.Type> hostTypePriority = [
-        com.redhat.ci.host.Type.CONTAINER,
-        com.redhat.ci.host.Type.VM,
-        com.redhat.ci.host.Type.BAREMETAL,
-    ]
+    List<com.redhat.ci.host.Type> hostTypePriority = []
 
     // The provisioning priority for the provider type (e.g. OpenShift vs. OpenStack vs. Beaker)
-    List<com.redhat.ci.provider.Type> providerPriority = [
-        com.redhat.ci.provider.Type.OPENSHIFT,
-        com.redhat.ci.provider.Type.KUBEVIRT,
-        com.redhat.ci.provider.Type.OPENSTACK,
-        com.redhat.ci.provider.Type.BEAKER,
-        com.redhat.ci.provider.Type.AWS,
-        com.redhat.ci.provider.Type.DUFFY,
-    ]
+    List<com.redhat.ci.provider.Type> providerPriority = []
 
     // The provisioning priority for the underlying provisioner (e.g. OpenShift API vs LinchPin)
-    List<com.redhat.ci.provisioner.Type> provisionerPriority = [
-        Type.OPENSHIFT,
-        Type.KUBEVIRT,
-        Type.LINCHPIN,
-    ]
+    List<com.redhat.ci.provisioner.Type> provisionerPriority = []
 
     // ID of Jenkins credential for kerberos principal needed for Beaker authentication.
     String krbPrincipalCredentialId = KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT
@@ -129,6 +114,8 @@ class ProvisioningConfig {
         this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
         this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
         this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+
+        initPriorityLists()
     }
 
     void setRunOnSlave(Boolean runOnSlave) {
@@ -139,5 +126,28 @@ class ProvisioningConfig {
     void setMode(Mode mode) {
         this.mode = mode
         this.runOnSlave = (mode == Mode.JNLP)
+    }
+
+    void initPriorityLists() {
+        hostTypePriority = [
+            com.redhat.ci.host.Type.CONTAINER,
+            com.redhat.ci.host.Type.VM,
+            com.redhat.ci.host.Type.BAREMETAL,
+        ]
+
+        providerPriority = [
+            com.redhat.ci.provider.Type.OPENSHIFT,
+            com.redhat.ci.provider.Type.KUBEVIRT,
+            com.redhat.ci.provider.Type.OPENSTACK,
+            com.redhat.ci.provider.Type.BEAKER,
+            com.redhat.ci.provider.Type.AWS,
+            com.redhat.ci.provider.Type.DUFFY,
+        ]
+
+        provisionerPriority = [
+            Type.OPENSHIFT,
+            Type.KUBEVIRT,
+            Type.LINCHPIN,
+        ]
     }
 }
