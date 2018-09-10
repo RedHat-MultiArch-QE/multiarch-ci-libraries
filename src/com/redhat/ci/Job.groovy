@@ -45,7 +45,7 @@ class Job {
     void run() {
         Map subJobs = [:]
         for (targetHost in targetHosts) {
-            subJobs[targetHost.id] = jobWrapper(targetHost)
+            subJobs[targetHost.arch] = jobWrapper(targetHost)
         }
 
         // Run each single host job in parallel on each specified host
@@ -62,13 +62,14 @@ class Job {
         host = provSvc.provision(targetHost, config, script)
 
         // Property validity check
-        if (!host || !host.hostname || !host.arch || !host.type) {
-            script.error("Invalid provisioned host: ${host}")
+        if (!host || !host.hostname || !host.arch || !host.type ||
+            !host.provisioner || !host.provider) {
+            script.echo("Invalid provisioned host: ${host}")
         }
 
         // If the provision failed, there will be an error
         if (host.error) {
-            script.error(host.error)
+            script.echo(host.error)
         }
         host
     }

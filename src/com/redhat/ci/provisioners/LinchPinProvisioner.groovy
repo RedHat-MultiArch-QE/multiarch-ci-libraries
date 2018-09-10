@@ -30,7 +30,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
             arch:target.arch,
             displayName:"${target.arch}-slave",
             provisioner:target.provisioner,
-            provider:target.provider
+            provider:target.provider,
+            type:target.type
         )
 
         try {
