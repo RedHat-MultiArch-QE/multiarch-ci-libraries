@@ -15,7 +15,7 @@ import java.util.logging.Level
  */
 class ProvisioningService {
     private static final String UNAVAILABLE = 'No available provisioner could provision target host.'
-    private static final Logger LOG = Logger.getLogger('ProvisioningService')
+    private static final Logger LOG = Logger.getLogger('com.redhat.ci.provisioner.ProvisioningService')
 
     class ProvisionerUnavailableException extends RuntimeException {
         ProvisionerUnavailableException(String message) {
