@@ -107,13 +107,13 @@ class ProvisioningConfig {
     Boolean installRhpkg = false
 
     ProvisioningConfig(Map params = [:], Map env = [:]) {
-        this.krbPrincipalCredentialId = params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
-        this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
-        this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
-        this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
-        this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
-        this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
-        this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+        this.krbPrincipalCredentialId = params && params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
+        this.keytabCredentialId = params && params.KEYTABCREDENTIALID ?: this.keytabCredentialId
+        this.sshPrivKeyCredentialId = params && params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
+        this.sshPubKeyCredentialId = params && params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
+        this.jenkinsSlaveCredentialId = params && params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
+        this.jenkinsMasterUrl = env && env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
+        this.jswarmExtraArgs = env && env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
         this.mode = Mode.JNLP
 
         initPriorityLists()
