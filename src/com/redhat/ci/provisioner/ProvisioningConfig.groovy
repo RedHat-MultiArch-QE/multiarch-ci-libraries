@@ -106,30 +106,19 @@ class ProvisioningConfig {
     // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
     Boolean installRhpkg = false
 
+    @SuppressWarnings(['CyclomaticComplexity', 'AbcMetric'])
     ProvisioningConfig(Map params = [:], Map env = [:]) {
-        this.krbPrincipalCredentialId = params && params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
-        this.keytabCredentialId = params && params.KEYTABCREDENTIALID ?: this.keytabCredentialId
-        this.sshPrivKeyCredentialId = params && params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
-        this.sshPubKeyCredentialId = params && params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
-        this.jenkinsSlaveCredentialId = params && params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
-        this.jenkinsMasterUrl = env && env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
-        this.jswarmExtraArgs = env && env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+        params = params ?: [:]
+        env = env ?: [:]
+        this.krbPrincipalCredentialId = params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
+        this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
+        this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
+        this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
+        this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
+        this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
+        this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
         this.mode = Mode.JNLP
 
-        initPriorityLists()
-    }
-
-    void setRunOnSlave(Boolean runOnSlave) {
-        this.runOnSlave = runOnSlave
-        this.mode = runOnSlave ? Mode.JNLP : Mode.SSH
-    }
-
-    void setMode(Mode mode) {
-        this.mode = mode
-        this.runOnSlave = (mode == Mode.JNLP)
-    }
-
-    void initPriorityLists() {
         hostTypePriority = [
             com.redhat.ci.host.Type.CONTAINER,
             com.redhat.ci.host.Type.VM,
@@ -150,5 +139,15 @@ class ProvisioningConfig {
             Type.KUBEVIRT,
             Type.LINCHPIN,
         ]
+    }
+
+    void setRunOnSlave(Boolean runOnSlave) {
+        this.runOnSlave = runOnSlave
+        this.mode = runOnSlave ? Mode.JNLP : Mode.SSH
+    }
+
+    void setMode(Mode mode) {
+        this.mode = mode
+        this.runOnSlave = (mode == Mode.JNLP)
     }
 }
