@@ -16,7 +16,7 @@ import java.util.logging.Level
  */
 @RunWith(MockitoJUnitRunner)
 class TestUtilsTest extends PipelineTestScript {
-    private static final Logger LOG = Logger.getLogger('TestUtilsTest')
+    private static final Logger LOG = Logger.getLogger(TestUtilsTest.name)
     private static final String X86_64 = 'x86_64'
 
     @SuppressWarnings('PublicInstanceField')

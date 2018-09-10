@@ -18,7 +18,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
-    private static final Logger LOG = Logger.getLogger('com.redhat.ci.provisioners.LinchPinProvisioner')
+    private static final Logger LOG = Logger.getLogger(LinchPinProvisioner.name)
 
     LinchPinProvisioner(Script script) {
         super(script)
