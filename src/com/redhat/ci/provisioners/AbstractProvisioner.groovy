@@ -2,7 +2,6 @@ package com.redhat.ci.provisioners
 
 import com.redhat.ci.provisioner.Provisioner
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.provisioner.Type
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 
@@ -12,9 +11,9 @@ import com.redhat.ci.hosts.ProvisionedHost
 abstract class AbstractProvisioner implements Provisioner {
     Script script = null
     Boolean available = false
-    protected List<com.redhat.ci.host.Type> supportedHostTypes = []
-    protected List<com.redhat.ci.provider.Type> supportedProviders = []
-    Type type = null
+    protected List<String> supportedHostTypes = []
+    protected List<String> supportedProviders = []
+    String type = null
 
     protected AbstractProvisioner(Script script) {
         this.script = script
@@ -38,7 +37,7 @@ abstract class AbstractProvisioner implements Provisioner {
      * Determines whether a host type is supported for provisioning.
      */
     @Override
-    Boolean supportsHostType(com.redhat.ci.host.Type hostType) {
+    Boolean supportsHostType(String hostType) {
         supportedHostTypes.contains(hostType)
     }
 
@@ -46,7 +45,7 @@ abstract class AbstractProvisioner implements Provisioner {
      * Determines whether a provider is supported for provisioning.
      */
     @Override
-    Boolean supportsProvider(com.redhat.ci.provider.Type provider) {
+    Boolean supportsProvider(String provider) {
         supportedProviders.contains(provider)
     }
 }

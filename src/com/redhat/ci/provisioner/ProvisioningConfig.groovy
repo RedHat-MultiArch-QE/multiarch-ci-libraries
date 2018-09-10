@@ -46,13 +46,13 @@ class ProvisioningConfig {
     String provisioningWorkspaceDir = 'workspace'
 
     // The provisioning priority for host types (e.g. containers vs VMs vs bare metal)
-    List<com.redhat.ci.host.Type> hostTypePriority = []
+    List<String> hostTypePriority = []
 
     // The provisioning priority for the provider type (e.g. OpenShift vs. OpenStack vs. Beaker)
-    List<com.redhat.ci.provider.Type> providerPriority = []
+    List<String> providerPriority = []
 
     // The provisioning priority for the underlying provisioner (e.g. OpenShift API vs LinchPin)
-    List<com.redhat.ci.provisioner.Type> provisionerPriority = []
+    List<String> provisionerPriority = []
 
     // ID of Jenkins credential for kerberos principal needed for Beaker authentication.
     String krbPrincipalCredentialId = KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT
@@ -90,7 +90,7 @@ class ProvisioningConfig {
 
     // Determines whether connection to the provisioned host should be over JNLP or SSH.
     Boolean runOnSlave = false
-    Mode mode
+    String mode = null
 
     // Whether Ansible should be installed on the provisioned host.
     // This will only be respected if runOnSlave is also set to true,
@@ -147,7 +147,7 @@ class ProvisioningConfig {
         this.mode = runOnSlave ? Mode.JNLP : Mode.SSH
     }
 
-    void setMode(Mode mode) {
+    void setMode(String mode) {
         this.mode = mode
         this.runOnSlave = (mode == Mode.JNLP)
     }

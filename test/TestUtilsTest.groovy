@@ -9,6 +9,7 @@ import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
 import java.util.logging.Logger
+import java.util.logging.Level
 
 /**
  * Tests TestUtils API and whether or not a library is importable.
@@ -43,7 +44,7 @@ class TestUtilsTest extends PipelineTestScript {
         Exception e, ProvisionedHost host ->
         LOG.info('onFailure(e, host)')
         LOG.severe(e.toString())
-        LOG.severe("Failed on host ${host.id} with exception")
+        LOG.log(Level.SEVERE, "Failed on host ${host} with exception", e)
         throw e
     }
 

@@ -1,7 +1,5 @@
 package com.redhat.ci.hosts
 
-import com.redhat.ci.host.Type
-
 /**
  * Host primitives.
  */
@@ -16,5 +14,5 @@ class Host {
     String arch = null
 
     // Host type specification (Baremetal, VM, container)
-    Type type = null
+    String type = null
 }

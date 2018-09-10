@@ -1,17 +1,14 @@
 package com.redhat.ci.hosts
 
-import com.redhat.ci.provider.Type
-import com.redhat.ci.provisioner.Type
-
 /**
  * A TargetHost that has undergone an attempt at provisioning a its associated state.
  */
 class ProvisionedHost extends TargetHost {
     // The provider the host was provisioned from
-    com.redhat.ci.provider.Type providerType = null
+    String providerType = null
 
     // The provisioner the host was provisioned with
-    Type provisionerType = null
+    String provisionerType = null
 
     // Any error that occurred during provisioning
     String error = null

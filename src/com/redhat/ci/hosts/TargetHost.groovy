@@ -1,26 +1,22 @@
 package com.redhat.ci.hosts
 
-import com.redhat.ci.host.Type
-import com.redhat.ci.provider.Type
-import com.redhat.ci.provisioner.Type
-
 /**
  * A target host for provisioning.
  */
 class TargetHost extends Host {
 
     // Host type priority list
-    List<com.redhat.ci.host.Type> typePriority = null
+    List<String> typePriority = null
 
     // Selected provider type
-    com.redhat.ci.provider.Type provider = null
+    String provider = null
 
     // Provider type priority list
-    List<com.redhat.ci.provider.Type> providerPriority = null
+    List<String> providerPriority = null
 
     // Selected provisioner type
-    Type provisioner = null
+    String provisioner = null
 
     // Provisioner type priority list
-    List<com.redhat.ci.provisioner.Type> provisionerPriority = null
+    List<String> provisionerPriority = null
 }

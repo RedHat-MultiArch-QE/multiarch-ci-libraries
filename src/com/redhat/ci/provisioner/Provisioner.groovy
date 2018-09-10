@@ -9,6 +9,6 @@ import com.redhat.ci.hosts.ProvisionedHost
 interface Provisioner {
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config)
     void teardown(ProvisionedHost host, ProvisioningConfig config)
-    Boolean supportsHostType(com.redhat.ci.host.Type hostType)
-    Boolean supportsProvider(com.redhat.ci.provider.Type providerType)
+    Boolean supportsHostType(String hostType)
+    Boolean supportsProvider(String providerType)
 }

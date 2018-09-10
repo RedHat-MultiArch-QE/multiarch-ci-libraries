@@ -15,7 +15,7 @@ import java.util.logging.Level
  */
 class LinchPinProvisioner extends AbstractProvisioner {
     private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate\n'
-    private static final Map<com.redhat.ci.provider.Type, String> LINCHPIN_TARGETS = [
+    private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
     private static final Logger LOG = Logger.getLogger('LinchPinProvisioner')
