@@ -64,12 +64,7 @@ class Job {
         // Property validity check
         if (!host || !host.hostname || !host.arch || !host.type ||
             !host.provisioner || !host.provider) {
-            script.echo("Invalid provisioned host: ${host}")
-            script.echo("hostname:${host.hostname}")
-            script.echo("arch:${host.arch}")
-            script.echo("type:${host.type}")
-            script.echo("provisioner:${host.provisioner}")
-            script.echo("provider:${host.provider}")
+            script.echo("Invalid provisioned host: ${host.dump()}")
         }
 
         // If the provision failed, there will be an error
