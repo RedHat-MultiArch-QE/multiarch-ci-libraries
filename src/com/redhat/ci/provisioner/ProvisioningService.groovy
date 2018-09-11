@@ -57,7 +57,7 @@ class ProvisioningService {
 
                 // Check if provisioner is available
                 if (!provisioner.available) {
-                    script.echo("Provisioning ${hostType} host " + 
+                    script.echo("Provisioning ${hostType} host " +
                                 "with ${provisionerType} provisioner is not possible. " +
                                 "Provisioner ${provisionerType} not available.")
                     continue

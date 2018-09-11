@@ -79,13 +79,13 @@ class Job {
             // Ensure teardown runs before the pipeline exits
             provSvc.teardown(host, config, script)
         } catch (e) {
-            echo("Ignoring exception in teardown: ${e}")
+            script.echo("Ignoring exception in teardown: ${e}")
         }
     }
 
     private void runOnTarget(TargetHost targetHost) {
         script.node("provisioner-${config.version}") {
-            ProvisionedHost host = null
+            ProvisionedHost host = new ProvisionedHost(targetHost)
             try {
                 host = provision(targetHost)
             } catch (e) {

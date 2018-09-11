@@ -26,13 +26,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
     }
 
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
-        ProvisionedHost host = new ProvisionedHost(
-            arch:target.arch,
-            displayName:"${target.arch}-slave",
-            provisioner:target.provisioner,
-            provider:target.provider,
-            type:target.type
-        )
+        ProvisionedHost host = new ProvisionedHost(target)
+        host.displayName = "${target.arch}-slave"
 
         try {
             Utils.installCredentials(script, config)
@@ -157,7 +152,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     credentialsId:config.jenkinsSlaveCredentialId,
                     usernameVariable:'JENKINS_SLAVE_USERNAME',
                     passwordVariable:'JENKINS_SLAVE_PASSWORD'
-                )
+                ),
             ]
         ) {
             // Build template data

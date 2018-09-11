@@ -36,4 +36,20 @@ class ProvisionedHost extends TargetHost {
 
     // Wheater installing rhpkg on the host was successful
     Boolean rhpkgInstalled = false
+
+    ProvisionedHost() {
+    }
+
+    ProvisionedHost(TargetHost target) {
+        super()
+        this.id = target.id
+        this.arch = target.arch
+        this.hostname = target.hostname
+        this.type = target.type
+        this.typePriority = target.typePriority
+        this.provider = target.provider
+        this.providerPriority = target.providerPriority
+        this.provisioner = target.provisioner
+        this.provisioner = target.provisionerPriority
+    }
 }
