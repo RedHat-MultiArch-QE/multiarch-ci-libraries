@@ -14,7 +14,7 @@ import com.redhat.ci.host.Type
 class ProvisioningService {
     private static final String UNAVAILABLE = 'No available provisioner could provision target host.'
 
-    class ProvisionerUnavailableException extends RuntimeException {
+    class ProvisionerUnavailableException extends Exception {
         ProvisionerUnavailableException(String message) {
             super(message)
         }

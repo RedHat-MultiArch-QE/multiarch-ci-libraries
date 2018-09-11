@@ -28,6 +28,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
         host.displayName = "${target.arch}-slave"
+        host.provisioner = this.type
+        host.provider = com.redhat.ci.provider.Type.BEAKER
 
         try {
             Utils.installCredentials(script, config)
