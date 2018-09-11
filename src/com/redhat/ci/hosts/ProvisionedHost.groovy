@@ -4,12 +4,6 @@ package com.redhat.ci.hosts
  * A TargetHost that has undergone an attempt at provisioning a its associated state.
  */
 class ProvisionedHost extends TargetHost {
-    // The provider the host was provisioned from
-    String providerType = null
-
-    // The provisioner the host was provisioned with
-    String provisionerType = null
-
     // Any error that occurred during provisioning
     String error = null
 

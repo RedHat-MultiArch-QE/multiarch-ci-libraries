@@ -83,6 +83,7 @@ class ProvisioningService {
                     // Attempt to provision with the selected provisioner and provider pair
                     host.provisioner = provisionerType
                     host.provider = providerType
+                    host.type = hostType
 
                     try {
                         script.echo("Attempting to provision ${hostType} host " +
