@@ -98,7 +98,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, host)
             }
         } catch (e) {
-            script.echo(e)
+            script.echo(e.message)
             host.error = e.message
         }
 
@@ -126,7 +126,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "teardown ${host.inventoryPath}"
                 )
             } catch (e) {
-                script.echo "${e}"
+                script.echo(e.message)
             }
         }
 
@@ -138,7 +138,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]}"
                 )
             } catch (e) {
-                script.echo(e)
+                script.echo(e.message)
             }
         }
 
