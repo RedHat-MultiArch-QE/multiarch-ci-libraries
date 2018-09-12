@@ -53,7 +53,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Install keys we can connect via JNLP or SSH
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                "linchpin --workspace ${config.provisioningWorkspaceDir} " +
+                "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                 "--template-data \'${getTemplateData(host, config)}\' " +
                 "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
