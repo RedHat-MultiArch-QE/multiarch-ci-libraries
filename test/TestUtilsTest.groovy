@@ -1,7 +1,5 @@
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.Rule
-import org.junit.rules.ExpectedException
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.Mock
 import com.redhat.ci.host.Type
@@ -10,6 +8,7 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
 import java.util.logging.Logger
 import java.util.logging.Level
+import com.redhat.ci.provisioner.ProvisioningService
 
 /**
  * Tests TestUtils API and whether or not a library is importable.
@@ -19,9 +18,8 @@ class TestUtilsTest extends PipelineTestScript {
     private static final Logger LOG = Logger.getLogger(TestUtilsTest.name)
     private static final String X86_64 = 'x86_64'
 
-    @SuppressWarnings('PublicInstanceField')
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none()
+    class TestException extends Exception {
+    }
 
     @Mock
     private final ProvisionedHost host
@@ -37,7 +35,7 @@ class TestUtilsTest extends PipelineTestScript {
         ProvisionedHost host, ProvisioningConfig config ->
         LOG.info('body(host, config)')
         LOG.info("Running on host ${host.id}, and throwing Exception")
-        throw new RuntimeException()
+        throw new TestException()
     }
 
     private final Closure onFailure = {
@@ -96,16 +94,51 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnVMHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(arch:'x86_64', type:Type.VM)
+        TargetHost target = new TargetHost(
+            arch:'x86_64',
+            type:Type.VM,
+            provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
+            provider:com.redhat.ci.provider.Type.BEAKER
+        )
+        TestUtils.runTest(this, target, config, body, onFailure, onComplete)
+        assert(config != null)
+    }
+
+    @Test
+    void shouldInstallAllConfigurationTest() {
+        ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+        config.installAnsible = true
+        config.installRhpkg = true
+
+        TargetHost target = new TargetHost(arch:'x86_64')
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assert(config != null)
     }
 
     @Test
     void shouldFailOnRun() {
-        thrown.expect(Exception)
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TestUtils.runTest(this, 'x86_64', config, errorBody, onFailure, onComplete)
-        assert(config != null)
+        Boolean exceptionOccured = false
+        try {
+            TestUtils.runTest(this, 'x86_64', config, errorBody, onFailure, onComplete)
+        } catch (TestException e) {
+            exceptionOccured = true
+        }
+        assert(exceptionOccured)
+    }
+
+    @Test
+    void shouldFailWithNoProvisionerAvailable() {
+        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
+
+        TargetHost target = new TargetHost(arch:'x86_64', provisionerPriority:[])
+        Boolean exceptionOccured = false
+        try {
+            TestUtils.runTest(this, target, config, body, onFailure, onComplete)
+        } catch (ProvisioningService.ProvisionerUnavailableException e) {
+            exceptionOccured = true
+        }
+
+        assert(exceptionOccured)
     }
 }

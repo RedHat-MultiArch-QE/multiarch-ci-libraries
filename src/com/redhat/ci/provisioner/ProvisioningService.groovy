@@ -43,7 +43,9 @@ class ProvisioningService {
         host.typePriority = host.typePriority ?: config.hostTypePriority
 
         // Ensure there is a default set for the provisioner priority
-        host.provisionerPriority = host.provisionerPriority ?: config.provisionerPriority
+        if (host.provisionerPriority == null) {
+            host.provisionerPriority = config.provisionerPriority
+        }
 
         // Ensure there is a default set for the provider priority
         host.providerPriority = host.providerPriority ?: config.providerPriority

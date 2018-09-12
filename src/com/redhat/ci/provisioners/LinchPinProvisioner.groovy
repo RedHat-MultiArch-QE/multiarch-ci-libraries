@@ -60,7 +60,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             // Retrieve the latest linchpin transaction output
             JsonSlurper slurper = new JsonSlurper()
-            Map linchpinLatest = slurper.parseFile("${config.provisioningWorkspaceDir}/resources/linchpin.latest")
+            File results = "${config.provisioningWorkspaceDir}/resources/linchpin.latest"
+            Map linchpinLatest = slurper.parseFile(results)
             if (linchpinLatest.keySet().size() != 1) {
                 return host
             }
