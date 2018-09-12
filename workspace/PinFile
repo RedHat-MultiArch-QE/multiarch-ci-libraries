@@ -15,7 +15,7 @@ beaker-slave:
         attempt_wait_time: 60
         cancel_message: Beaker request timeout
         recipesets:
-        - distro: "RHEL-ALT-7.5"
+        - distro: "RHEL-7.5"
           arch: {{ arch | default('x86_64') }}
           variant: Server
           count: 1
