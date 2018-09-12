@@ -7,6 +7,7 @@ import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 
 /**
  * Uses LinchPin and the libraries defined workspace to provision resources.
@@ -25,6 +26,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
     }
 
+    @SuppressWarnings('AbcMetric')
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
         host.displayName = "${target.arch}-slave"
@@ -56,24 +58,26 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
 
-            // We need to scan for inventory file. Please see the following for reasoning:
-            // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/430
-            // Possible solutions to not require the scan:
-            // - https://github.com/CentOS-PaaS-SIG/linchpin/issues/421
-            // - overriding [evars] section and specifying inventory_file
-            //
-            host.inventoryPath = script.sh(
-                returnStdout:true,
-                script:"readlink -f ${config.provisioningWorkspaceDir}/inventories/*.inventory"
-            ).trim()
+            // Retrieve the latest linchpin transaction output
+            JsonSlurper slurper = new JsonSlurper()
+            Map linchpinLatest = slurper.parseFile("${config.provisioningWorkspaceDir}/resources/linchpin.latest")
+            if (linchpinLatest.keySet().size() != 1) {
+                return host
+            }
 
-            // Now that we have the inventory file, we should populate the hostname
-            // With the name of the master node
-            host.hostname = script.sh(
-                returnStdout:true,
-                script:"awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
-            ).trim()
+            // Parse the linchpin transaction ID
+            host.linchpinTxId = linchpinLatest.keySet().toArray()[0]
+            script.echo("linchpinTxId:${host.linchpinTxId}")
+            Map linchpinTargets = linchpinLatest[host.linchpinTxId]['targets'][0]
+            script.echo("linchpinTargets:${linchpinTargets}")
+            String linchpinTarget = LINCHPIN_TARGETS[host.provider]
+            script.echo("linchpinTarget:${linchpinTarget}")
+            host.inventoryPath = linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
+            script.echo("inventoryPath:${host.inventoryPath}")
 
+            // Parse the inventory file for the name of the master node
+            String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
+            host.hostname = script.sh(returnStdout:true, script:getMasterNode).trim()
             host.provisioned = true
 
             if (config.mode == Mode.JNLP) {
