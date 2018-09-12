@@ -28,8 +28,11 @@ class ProvisionedHost extends TargetHost {
     // Whether installing credentials on the host was successful
     Boolean credentialsInstalled = false
 
-    // Wheater installing rhpkg on the host was successful
+    // Whether installing rhpkg on the host was successful
     Boolean rhpkgInstalled = false
+
+    // Linchpin Transaction Id
+    Integer linchpinTxId = null
 
     ProvisionedHost() {
     }
