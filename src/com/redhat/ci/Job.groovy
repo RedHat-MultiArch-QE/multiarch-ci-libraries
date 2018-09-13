@@ -57,12 +57,18 @@ class Job {
         }
     }
 
-    private ProvisionedHost provision(TargetHost targetHost) {
+    protected ProvisionedHost provision(TargetHost targetHost) {
         ProvisionedHost host = null
         host = provSvc.provision(targetHost, config, script)
 
+        // Null check
+        if (!host) {
+            script.echo("Invalid provisioned host: ${host}")
+            return host
+        }
+
         // Property validity check
-        if (!host || !host.hostname || !host.arch || !host.type ||
+        if (!host.hostname || !host.arch || !host.type ||
             !host.provisioner || !host.provider) {
             script.echo("Invalid provisioned host: ${host.dump()}")
         }
@@ -74,7 +80,7 @@ class Job {
         host
     }
 
-    private void teardown(ProvisionedHost host) {
+    protected void teardown(ProvisionedHost host) {
         try {
             // Ensure teardown runs before the pipeline exits
             provSvc.teardown(host, config, script)
@@ -83,12 +89,13 @@ class Job {
         }
     }
 
-    private void runOnTarget(TargetHost targetHost) {
+    protected void runOnTarget(TargetHost targetHost) {
         script.node("provisioner-${config.version}") {
             ProvisionedHost host = new ProvisionedHost(targetHost)
             try {
                 host = provision(targetHost)
             } catch (e) {
+                script.echo(e.message)
                 onFailure(e, host)
                 teardown(host)
                 return
