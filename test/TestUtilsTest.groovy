@@ -6,15 +6,16 @@ import com.redhat.ci.host.Type
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.provisioner.ProvisioningService
 import java.util.logging.Logger
 import java.util.logging.Level
-import com.redhat.ci.provisioner.ProvisioningService
 
 /**
  * Tests TestUtils API and whether or not a library is importable.
  */
 @RunWith(MockitoJUnitRunner)
 class TestUtilsTest extends PipelineTestScript {
+
     private static final Logger LOG = Logger.getLogger(TestUtilsTest.name)
     private static final String X86_64 = 'x86_64'
 
@@ -54,12 +55,6 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldGetProvisioningConfig() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        assert(config != null)
-    }
-
-    @Test
-    void shouldSupportAPIRef() {
-        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
         assert(config != null)
     }
 

@@ -49,7 +49,7 @@ codenarc {
 
 
 clover {
-    targetPercentage = '85%'
+    targetPercentage = '95%'
 
     report {
         html = true

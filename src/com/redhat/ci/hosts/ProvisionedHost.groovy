@@ -47,6 +47,6 @@ class ProvisionedHost extends TargetHost {
         this.provider = target.provider
         this.providerPriority = target.providerPriority
         this.provisioner = target.provisioner
-        this.provisioner = target.provisionerPriority
+        this.provisionerPriority = target.provisionerPriority
     }
 }
