@@ -107,6 +107,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldInstallAllConfigurationTest() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+        config.runOnSlave = true
         config.installAnsible = true
         config.installRhpkg = true
 

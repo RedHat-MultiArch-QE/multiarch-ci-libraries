@@ -67,9 +67,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
             }
 
             // Parse the linchpin transaction ID
-            host.linchpinTxId = linchpinLatest.keySet().toArray()[0]
+            host.linchpinTxId = linchpinLatest.keySet().first().toInteger()
             script.echo("linchpinTxId:${host.linchpinTxId}")
-            Map linchpinTargets = linchpinLatest[host.linchpinTxId]['targets'][0]
+            Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
             script.echo("linchpinTargets:${linchpinTargets}")
             String linchpinTarget = LINCHPIN_TARGETS[host.provider]
             script.echo("linchpinTarget:${linchpinTarget}")

@@ -1,8 +1,0 @@
-@Library('multiarch-ci-libraries')
-import com.redhat.ci.provisioner.ProvisioningConfig
-
-ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-
-stage ('Download Test Files') {
-    downloadTests()
-}
