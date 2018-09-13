@@ -19,9 +19,6 @@ class TestUtilsTest extends PipelineTestScript {
     private static final Logger LOG = Logger.getLogger(TestUtilsTest.name)
     private static final String X86_64 = 'x86_64'
 
-    class TestException extends Exception {
-    }
-
     @Mock
     private final ProvisionedHost host
 
