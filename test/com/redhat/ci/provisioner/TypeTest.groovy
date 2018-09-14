@@ -3,22 +3,22 @@ package com.redhat.ci.provisioner
 import org.junit.Test
 
 /**
- * Exhaustive coverage of host types.
+ * Exhaustive coverage of provisioner types.
  */
 class TypeTest {
 
     @Test
-    void shouldSupportLinchPin() {
+    void supportsLinchPin() {
         assert(Type.LINCHPIN == 'LINCHPIN')
     }
 
     @Test
-    void shouldSupportKubeVirt() {
+    void supportsKubeVirt() {
         assert(Type.KUBEVIRT == 'KUBEVIRT')
     }
 
     @Test
-    void shouldSupportContainer() {
+    void supportsContainer() {
         assert(Type.OPENSHIFT == 'OPENSHIFT')
     }
 }

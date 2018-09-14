@@ -7,7 +7,6 @@ import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
 
 /**
  * Uses LinchPin and the libraries defined workspace to provision resources.
@@ -59,9 +58,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             )
 
             // Retrieve the latest linchpin transaction output
-            JsonSlurper slurper = new JsonSlurper()
-            String results = script.readFile("${config.provisioningWorkspaceDir}/resources/linchpin.latest")
-            Map linchpinLatest = slurper.parseText(results)
+            Map linchpinLatest = script.readJSON("${config.provisioningWorkspaceDir}/resources/linchpin.latest")
             if (linchpinLatest.keySet().size() != 1) {
                 return host
             }

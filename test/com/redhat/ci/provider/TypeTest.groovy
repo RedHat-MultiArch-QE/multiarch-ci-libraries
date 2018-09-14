@@ -7,32 +7,32 @@ import org.junit.Test
  */
 class TypeTest {
     @Test
-    void shouldSupportAWS() {
+    void supportsAWS() {
         assert(Type.AWS == 'AWS')
     }
 
     @Test
-    void shouldSupportBeaker() {
+    void supportsBeaker() {
         assert(Type.BEAKER == 'BEAKER')
     }
 
     @Test
-    void shouldSupportDuffy() {
+    void supportsDuffy() {
         assert(Type.DUFFY == 'DUFFY')
     }
 
     @Test
-    void shouldSupportKubeVirt() {
+    void supportsKubeVirt() {
         assert(Type.KUBEVIRT == 'KUBEVIRT')
     }
 
     @Test
-    void shouldSupportOpenShift() {
+    void supportsOpenShift() {
         assert(Type.OPENSHIFT == 'OPENSHIFT')
     }
 
     @Test
-    void shouldSupportOpenStack() {
+    void supportsOpenStack() {
         assert(Type.OPENSTACK == 'OPENSTACK')
     }
 }

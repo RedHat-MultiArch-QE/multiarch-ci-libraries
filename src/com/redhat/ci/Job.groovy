@@ -74,7 +74,7 @@ class Job {
                         "hostname:${host.hostname}, " +
                         "arch:${host.arch}, " +
                         "type:${host.type}, " +
-                        "provisioner:${host.provisioner}" +
+                        "provisioner:${host.provisioner}, " +
                         "provider:${host.provider}" +
                         ']'
             )
@@ -107,7 +107,7 @@ class Job {
                 teardown(host)
                 return
             }
-            script.echo("${config.mode}, ${config.runOnSlave}")
+
             if (config.runOnSlave) {
                 script.node(host.displayName) {
                     try {

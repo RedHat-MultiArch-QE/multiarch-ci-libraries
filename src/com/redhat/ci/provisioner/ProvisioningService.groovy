@@ -14,12 +14,6 @@ import com.redhat.ci.host.Type
 class ProvisioningService {
     private static final String UNAVAILABLE = 'No available provisioner could provision target host.'
 
-    class ProvisionerUnavailableException extends Exception {
-        ProvisionerUnavailableException(String message) {
-            super(message)
-        }
-    }
-
     @SuppressWarnings('NestedForLoop')
     ProvisionedHost provision(TargetHost host, ProvisioningConfig config, Script script) {
         Provisioner provisioner = null

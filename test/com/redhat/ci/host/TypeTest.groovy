@@ -8,17 +8,17 @@ import org.junit.Test
 class TypeTest {
 
     @Test
-    void shouldSupportBaremetal() {
+    void supportsBaremetal() {
         assert(Type.BAREMETAL == 'BAREMETAL')
     }
 
     @Test
-    void shouldSupportVM() {
+    void supportsVM() {
         assert(Type.VM == 'VM')
     }
 
     @Test
-    void shouldSupportContainer() {
+    void supportsContainer() {
         assert(Type.CONTAINER == 'CONTAINER')
     }
 }
