@@ -89,8 +89,7 @@ class ProvisioningConfig {
     String jswarmExtraArgs = JSWARM_EXTRA_ARGS_DEFAULT
 
     // Determines whether connection to the provisioned host should be over JNLP or SSH.
-    Boolean runOnSlave = false
-    String mode = null
+    String mode = Mode.SSH
 
     // Whether Ansible should be installed on the provisioned host.
     // This will only be respected if runOnSlave is also set to true,
@@ -118,8 +117,6 @@ class ProvisioningConfig {
         this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
         this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
 
-        this.mode = Mode.SSH
-
         hostTypePriority = [
             com.redhat.ci.host.Type.CONTAINER,
             com.redhat.ci.host.Type.VM,
@@ -143,12 +140,10 @@ class ProvisioningConfig {
     }
 
     void setRunOnSlave(Boolean runOnSlave) {
-        this.runOnSlave = runOnSlave
         this.mode = runOnSlave ? Mode.JNLP : Mode.SSH
     }
 
-    void setMode(String mode) {
-        this.mode = mode
-        this.runOnSlave = (mode == Mode.JNLP)
+    Boolean getRunOnSlave() {
+        this.mode == Mode.JNLP
     }
 }

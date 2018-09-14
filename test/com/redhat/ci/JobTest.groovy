@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.Before
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
+import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import org.junit.runner.RunWith
@@ -57,24 +58,25 @@ class JobTest extends Job {
 
     @Before
     void init() {
-        onCompleteCalled = false
-        body = bodyNoOp
+        this.script = new PipelineTestScript()
+        this.onCompleteCalled = false
+        this.body = bodyNoOp
+        this.config = new ProvisioningConfig()
+        this.targetHosts = [target]
+        this.provSvc = mock(ProvisioningService)
+        this.onFailure = onFailureNoOp
+        this.onComplete = onCompleteNoOp
     }
 
     JobTest() {
         super(
-            new PipelineTestScript(),
             null,
-            new ProvisioningConfig(),
+            null,
+            null,
             null,
             null,
             null
         )
-        this.targetHosts = [target]
-        this.provSvc = mock(ProvisioningService)
-        this.body = bodyNoOp
-        this.onFailure = onFailureNoOp
-        this.onComplete = onCompleteNoOp
     }
 
     @Test
@@ -158,8 +160,9 @@ class JobTest extends Job {
 
     @Test
     void runOnTargetWithBodyFailureOverJNLP() {
-        config = new ProvisioningConfig(mode:'JNLP')
-        body = bodyFailure
+        this.config.mode = Mode.JNLP
+        assert(config.mode == Mode.JNLP)
+        this.body = bodyFailure
 
         when(provSvc.provision(target, config, script)).thenReturn(validHost)
         doNothing().when(provSvc).teardown(validHost, config, script)
@@ -172,8 +175,9 @@ class JobTest extends Job {
 
     @Test
     void runOnTargetWithBodyFailureOverSSH() {
-        config = new ProvisioningConfig(mode:'SSH')
-        body = bodyFailure
+        this.config.mode = Mode.SSH
+        assert(config.mode == Mode.SSH)
+        this.body = bodyFailure
 
         when(provSvc.provision(target, config, script)).thenReturn(validHost)
         doNothing().when(provSvc).teardown(validHost, config, script)
@@ -182,5 +186,35 @@ class JobTest extends Job {
 
         verify(provSvc, times(1)).provision(target, config, script)
         verify(provSvc, times(1)).teardown(validHost, config, script)
+    }
+
+    @Test
+    void runOnTargetOverJNLP() {
+        this.config.mode = Mode.JNLP
+        assert(config.mode == Mode.JNLP)
+
+        when(provSvc.provision(target, config, script)).thenReturn(validHost)
+        doNothing().when(provSvc).teardown(validHost, config, script)
+
+        runOnTarget(target)
+
+        verify(provSvc, times(1)).provision(target, config, script)
+        verify(provSvc, times(1)).teardown(validHost, config, script)
+        assert(script.methodCallCounts['node'] == 2)
+    }
+
+    @Test
+    void runOnTargetOverSSH() {
+        this.config.mode = Mode.SSH
+        assert(config.mode == Mode.SSH)
+
+        when(provSvc.provision(target, config, script)).thenReturn(validHost)
+        doNothing().when(provSvc).teardown(validHost, config, script)
+
+        runOnTarget(target)
+
+        verify(provSvc, times(1)).provision(target, config, script)
+        verify(provSvc, times(1)).teardown(validHost, config, script)
+        assert(script.methodCallCounts['node'] == 1)
     }
 }

@@ -107,12 +107,13 @@ class Job {
                 teardown(host)
                 return
             }
-
+            script.echo("${config.mode}, ${config.runOnSlave}")
             if (config.runOnSlave) {
                 script.node(host.displayName) {
                     try {
                         body(host, config)
                     } catch (e) {
+                        script.echo(e.message)
                         onFailure(e, host)
                     }
                 }
@@ -124,6 +125,7 @@ class Job {
             try {
                 body(host, config)
             } catch (e) {
+                script.echo(e.message)
                 onFailure(e, host)
             } finally {
                 teardown(host)
