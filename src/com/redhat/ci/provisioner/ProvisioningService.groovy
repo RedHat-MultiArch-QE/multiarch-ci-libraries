@@ -108,7 +108,7 @@ class ProvisioningService {
         provisioner.teardown(host, config)
     }
 
-    private Provisioner getProvisioner(String provisioner, Script script) {
+    protected Provisioner getProvisioner(String provisioner, Script script) {
         switch (provisioner) {
             case com.redhat.ci.provisioner.Type.LINCHPIN:
                 return new LinchPinProvisioner(script)

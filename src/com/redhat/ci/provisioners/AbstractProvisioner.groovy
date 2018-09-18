@@ -10,10 +10,10 @@ import com.redhat.ci.hosts.ProvisionedHost
  */
 abstract class AbstractProvisioner implements Provisioner {
     Script script = null
-    Boolean available = false
+    String type = null
     protected List<String> supportedHostTypes = []
     protected List<String> supportedProviders = []
-    String type = null
+    protected Boolean available = false
 
     protected AbstractProvisioner(Script script) {
         this.script = script
@@ -47,5 +47,13 @@ abstract class AbstractProvisioner implements Provisioner {
     @Override
     Boolean supportsProvider(String provider) {
         supportedProviders.contains(provider)
+    }
+
+    /**
+     * Getter for availability status.
+     */
+    @Override
+    Boolean getAvailable() {
+        this.available
     }
 }
