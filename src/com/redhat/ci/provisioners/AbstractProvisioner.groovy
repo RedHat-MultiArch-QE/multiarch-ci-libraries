@@ -54,6 +54,6 @@ abstract class AbstractProvisioner implements Provisioner {
      */
     @Override
     Boolean getAvailable() {
-        this.available
+        this.@available
     }
 }
