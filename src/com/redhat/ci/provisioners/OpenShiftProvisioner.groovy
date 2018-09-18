@@ -10,6 +10,10 @@ import com.redhat.ci.provisioner.Type
  */
 class OpenShiftProvisioner extends AbstractProvisioner {
 
+    OpenShiftProvisioner() {
+        this(null)
+    }
+
     OpenShiftProvisioner(Script script) {
         super(script)
         this.type = Type.OPENSHIFT

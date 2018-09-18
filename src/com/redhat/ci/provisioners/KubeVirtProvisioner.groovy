@@ -9,6 +9,9 @@ import com.redhat.ci.provisioner.Type
  * A stubbed provisioner template for KubeVirt requests.
  */
 class KubeVirtProvisioner extends AbstractProvisioner {
+    KubeVirtProvisioner() {
+        this(null)
+    }
 
     KubeVirtProvisioner(Script script) {
         super(script)

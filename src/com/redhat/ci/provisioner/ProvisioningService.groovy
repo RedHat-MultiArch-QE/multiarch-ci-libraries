@@ -12,7 +12,7 @@ import com.redhat.ci.host.Type
  * Attempts to minimize resource footprint.
  */
 class ProvisioningService {
-    private static final String UNAVAILABLE = 'No available provisioner could provision target host.'
+    public static final String UNAVAILABLE = 'No available provisioner could provision target host.'
 
     @SuppressWarnings('NestedForLoop')
     ProvisionedHost provision(TargetHost host, ProvisioningConfig config, Script script) {
@@ -44,21 +44,20 @@ class ProvisioningService {
         // Ensure there is a default set for the provider priority
         host.providerPriority = host.providerPriority ?: config.providerPriority
 
-        // Loop through each host type by priority
-        for (hostType in host.typePriority) {
-            // Loop through each provisioner type by priority
-            for (provisionerType in host.provisionerPriority) {
-                // Verify that there is an available provisioner of this type
-                provisioner = getProvisioner(provisionerType, script)
+        // Loop through each provisioner type by priority
+        for (provisionerType in host.provisionerPriority) {
+            // Verify that there is an available provisioner of this type
+            provisioner = getProvisioner(provisionerType, script)
 
-                // Check if provisioner is available
-                if (!provisioner.available) {
-                    script.echo("Provisioning ${hostType} host " +
-                                "with ${provisionerType} provisioner is not possible. " +
-                                "Provisioner ${provisionerType} not available.")
-                    continue
-                }
+            // Check if provisioner is available
+            if (!provisioner.available) {
+                script.echo("Provisioning host with ${provisionerType} provisioner is not possible. " +
+                            "Provisioner ${provisionerType} not available.")
+                continue
+            }
 
+            // Loop through each host type by priority
+            for (hostType in host.typePriority) {
                 // Check if provisioner supports host type
                 if (!provisioner.supportsHostType(hostType)) {
                     script.echo("Provisioning ${hostType} host " +
@@ -83,8 +82,8 @@ class ProvisioningService {
 
                     try {
                         script.echo("Attempting to provision ${hostType} host " +
-                                 "with ${provisionerType} provisioner " +
-                                 "and ${providerType} provider.")
+                                    "with ${provisionerType} provisioner " +
+                                    "and ${providerType} provider.")
                         return provisioner.provision(host, config)
                     } catch (e) {
                         // Provisioning failed, so try next provider
@@ -117,6 +116,7 @@ class ProvisioningService {
             case com.redhat.ci.provisioner.Type.KUBEVIRT:
                 return new KubeVirtProvisioner(script)
             default:
+                script.echo("Unrecognized provisioner:${provisioner}")
                 throw new ProvisionerUnavailableException(UNAVAILABLE)
         }
     }

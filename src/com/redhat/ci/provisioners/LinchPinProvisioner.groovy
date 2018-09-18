@@ -18,9 +18,15 @@ class LinchPinProvisioner extends AbstractProvisioner {
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
 
+    LinchPinProvisioner() {
+        this(null)
+    }
+
     LinchPinProvisioner(Script script) {
         super(script)
-        this.available = true
+        if (script) {
+            this.available = true
+        }
         this.type = Type.LINCHPIN
         this.supportedHostTypes = [com.redhat.ci.host.Type.VM, com.redhat.ci.host.Type.BAREMETAL]
         this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
@@ -59,7 +65,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             )
 
             // Retrieve the latest linchpin transaction output
-            Map linchpinLatest = script.readJSON("${config.provisioningWorkspaceDir}/resources/linchpin.latest")
+            Map linchpinLatest = script.readJSON(file:"${config.provisioningWorkspaceDir}/resources/linchpin.latest")
             if (linchpinLatest.keySet().size() != 1) {
                 return host
             }
@@ -139,7 +145,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     ACTIVATE_VIRTUALENV +
                     "linchpin --workspace ${config.provisioningWorkspaceDir} " +
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
-                    "--txid ${host.linchpinTxId}"
+                    "--tx-id ${host.linchpinTxId}"
                 )
             } catch (e) {
                 script.echo(e.message)

@@ -14,6 +14,8 @@ class PipelineTestScript extends Script {
         null
     }
 
+    List<String> testLog = []
+
     Map<String, Integer> methodCallCounts = [
         ansiColor:0,
         checkout:0,
@@ -62,6 +64,7 @@ class PipelineTestScript extends Script {
     Closure echo = {
         msg ->
         methodCallCounts['echo']++
+        testLog.push(msg)
         LOG.info("echo(${msg})")
     }
 

@@ -8,29 +8,33 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Provisioner
 
 /**
- * Tests methods belonging to KubeVirtProvisioner.
+ * Tests methods belonging to LinchPinProvisioner.
  */
-class KubeVirtProvisionerTest {
-    private KubeVirtProvisioner provisioner
+class LinchPinProvisionerTest {
+    private LinchPinProvisioner provisioner
     private PipelineTestScript script
 
     @Before
     void init() {
-        provisioner = new KubeVirtProvisioner(script)
         script = new PipelineTestScript()
+        provisioner = new LinchPinProvisioner(script)
     }
 
     @Test
-    void ensureUnavailable() {
-        Provisioner nullScriptProvisioner = new KubeVirtProvisioner()
+    void ensureUnavailableOnlyWhenScriptIsNull() {
+        Provisioner nullScriptProvisioner = new LinchPinProvisioner()
         assert(!nullScriptProvisioner.available)
-        assert(!provisioner.available)
+    }
+
+    @Test
+    void ensureAvailableWhenScriptIsNonNull() {
+        assert(provisioner.available)
     }
 
     @Test
     void testProvision() {
         ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
-        assert(host == null)
+        assert(host != null)
     }
 
     @Test
