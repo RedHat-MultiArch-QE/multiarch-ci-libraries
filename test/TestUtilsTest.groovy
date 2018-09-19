@@ -32,7 +32,6 @@ class TestUtilsTest extends PipelineTestScript {
         assert(host)
     }
 
-    @SuppressWarnings('ThrowRuntimeException')
     private final Closure errorBody = {
         ProvisionedHost host, ProvisioningConfig config ->
         LOG.info('body(host, config)')

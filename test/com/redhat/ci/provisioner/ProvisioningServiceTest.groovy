@@ -72,7 +72,7 @@ class ProvisioningServiceTest {
         }
 
         assert(exceptionThrown)
-        assert(script.testLog.contains(EXCEPTION_MESSAGE))
+        assert(script.testLog.contains("Exception: ${EXCEPTION_MESSAGE}"))
         assert(script.testLog.contains("Provisioning ${target.type} " +
                                        "host with ${target.provisioner} provisioner " +
                                        "and ${target.provider} provider failed."))

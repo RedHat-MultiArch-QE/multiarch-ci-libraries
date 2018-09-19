@@ -117,7 +117,7 @@ class PipelineTestScript extends Script {
         methodCallCounts['readJSON']++
         LOG.info("readJSON(${file})")
         JsonSlurper slurper = new JsonSlurper()
-        slurper.parseText(this.getClass().getResource('resources/linchpin.latest').text)
+        slurper.parseText(this.getClass().getResource('linchpin.latest').text)
     }
 
     Closure scm = {

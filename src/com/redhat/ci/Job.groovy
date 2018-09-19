@@ -2,6 +2,7 @@ package com.redhat.ci
 
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
+import com.redhat.ci.provisioner.ProvisioningException
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.hosts.TargetHost
 
@@ -67,23 +68,23 @@ class Job {
             return host
         }
 
+        // If the provision failed, there will be an error
+        if (host.error) {
+            throw new ProvisioningException(host.error)
+        }
+
         // Property validity check
         if (!host.hostname || !host.arch || !host.type ||
             !host.provisioner || !host.provider) {
-            script.echo('Invalid provisioned host: [' +
-                        "hostname:${host.hostname}, " +
-                        "arch:${host.arch}, " +
-                        "type:${host.type}, " +
-                        "provisioner:${host.provisioner}, " +
-                        "provider:${host.provider}" +
-                        ']'
-            )
+            throw new ProvisioningException('Invalid provisioned host: [' +
+                                            "hostname:${host.hostname}, " +
+                                            "arch:${host.arch}, " +
+                                            "type:${host.type}, " +
+                                            "provisioner:${host.provisioner}, " +
+                                            "provider:${host.provider}" +
+                                            ']')
         }
 
-        // If the provision failed, there will be an error
-        if (host.error) {
-            script.echo(host.error)
-        }
         host
     }
 

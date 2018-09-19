@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.Before
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
+import com.redhat.ci.provisioner.ProvisioningException
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
@@ -91,15 +92,39 @@ class JobTest extends Job {
     }
 
     @Test
-    void provisionInvalidHostWithError() {
-        ProvisionedHost invalidHost = new ProvisionedHost(target)
-        invalidHost.error = 'This is a really bad error'
+    void provisionValidHostWithError() {
+        ProvisionedHost validHost = new ProvisionedHost(target)
+        validHost.error = 'This is a really bad error'
+        when(provSvc.provision(target, config, script)).thenReturn(validHost)
+
+        ProvisionedHost host = null
+        Boolean exceptionOccured = false
+        try {
+            host = provision(target)
+        } catch (ProvisioningException e) {
+            assert(e.message == validHost.error)
+            exceptionOccured = true
+        }
+        assert(!host)
+        assert(exceptionOccured)
+        verify(provSvc, times(1)).provision(target, config, script)
+    }
+
+    @Test
+    void provisionInvalidHost() {
+        ProvisionedHost invalidHost = new ProvisionedHost()
         when(provSvc.provision(target, config, script)).thenReturn(invalidHost)
 
-        assert(script.methodCallCounts['echo'] == 0)
-        ProvisionedHost host = provision(target)
-        assert(script.methodCallCounts['echo'] == 2)
-        assert(host != null)
+        ProvisionedHost host = null
+        Boolean exceptionOccured = false
+        try {
+            host = provision(target)
+        } catch (ProvisioningException e) {
+            assert(e.message.contains('Invalid provisioned host'))
+            exceptionOccured = true
+        }
+        assert(!host)
+        assert(exceptionOccured)
         verify(provSvc, times(1)).provision(target, config, script)
     }
 
