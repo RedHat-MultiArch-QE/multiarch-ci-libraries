@@ -106,8 +106,8 @@ class ProvisioningConfig {
     Boolean installRhpkg = false
 
     ProvisioningConfig(Map params = [:], Map env = [:]) {
-        paramDefaults = params
-        envDefaults = env
+        initParamDefaults(params)
+        initEnvDefaults(env)
 
         hostTypePriority = [
             com.redhat.ci.host.Type.CONTAINER,
@@ -139,7 +139,7 @@ class ProvisioningConfig {
         this.mode == Mode.JNLP
     }
 
-    private void setParamDefaults(Map params) {
+    private void initParamDefaults(Map params) {
         this.krbPrincipalCredentialId = params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
         this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
         this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
@@ -147,7 +147,7 @@ class ProvisioningConfig {
         this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
     }
 
-    private void setEnvDefaults(Map env) {
+    private void initEnvDefaults(Map env) {
         this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
         this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
     }
