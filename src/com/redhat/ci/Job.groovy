@@ -102,7 +102,7 @@ class Job {
             try {
                 host = provision(targetHost)
             } catch (e) {
-                script.echo(e.message)
+                script.echo("Exception: ${e.message}")
                 onFailure(e, host)
                 teardown(host)
                 return
@@ -113,7 +113,7 @@ class Job {
                     try {
                         body(host, config)
                     } catch (e) {
-                        script.echo(e.message)
+                        script.echo("Exception: ${e.message}")
                         onFailure(e, host)
                     }
                 }
@@ -125,7 +125,7 @@ class Job {
             try {
                 body(host, config)
             } catch (e) {
-                script.echo(e.message)
+                script.echo("Exception: ${e.message}")
                 onFailure(e, host)
             } finally {
                 teardown(host)

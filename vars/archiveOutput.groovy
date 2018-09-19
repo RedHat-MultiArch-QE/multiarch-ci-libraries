@@ -9,7 +9,7 @@ void call() {
     }
     catch (e) {
         // We don't care if this step fails
-        echo "Ignoring empty archive/report warning: ${e}"
+        echo("Ignoring exception: ${e}")
     }
     try {
         archiveArtifacts(
@@ -21,6 +21,6 @@ void call() {
     }
     catch (e) {
         // We don't care if this step fails
-        echo "Ignoring empty archive/report warning: ${e}"
+        echo("Ignoring exception: ${e}")
     }
 }

@@ -28,7 +28,7 @@ class TestUtilsTest extends PipelineTestScript {
     private final Closure body = {
         ProvisionedHost host, ProvisioningConfig config ->
         LOG.info('body(host, config)')
-        LOG.info("Running on host ${host.id}")
+        echo("Running on host ${host.id}")
         assert(host)
     }
 
@@ -36,14 +36,14 @@ class TestUtilsTest extends PipelineTestScript {
     private final Closure errorBody = {
         ProvisionedHost host, ProvisioningConfig config ->
         LOG.info('body(host, config)')
-        LOG.info("Running on host ${host.id}, and throwing Exception")
+        echo("Running on host ${host.id}, and throwing Exception")
         throw new TestException()
     }
 
     private final Closure onFailure = {
         Exception e, ProvisionedHost host ->
         LOG.info('onFailure(e, host)')
-        LOG.severe(e.toString())
+        echo(e.message)
         LOG.log(Level.SEVERE, "Failed on host ${host} with exception", e)
         throw e
     }
@@ -61,19 +61,31 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldGetProvisioningConfig() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        assert(config != null)
+        assert(config)
+        assertNoExceptions()
+    }
+
+    @Test
+    void shouldGetProvisioningConfigViaAPI() {
+        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
+        assert(config)
+        assertNoExceptions()
     }
 
     @Test
     void shouldRunTestOnSingleHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TestUtils.runTest(this, X86_64, config, body, onFailure, onComplete)
-        assert(config != null)
+        assertNoExceptions()
     }
 
     @Test
     void shouldRunTestOnMultiArchHosts() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+
+        // This test also covers the SCM step for Multi-Branch pipelines
+        config.provisioningRepoUrl = null
+
         TestUtils.runParallelMultiArchTest(
             this,
             [X86_64, 'ppc64le', 'aarch64', 's390x'],
@@ -81,7 +93,11 @@ class TestUtilsTest extends PipelineTestScript {
             body,
             onFailure,
             onComplete)
-        assert(config != null)
+
+        // Ensure SCM step was called to create workspace once for each arch
+        assert(methodCallCounts['scm'] == 4)
+
+        assertNoExceptions()
     }
 
     @Test
@@ -89,7 +105,7 @@ class TestUtilsTest extends PipelineTestScript {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TargetHost target = new TargetHost(arch:X86_64, type:Type.BAREMETAL)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
-        assert(config != null)
+        assertNoExceptions()
     }
 
     @Test
@@ -102,7 +118,7 @@ class TestUtilsTest extends PipelineTestScript {
             provider:com.redhat.ci.provider.Type.BEAKER
         )
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
-        assert(config != null)
+        assertNoExceptions()
     }
 
     @Test
@@ -116,11 +132,8 @@ class TestUtilsTest extends PipelineTestScript {
 
             TargetHost target = new TargetHost(arch:X86_64)
             TestUtils.runTest(this, target, config, body, onFailure, onComplete)
-
-            testLog.each {
-                msg ->
-                assert(!msg.toLowerCase().contains('exception'))
-            }
+            assertNoExceptions()
+            reset()
         }
     }
 
@@ -155,5 +168,12 @@ class TestUtilsTest extends PipelineTestScript {
         }
 
         assert(exceptionOccured)
+    }
+
+    private void assertNoExceptions() {
+        testLog.each {
+            msg ->
+            assert(!msg.toLowerCase().contains('exception'))
+        }
     }
 }

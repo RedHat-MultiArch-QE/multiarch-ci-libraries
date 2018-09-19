@@ -44,7 +44,7 @@ repositories {
 
 codenarc {
     config = resources.text.fromFile("${project.projectDir}/config/codenarc/codenarc.groovy")
-    toolVersion = '1.2'
+    toolVersion = '1.2.1'
 }
 
 

@@ -90,7 +90,7 @@ class ProvisioningService {
                         script.echo("Provisioning ${hostType} host " +
                                     "with ${provisionerType} provisioner " +
                                     "and ${providerType} provider failed.")
-                        script.echo(e.message)
+                        script.echo("Exception: ${e.message}")
                         continue
                     }
                 }

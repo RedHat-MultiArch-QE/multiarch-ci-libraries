@@ -140,10 +140,10 @@ ruleset {
     DuplicateStringLiteral 
     
     // rulesets/enhanced.xml
-    // CloneWithoutCloneable 
-    // JUnitAssertEqualsConstantActualValue 
-    // MissingOverrideAnnotation 
-    // UnsafeImplementationAsMap 
+    //CloneWithoutCloneable 
+    //JUnitAssertEqualsConstantActualValue 
+    //MissingOverrideAnnotation 
+    //UnsafeImplementationAsMap 
     
     // rulesets/exceptions.xml
     CatchArrayIndexOutOfBoundsException 
@@ -347,7 +347,7 @@ ruleset {
     // rulesets/size.xml
     AbcMetric   // Requires the GMetrics jar
     ClassSize 
-    // CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
+    //CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
     CyclomaticComplexity   // Requires the GMetrics jar
     MethodCount 
     MethodSize 

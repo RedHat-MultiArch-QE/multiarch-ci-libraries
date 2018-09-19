@@ -102,7 +102,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, host)
             }
         } catch (e) {
-            script.echo(e.message)
+            script.echo("Exception: ${e.message}")
             host.error = e.message
         }
 
@@ -130,7 +130,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "teardown ${host.inventoryPath}"
                 )
             } catch (e) {
-                script.echo(e.message)
+                script.echo("Exception: ${e.message}")
             }
         }
 
@@ -145,7 +145,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "--tx-id ${host.linchpinTxId}"
                 )
             } catch (e) {
-                script.echo(e.message)
+                script.echo("Exception: ${e.message}")
             }
         }
 

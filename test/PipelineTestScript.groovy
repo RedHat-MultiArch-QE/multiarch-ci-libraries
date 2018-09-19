@@ -4,7 +4,7 @@ import groovy.json.JsonSlurper
 /**
  * A mock for a pipeline script used to test the external API.
  */
-@SuppressWarnings(['Instanceof', 'LineLength'])
+@SuppressWarnings(['Instanceof', 'JavaIoPackageAccess'])
 class PipelineTestScript extends Script {
 
     private static final Logger LOG = Logger.getLogger(PipelineTestScript.name)
@@ -28,6 +28,7 @@ class PipelineTestScript extends Script {
         parallel:0,
         podTemplate:0,
         readJSON:0,
+        scm:0,
         sh:0,
         stage:0,
         timestamps:0,
@@ -116,10 +117,11 @@ class PipelineTestScript extends Script {
         methodCallCounts['readJSON']++
         LOG.info("readJSON(${file})")
         JsonSlurper slurper = new JsonSlurper()
-        slurper.parseText(
-        '''
-        {"4": {"action": "up", "targets": [{"beaker-slave": {"1": {"uhash": "178e46", "rc": 0}, "outputs": {"inventory_path": ["/home/jpoulin/Projects/scratch/postup-hook-test/inventories/beaker-slave-178e46.inventory"], "resources": {"os_keypair_res": [], "rax_server_res": [], "aws_ec2_res": [], "os_server_res": [], "ovirt_vms_res": [], "aws_ec2_key_res": [], "gcloud_gce_res": [], "aws_s3_res": [], "duffy_res": [], "os_sg_res": [], "dummy_res": [{"failed": false, "changed": true, "hosts": ["dummy-node-178e46-0.example.net"], "dummy_file": "/tmp/dummy.hosts"}], "beaker_res": [], "aws_cfn_res": [], "os_heat_res": [], "os_obj_res": [], "libvirt_res": [], "os_volume_res": []}}, "inputs": {"hooks_data": {"postup": [{"context": true, "type": "ansible", "name": "test", "actions": [{"extra_vars": {"test": "Hello World"}, "playbook": "site.yml"}]}]}, "layout_data": {"inventory_layout": {"hosts": [{"count": 1, "name": "beaker-slave", "host_groups": ["rhel7", "certificate_authority", "repositories", "jenkins_slave", "master_node"]}]}}, "topology_data": {"topology_name": "beaker-slave", "resource_groups": [{"resource_group_name": "dummy-slaves", "resource_definitions": [{"count": 1, "role": "dummy_node", "name": "dummy-node"}], "resource_group_type": "dummy"}]}}}}]}}
-       ''')
+        slurper.parseText(this.getClass().getResource('resources/linchpin.latest').text)
+    }
+
+    Closure scm = {
+        methodCallCounts['scm']++
     }
 
     Closure sh = {
@@ -172,7 +174,6 @@ class PipelineTestScript extends Script {
                 environment:[:],
             ]
             params = [:]
-            scm = [:]
         }
     }
 
