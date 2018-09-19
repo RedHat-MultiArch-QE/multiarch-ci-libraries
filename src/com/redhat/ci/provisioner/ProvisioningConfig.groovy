@@ -105,9 +105,17 @@ class ProvisioningConfig {
     // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
     Boolean installRhpkg = false
 
+    @SuppressWarnings(['CyclomaticComplexity', 'AbcMetric'])
     ProvisioningConfig(Map params = [:], Map env = [:]) {
-        initParamDefaults(params)
-        initEnvDefaults(env)
+        params = params ?: [:]
+        env = env ?: [:]
+        this.krbPrincipalCredentialId = params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
+        this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
+        this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
+        this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
+        this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
+        this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
+        this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
 
         hostTypePriority = [
             com.redhat.ci.host.Type.CONTAINER,
@@ -137,18 +145,5 @@ class ProvisioningConfig {
 
     Boolean getRunOnSlave() {
         this.mode == Mode.JNLP
-    }
-
-    private void initParamDefaults(Map params) {
-        this.krbPrincipalCredentialId = params.KRBPRINCIPALCREDENTIALID ?: this.krbPrincipalCredentialId
-        this.keytabCredentialId = params.KEYTABCREDENTIALID ?: this.keytabCredentialId
-        this.sshPrivKeyCredentialId = params.SSHPRIVKEYCREDENTIALID ?: this.sshPrivKeyCredentialId
-        this.sshPubKeyCredentialId = params.SSHPUBKEYCREDENTIALID ?: this.sshPubKeyCredentialId
-        this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
-    }
-
-    private void initEnvDefaults(Map env) {
-        this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
-        this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
     }
 }
