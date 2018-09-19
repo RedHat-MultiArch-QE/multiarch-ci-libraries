@@ -19,7 +19,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
     sh("""
         for i in ${params.TEST_DIR}/scripts/*/test.sh
             do ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-                -i ~/.ssh/id_rsa root@${host.hostName} < \$i
+                -i ~/.ssh/id_rsa root@${host.hostname} < \$i
         done
     """)
 }
