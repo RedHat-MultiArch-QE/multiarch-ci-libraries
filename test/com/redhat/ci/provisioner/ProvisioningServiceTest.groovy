@@ -42,7 +42,7 @@ class ProvisioningServiceTest {
         Boolean exceptionThrown = false
         try {
             mockSvc.provision(target, config, script)
-        } catch (ProvisionerUnavailableException e) {
+        } catch (ProvisioningException e) {
             exceptionThrown = true
             assert(e.message == ProvisioningService.UNAVAILABLE)
         }
@@ -67,7 +67,7 @@ class ProvisioningServiceTest {
         Boolean exceptionThrown = false
         try {
             mockSvc.provision(target, config, script)
-        } catch (ProvisionerUnavailableException e) {
+        } catch (ProvisioningException e) {
             exceptionThrown = true
         }
 
@@ -98,7 +98,7 @@ class ProvisioningServiceTest {
         Boolean exceptionThrown = false
         try {
             mockSvc.provision(target, config, script)
-        } catch (ProvisionerUnavailableException e) {
+        } catch (ProvisioningException e) {
             exceptionThrown = true
             assert(e.message == ProvisioningService.UNAVAILABLE)
         }
@@ -115,7 +115,7 @@ class ProvisioningServiceTest {
         Boolean exceptionThrown = false
         try {
             mockSvc.provision(target, config, script)
-        } catch (ProvisionerUnavailableException e) {
+        } catch (ProvisioningException e) {
             exceptionThrown = true
             assert(e.message == ProvisioningService.UNAVAILABLE)
         }

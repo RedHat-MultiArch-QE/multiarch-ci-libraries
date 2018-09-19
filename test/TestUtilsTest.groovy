@@ -6,7 +6,7 @@ import com.redhat.ci.host.Type
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.provisioner.ProvisionerUnavailableException
+import com.redhat.ci.provisioner.ProvisioningException
 import java.util.logging.Logger
 import java.util.logging.Level
 
@@ -128,7 +128,7 @@ class TestUtilsTest extends PipelineTestScript {
         Boolean exceptionOccured = false
         try {
             TestUtils.runTest(this, target, config, body, onFailure, onComplete)
-        } catch (ProvisionerUnavailableException e) {
+        } catch (ProvisioningException e) {
             exceptionOccured = true
         }
 

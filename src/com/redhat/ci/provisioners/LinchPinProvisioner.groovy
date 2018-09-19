@@ -4,6 +4,7 @@ import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.provisioner.ProvisioningException
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
@@ -32,7 +33,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
         this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
     }
 
-    @SuppressWarnings('AbcMetric')
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
         host.displayName = "${target.arch}-slave"
@@ -40,10 +40,11 @@ class LinchPinProvisioner extends AbstractProvisioner {
         host.provider = com.redhat.ci.provider.Type.BEAKER
 
         try {
+            // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
 
+            // Get LinchPin workspace
             if (config.provisioningRepoUrl != null) {
-                // Get LinchPin workspace
                 script.checkout(
                     scm:[$class:'GitSCM',
                          userRemoteConfigs:[[url:config.provisioningRepoUrl]],
@@ -55,34 +56,26 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             // Attempt provisioning
             host.initialized = true
-
-            // Install keys we can connect via JNLP or SSH
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
-                "--template-data \'${getTemplateData(host, config)}\' " +
-                "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                    "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
+                    "--template-data \'${getTemplateData(host, config)}\' " +
+                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
 
-            // Retrieve the latest linchpin transaction output
+            // Parse the latest run info
             Map linchpinLatest = script.readJSON(file:"${config.provisioningWorkspaceDir}/resources/linchpin.latest")
-            if (linchpinLatest.keySet().size() != 1) {
-                return host
-            }
 
-            // Parse the linchpin transaction ID
-            host.linchpinTxId = linchpinLatest.keySet().first().toInteger()
+            // Populate the linchpin transaction ID, inventory path, and hostname
+            host.linchpinTxId = getLinchpinTxId(linchpinLatest)
+            host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
+            host.hostname = getHostname(host)
+
             script.echo("linchpinTxId:${host.linchpinTxId}")
-            Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
-            script.echo("linchpinTargets:${linchpinTargets}")
-            String linchpinTarget = LINCHPIN_TARGETS[host.provider]
-            script.echo("linchpinTarget:${linchpinTarget}")
-            host.inventoryPath = linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
             script.echo("inventoryPath:${host.inventoryPath}")
+            script.echo("hostname:${host.hostname}")
 
             // Parse the inventory file for the name of the master node
-            String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
-            host.hostname = script.sh(returnStdout:true, script:getMasterNode).trim()
             host.provisioned = true
 
             if (config.mode == Mode.JNLP) {
@@ -143,9 +136,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
             try {
                 script.sh(
                     ACTIVATE_VIRTUALENV +
-                    "linchpin --workspace ${config.provisioningWorkspaceDir} " +
-                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
-                    "--tx-id ${host.linchpinTxId}"
+                        "linchpin --workspace ${config.provisioningWorkspaceDir} " +
+                        "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
+                        "--tx-id ${host.linchpinTxId}"
                 )
             } catch (e) {
                 script.echo(e.message)
@@ -157,7 +150,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         }
     }
 
-    String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
+    private String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
         script.withCredentials(
             [
                 script.usernamePassword(
@@ -195,5 +188,29 @@ class LinchPinProvisioner extends AbstractProvisioner {
             String templateDataJson = JsonOutput.toJson(templateData)
             templateDataJson
         }
+    }
+
+    private Integer getLinchpinTxId(Map linchpinLatest) {
+        // Ensure keySet size is what is expected
+        int keySetSize = linchpinLatest.keySet().size()
+        if (keySetSize != 1) {
+            throw new ProvisioningException("LinchPin latest run keySet size is invalid. Expected 1, got ${keySetSize}")
+        }
+
+        linchpinLatest.keySet().first().toInteger()
+    }
+
+    private String getLinchpinInventoryPath(Map linchpinLatest, ProvisionedHost host) {
+        Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
+        script.echo("linchpinTargets:${linchpinTargets}")
+
+        String linchpinTarget = LINCHPIN_TARGETS[host.provider]
+        script.echo("linchpinTarget:${linchpinTarget}")
+        linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
+    }
+
+    private String getHostname(ProvisionedHost host) {
+        String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
+        script.sh(returnStdout:true, script:getMasterNode).trim()
     }
 }

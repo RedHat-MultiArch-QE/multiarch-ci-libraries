@@ -99,7 +99,7 @@ class ProvisioningService {
 
         // If we haven't returned from the function yet, we are out of available
         // hostType, provisioner, and provider combinations.
-        throw new ProvisionerUnavailableException(UNAVAILABLE)
+        throw new ProvisioningException(UNAVAILABLE)
     }
 
     void teardown(ProvisionedHost host, ProvisioningConfig config, Script script) {
@@ -117,7 +117,7 @@ class ProvisioningService {
                 return new KubeVirtProvisioner(script)
             default:
                 script.echo("Unrecognized provisioner:${provisioner}")
-                throw new ProvisionerUnavailableException(UNAVAILABLE)
+                throw new ProvisioningException(UNAVAILABLE)
         }
     }
 }

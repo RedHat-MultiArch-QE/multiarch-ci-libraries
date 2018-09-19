@@ -4,9 +4,9 @@ import org.junit.Test
 import org.junit.Before
 
 /**
- * Tests ensuring that ProvisionerUnavailableExceptions can be thrown.
+ * Tests ensuring that ProvisioningExceptions can be thrown.
  */
-class ProvisionerUnavailableExceptionTest {
+class ProvisioningExceptionTest {
 
     private static final String MESSAGE = 'Provisioner is unavailable.'
     private Boolean exceptionThrown = null
@@ -21,8 +21,8 @@ class ProvisionerUnavailableExceptionTest {
     @Test
     void throwsEmptyException() {
         try {
-            throw new ProvisionerUnavailableException()
-        } catch (ProvisionerUnavailableException e) {
+            throw new ProvisioningException()
+        } catch (ProvisioningException e) {
             exceptionThrown = true
             exceptionMessage = e.message
         }
@@ -34,8 +34,8 @@ class ProvisionerUnavailableExceptionTest {
     @Test
     void throwsMessageException() {
         try {
-            throw new ProvisionerUnavailableException(MESSAGE)
-        } catch (ProvisionerUnavailableException e) {
+            throw new ProvisioningException(MESSAGE)
+        } catch (ProvisioningException e) {
             exceptionThrown = true
             exceptionMessage = e.message
         }
