@@ -14,7 +14,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
     // SSH Mode
     sh("""
         . /home/jenkins/envs/provisioner/bin/activate;
-        ansible-playbook -i '${host.inventoryPath}' ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml
+        ansible-playbook -u root -i '${host.inventoryPath}' ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml
     """)
     sh("""
         for i in ${params.TEST_DIR}/scripts/*/test.sh

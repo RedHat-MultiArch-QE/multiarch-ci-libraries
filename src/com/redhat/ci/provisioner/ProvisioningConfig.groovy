@@ -105,7 +105,7 @@ class ProvisioningConfig {
     // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
     Boolean installRhpkg = false
 
-    @SuppressWarnings(['CyclomaticComplexity', 'AbcMetric'])
+    @SuppressWarnings('AbcMetric')
     ProvisioningConfig(Map params = [:], Map env = [:]) {
         params = params ?: [:]
         env = env ?: [:]
