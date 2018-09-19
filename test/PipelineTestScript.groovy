@@ -35,11 +35,9 @@ class PipelineTestScript extends Script {
         withCredentials:0,
     ]
 
-    void resetCounts() {
-        methodCallCounts.each {
-            key, value ->
-            methodCallCounts[key] = 0
-        }
+    void reset() {
+        resetCounts()
+        testLog = []
     }
 
     Closure ansiColor = {
@@ -175,6 +173,13 @@ class PipelineTestScript extends Script {
             ]
             params = [:]
             scm = [:]
+        }
+    }
+
+    private void resetCounts() {
+        methodCallCounts.each {
+            key, value ->
+            methodCallCounts[key] = 0
         }
     }
 }

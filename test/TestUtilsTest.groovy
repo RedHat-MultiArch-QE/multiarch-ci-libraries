@@ -1,4 +1,5 @@
 import org.junit.Test
+import org.junit.Before
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.Mock
@@ -6,6 +7,7 @@ import com.redhat.ci.host.Type
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.ProvisioningException
 import java.util.logging.Logger
 import java.util.logging.Level
@@ -18,6 +20,7 @@ class TestUtilsTest extends PipelineTestScript {
 
     private static final Logger LOG = Logger.getLogger(TestUtilsTest.name)
     private static final String X86_64 = 'x86_64'
+    private static final List<String> TEST_MODES = [Mode.SSH, Mode.JNLP]
 
     @Mock
     private final ProvisionedHost host
@@ -26,6 +29,7 @@ class TestUtilsTest extends PipelineTestScript {
         ProvisionedHost host, ProvisioningConfig config ->
         LOG.info('body(host, config)')
         LOG.info("Running on host ${host.id}")
+        assert(host)
     }
 
     @SuppressWarnings('ThrowRuntimeException')
@@ -47,6 +51,11 @@ class TestUtilsTest extends PipelineTestScript {
     private final Closure onComplete = {
         ->
         LOG.info('onComplete()')
+    }
+
+    @Before
+    void init() {
+        reset()
     }
 
     @Test
@@ -78,7 +87,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnBareMetalHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(arch:'x86_64', type:Type.BAREMETAL)
+        TargetHost target = new TargetHost(arch:X86_64, type:Type.BAREMETAL)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assert(config != null)
     }
@@ -87,7 +96,7 @@ class TestUtilsTest extends PipelineTestScript {
     void shouldRunTestOnVMHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TargetHost target = new TargetHost(
-            arch:'x86_64',
+            arch:X86_64,
             type:Type.VM,
             provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
             provider:com.redhat.ci.provider.Type.BEAKER
@@ -98,33 +107,46 @@ class TestUtilsTest extends PipelineTestScript {
 
     @Test
     void shouldInstallAllConfigurationTest() {
-        ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        config.runOnSlave = true
-        config.installAnsible = true
-        config.installRhpkg = true
+        TEST_MODES.each {
+            mode ->
+            ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+            config.mode = mode
+            config.installAnsible = true
+            config.installRhpkg = true
 
-        TargetHost target = new TargetHost(arch:'x86_64')
-        TestUtils.runTest(this, target, config, body, onFailure, onComplete)
-        assert(config != null)
+            TargetHost target = new TargetHost(arch:X86_64)
+            TestUtils.runTest(this, target, config, body, onFailure, onComplete)
+
+            testLog.each {
+                msg ->
+                assert(!msg.toLowerCase().contains('exception'))
+            }
+        }
     }
 
     @Test
     void shouldFailOnRun() {
-        ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        Boolean exceptionOccured = false
-        try {
-            TestUtils.runTest(this, 'x86_64', config, errorBody, onFailure, onComplete)
-        } catch (TestException e) {
-            exceptionOccured = true
+        TEST_MODES.each {
+            mode ->
+            Boolean exceptionOccured = false
+            try {
+                ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+                config.mode = mode
+
+                TestUtils.runTest(this, X86_64, config, errorBody, onFailure, onComplete)
+            } catch (TestException e) {
+                LOG.severe("${e.message}")
+                exceptionOccured = true
+            }
+            assert(exceptionOccured)
         }
-        assert(exceptionOccured)
     }
 
     @Test
     void shouldFailWithNoProvisionerAvailable() {
         ProvisioningConfig config = API.v1.getProvisioningConfig(this)
 
-        TargetHost target = new TargetHost(arch:'x86_64', provisionerPriority:[])
+        TargetHost target = new TargetHost(arch:X86_64, provisionerPriority:[])
         Boolean exceptionOccured = false
         try {
             TestUtils.runTest(this, target, config, body, onFailure, onComplete)

@@ -57,10 +57,12 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Attempt provisioning
             host.initialized = true
             script.sh(
-                ACTIVATE_VIRTUALENV +
+                'ls -a workspace;' +
+                    ACTIVATE_VIRTUALENV +
                     "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                    'ls -a workspace;'
             )
 
             // Parse the latest run info
@@ -70,7 +72,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.linchpinTxId = getLinchpinTxId(linchpinLatest)
             host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             host.hostname = getHostname(host)
-
             script.echo("linchpinTxId:${host.linchpinTxId}")
             script.echo("inventoryPath:${host.inventoryPath}")
             script.echo("hostname:${host.hostname}")
@@ -135,7 +136,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         if (host.initialized) {
             try {
                 script.sh(
-                    'pwd; ls; ls workspace;' +
+                    'ls -a workspace;' +
                         ACTIVATE_VIRTUALENV +
                         "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                         "--template-data \'${getTemplateData(host, config)}\' " +
@@ -204,10 +205,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     private String getLinchpinInventoryPath(Map linchpinLatest, ProvisionedHost host) {
         Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
-        script.echo("linchpinTargets:${linchpinTargets}")
-
         String linchpinTarget = LINCHPIN_TARGETS[host.provider]
-        script.echo("linchpinTarget:${linchpinTarget}")
         linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
     }
 
