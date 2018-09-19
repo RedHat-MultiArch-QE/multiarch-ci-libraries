@@ -14,7 +14,8 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
-    private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate\n'
+    private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate;'
+    private static final String DEBUG_WORKSPACE = 'ls -a workspace;'
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
@@ -57,12 +58,12 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Attempt provisioning
             host.initialized = true
             script.sh(
-                'ls -a workspace;' +
+                DEBUG_WORKSPACE +
                     ACTIVATE_VIRTUALENV +
                     "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
-                    'ls -a workspace;'
+                    "--verbose up ${LINCHPIN_TARGETS[host.provider]};" +
+                    DEBUG_WORKSPACE
             )
 
             // Parse the latest run info
@@ -136,7 +137,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         if (host.initialized) {
             try {
                 script.sh(
-                    'ls -a workspace;' +
+                    DEBUG_WORKSPACE +
                         ACTIVATE_VIRTUALENV +
                         "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                         "--template-data \'${getTemplateData(host, config)}\' " +
