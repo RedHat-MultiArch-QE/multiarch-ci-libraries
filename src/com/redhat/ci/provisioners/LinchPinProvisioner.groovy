@@ -62,9 +62,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     ACTIVATE_VIRTUALENV +
                     "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose up ${LINCHPIN_TARGETS[host.provider]};" +
-                    DEBUG_WORKSPACE
+                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
+            script.sh(DEBUG_WORKSPACE)
 
             // Parse the latest run info
             Map linchpinLatest = script.readJSON(file:"${config.provisioningWorkspaceDir}/resources/linchpin.latest")
