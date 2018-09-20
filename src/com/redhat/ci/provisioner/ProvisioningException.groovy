@@ -3,7 +3,7 @@ package com.redhat.ci.provisioner
 /**
  * Custom exception to throw when provisioning fails.
  */
-class ProvisioningException extends RuntimeException {
+class ProvisioningException extends Exception {
     ProvisioningException() {
     }
 
