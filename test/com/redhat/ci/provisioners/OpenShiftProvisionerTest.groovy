@@ -35,13 +35,7 @@ class OpenShiftProvisionerTest {
 
     @Test
     void testTeardown() {
-        Boolean exceptionOccured = false
-        try {
-            provisioner.teardown(new ProvisionedHost(), new ProvisioningConfig())
-        } catch (TestException e) {
-            exceptionOccured = true
-        }
-
-        assert(!exceptionOccured)
+        provisioner.teardown(new ProvisionedHost(), new ProvisioningConfig())
+        assert(!script.testLog)
     }
 }

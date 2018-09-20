@@ -167,9 +167,9 @@ class PipelineTestScript extends Script {
 
     PipelineTestScript() {
         binding.with {
-            currentBuild = {
-                [result:'']
-            }
+            currentBuild = [
+                result:'SUCCESS',
+            ]
             env = [
                 environment:[:],
             ]

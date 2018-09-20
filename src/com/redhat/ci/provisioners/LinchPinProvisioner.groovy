@@ -115,10 +115,19 @@ class LinchPinProvisioner extends AbstractProvisioner {
      * @param host Provisioned host to be torn down.
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
-        // Check if the host was provisoned
-        if (!host || !host.initialized) {
-            // The provisioning job did not successfully provision a machine,
-            // so there is nothing to teardown
+        // Check if the host was even created
+        if (!host) {
+            return
+        }
+
+        // Host exists, so if there's an error, the job should fail
+        if (host.error) {
+            script.currentBuild.result = 'FAILURE'
+        }
+
+        // The provisioning job did not successfully provision a machine,
+        // so there is nothing to teardown
+        if (!host.initialized) {
             return
         }
 
@@ -134,23 +143,17 @@ class LinchPinProvisioner extends AbstractProvisioner {
             }
         }
 
-        if (host.initialized) {
-            try {
-                script.sh(
-                    DEBUG_WORKSPACE +
-                        ACTIVATE_VIRTUALENV +
-                        "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
-                        "--template-data \'${getTemplateData(host, config)}\' " +
-                        "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
-                        "--tx-id ${host.linchpinTxId}"
-                )
-            } catch (e) {
-                script.echo("Exception: ${e.message}")
-            }
-        }
-
-        if (host.error) {
-            script.currentBuild.result = 'FAILURE'
+        try {
+            script.sh(
+                DEBUG_WORKSPACE +
+                    ACTIVATE_VIRTUALENV +
+                    "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
+                    "--template-data \'${getTemplateData(host, config)}\' " +
+                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
+                    "--tx-id ${host.linchpinTxId}"
+            )
+        } catch (e) {
+            script.echo("Exception: ${e.message}")
         }
     }
 
