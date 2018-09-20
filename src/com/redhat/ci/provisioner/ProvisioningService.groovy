@@ -91,7 +91,6 @@ class ProvisioningService {
                                     "with ${provisionerType} provisioner " +
                                     "and ${providerType} provider failed.")
                         script.echo("Exception: ${e.message}")
-                        continue
                     }
                 }
             }

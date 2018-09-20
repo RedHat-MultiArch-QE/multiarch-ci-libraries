@@ -55,23 +55,28 @@ class ProvisioningServiceTest {
     void provisionFailureThrowsException() {
         TargetHost target = new TargetHost(type:BAREMETAL, provider:BEAKER, provisioner:Type.LINCHPIN)
 
+        ProvisionedHost host = new ProvisionedHost(target)
+        host.error = EXCEPTION_MESSAGE
+
         Provisioner mockProv = mock(Provisioner)
         when(mockProv.provision(target, config))
             .thenThrow(new NullPointerException(EXCEPTION_MESSAGE))
-            .thenReturn(null)
         when(mockProv.available).thenReturn(true)
         when(mockProv.supportsProvider(anyString())).thenReturn(true)
         when(mockProv.supportsHostType(anyString())).thenReturn(true)
         when(mockSvc.getProvisioner(target.provisioner, script)).thenReturn(mockProv)
 
-        Boolean exceptionThrown = false
+        ProvisionedHost provisionedHost = null
+        Boolean exceptionOccured = false
         try {
-            mockSvc.provision(target, config, script)
-        } catch (ProvisioningException e) {
-            exceptionThrown = true
+            provisionedHost = mockSvc.provision(target, config, script)
+        } catch (e) {
+            assert(e.message == ProvisioningService.UNAVAILABLE)
+            exceptionOccured = true
         }
 
-        assert(exceptionThrown)
+        assert(exceptionOccured)
+        assert(!provisionedHost)
         assert(script.testLog.contains("Exception: ${EXCEPTION_MESSAGE}"))
         assert(script.testLog.contains("Provisioning ${target.type} " +
                                        "host with ${target.provisioner} provisioner " +
