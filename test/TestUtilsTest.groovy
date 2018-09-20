@@ -82,10 +82,6 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnMultiArchHosts() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-
-        // This test also covers the SCM step for Multi-Branch pipelines
-        config.provisioningRepoUrl = null
-
         TestUtils.runParallelMultiArchTest(
             this,
             [X86_64, 'ppc64le', 'aarch64', 's390x'],
@@ -93,9 +89,6 @@ class TestUtilsTest extends PipelineTestScript {
             body,
             onFailure,
             onComplete)
-
-        // Ensure SCM step was called to create workspace once for each arch
-        assert(methodCallCounts['scm'] == 4)
 
         assertNoExceptions()
     }

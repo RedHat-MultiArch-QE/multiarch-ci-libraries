@@ -84,9 +84,8 @@ class JobTest extends Job {
     void provisionNullHost() {
         when(provSvc.provision(target, config, script)).thenReturn(null)
 
-        assert(script.methodCallCounts['echo'] == 0)
         ProvisionedHost host = provision(target)
-        assert(script.methodCallCounts['echo'] == 1)
+
         assert(host == null)
         verify(provSvc, times(1)).provision(target, config, script)
     }
@@ -132,10 +131,9 @@ class JobTest extends Job {
     void provisionValidHost() {
         when(provSvc.provision(target, config, script)).thenReturn(validHost)
 
-        assert(script.methodCallCounts['echo'] == 0)
         ProvisionedHost host = provision(target)
-        assert(script.methodCallCounts['echo'] == 0)
-        assert(host != null)
+
+        assert(host)
         verify(provSvc, times(1)).provision(target, config, script)
     }
 
@@ -144,9 +142,8 @@ class JobTest extends Job {
         doThrow(new NullPointerException('Null host cannot be torn down.'))
             .when(provSvc).teardown(null, config, script)
 
-        assert(script.methodCallCounts['echo'] == 0)
         teardown(null)
-        assert(script.methodCallCounts['echo'] == 1)
+
         verify(provSvc, times(1)).teardown(null, config, script)
     }
 
@@ -154,9 +151,8 @@ class JobTest extends Job {
     void teardownValidHost() {
         doNothing().when(provSvc).teardown(validHost, config, script)
 
-        assert(script.methodCallCounts['echo'] == 0)
         teardown(validHost)
-        assert(script.methodCallCounts['echo'] == 0)
+
         verify(provSvc, times(1)).teardown(validHost, config, script)
     }
 
@@ -164,11 +160,11 @@ class JobTest extends Job {
     void run() {
         when(provSvc.provision(target, config, script)).thenReturn(validHost)
         doNothing().when(provSvc).teardown(validHost, config, script)
-        assert(script.methodCallCounts['parallel'] == 0)
+
         super.run()
+
         verify(provSvc, times(1)).provision(target, config, script)
         verify(provSvc, times(1)).teardown(validHost, config, script)
-        assert(script.methodCallCounts['parallel'] == 1)
         assert(onCompleteCalled == true)
     }
 
@@ -178,7 +174,9 @@ class JobTest extends Job {
             .thenThrow(new NullPointerException('Null host cannot provisioned.'))
             .thenReturn(null)
         doNothing().when(provSvc).teardown(any(ProvisionedHost), eq(config), eq(script))
+
         runOnTarget(target)
+
         verify(provSvc, times(1)).provision(target, config, script)
         verify(provSvc, times(1)).teardown(any(ProvisionedHost), eq(config), eq(script))
     }
@@ -225,7 +223,6 @@ class JobTest extends Job {
 
         verify(provSvc, times(1)).provision(target, config, script)
         verify(provSvc, times(1)).teardown(validHost, config, script)
-        assert(script.methodCallCounts['node'] == 2)
     }
 
     @Test
@@ -240,6 +237,5 @@ class JobTest extends Job {
 
         verify(provSvc, times(1)).provision(target, config, script)
         verify(provSvc, times(1)).teardown(validHost, config, script)
-        assert(script.methodCallCounts['node'] == 1)
     }
 }

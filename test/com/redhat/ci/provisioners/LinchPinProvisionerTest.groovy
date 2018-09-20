@@ -105,7 +105,7 @@ class LinchPinProvisionerTest {
     void testTeardownHostIsNullNoOp() {
         provisioner.teardown(null, new ProvisioningConfig())
         assert(script.currentBuild.result == 'SUCCESS')
-        assert(script.methodCallCounts['sh'] == 0)
+        assert(!script.testLog)
     }
 
     @Test
@@ -113,7 +113,7 @@ class LinchPinProvisionerTest {
         provisioner.teardown(new ProvisionedHost(initialized:false, error:EXCEPTION_MESSAGE),
                              new ProvisioningConfig())
         assert(script.currentBuild.result == 'FAILURE')
-        assert(script.methodCallCounts['sh'] == 0)
+        assert(!script.testLog)
     }
 
     @Test
