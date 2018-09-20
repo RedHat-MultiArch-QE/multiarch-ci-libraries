@@ -88,18 +88,21 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 // (Already installed in SSH mode)
                 if (config.installAnsible) {
                     Utils.installAnsible(script, host)
+                    script.sh(DEBUG_WORKSPACE)
                 }
 
                 // In JNLP mode, install provisioning credentials directly on the provisioned host
                 // (Already installed in SSH mode)
                 if (config.installCredentials) {
                     Utils.installCredentials(script, config, host)
+                    script.sh(DEBUG_WORKSPACE)
                 }
             }
 
             // We can install the RHPKG tool if the user intends to use it.
             if (config.installRhpkg) {
                 Utils.installRhpkg(script, host)
+                script.sh(DEBUG_WORKSPACE)
             }
         } catch (e) {
             script.echo("Exception: ${e.message}")
