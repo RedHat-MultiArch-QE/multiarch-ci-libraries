@@ -10,7 +10,7 @@ import com.redhat.ci.hosts.TargetHost
  * Represents a job that provisions the resources it needs, and runs @param body on them.
  */
 class Job {
-    private static final String DEBUG_WORKSPACE = 'ls -a workspace;'
+    private static final String DEBUG_WORKSPACE = 'ls -a provisioning/workspace;'
 
     Script script
     List<TargetHost> targetHosts
