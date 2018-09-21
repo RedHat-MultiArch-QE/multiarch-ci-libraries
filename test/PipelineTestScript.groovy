@@ -36,6 +36,12 @@ class PipelineTestScript extends Script {
         LOG.info('containerTemplate()')
     }
 
+    Closure dir = {
+        dir, body ->
+        LOG.info("dir(${dir})")
+        body()
+    }
+
     Closure echo = {
         msg ->
         testLog.push(msg)

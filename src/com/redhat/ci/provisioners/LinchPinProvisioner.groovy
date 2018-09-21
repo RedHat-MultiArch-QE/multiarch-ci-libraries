@@ -16,6 +16,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate;'
     private static final String DEBUG_WORKSPACE = 'ls -a workspace;'
+    private static final String PROVISIONING_DIR = 'provisioning'
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
@@ -45,29 +46,32 @@ class LinchPinProvisioner extends AbstractProvisioner {
             Utils.installCredentials(script, config)
 
             // Get LinchPin workspace
-            if (config.provisioningRepoUrl != null) {
-                script.checkout(
-                    scm:[$class:'GitSCM',
-                         userRemoteConfigs:[[url:config.provisioningRepoUrl]],
-                         branches:[[name:config.provisioningRepoRef]]],
-                    poll:false)
-            } else {
-                script.checkout(script.scm)
+            script.dir(PROVISIONING_DIR) {
+                if (config.provisioningRepoUrl != null) {
+                    script.checkout(
+                        scm:[$class:'GitSCM',
+                             userRemoteConfigs:[[url:config.provisioningRepoUrl]],
+                             branches:[[name:config.provisioningRepoRef]]],
+                        poll:false)
+                } else {
+                    script.checkout(script.scm)
+                }
             }
+            host.initialized = true
 
             // Attempt provisioning
-            host.initialized = true
+            String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
             script.sh(
                 DEBUG_WORKSPACE +
                     ACTIVATE_VIRTUALENV +
-                    "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
+                    "linchpin -vvv --workspace ${workspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
             script.sh(DEBUG_WORKSPACE)
 
             // Parse the latest run info
-            Map linchpinLatest = script.readJSON(file:"${config.provisioningWorkspaceDir}/resources/linchpin.latest")
+            Map linchpinLatest = script.readJSON(file:"${workspaceDir}/resources/linchpin.latest")
 
             // Populate the linchpin transaction ID, inventory path, and hostname
             host.linchpinTxId = getLinchpinTxId(linchpinLatest)
@@ -146,12 +150,13 @@ class LinchPinProvisioner extends AbstractProvisioner {
             }
         }
 
+        String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
         try {
             script.sh(
                 DEBUG_WORKSPACE +
                     ACTIVATE_VIRTUALENV +
-                    "linchpin -vvv --workspace ${config.provisioningWorkspaceDir} " +
-                    "--template-data \'${getTemplateData(host, config)}\' " +
+                    "linchpin -vvv --workspace ${workspaceDir} " +
+                    //"--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
                     "--tx-id ${host.linchpinTxId}"
             )
