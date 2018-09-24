@@ -23,11 +23,9 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
     if (config.mode == Mode.SSH) {
         try {
             sh("""
-                ls -a provisioning/workspace;
                 . /home/jenkins/envs/provisioner/bin/activate;
                 ansible-playbook --key-file '~/.ssh/id_rsa' -i '${host.inventoryPath}' \
                     ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml;
-                ls -a provisioning/workspace;
             """)
         } catch (e) {
             exceptions.add(e)
@@ -46,6 +44,6 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
 
     exceptions.each {
         e ->
-        script.error(e.message)
+        error(e.message)
     }
 }
