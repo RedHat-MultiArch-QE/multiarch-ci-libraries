@@ -11,6 +11,7 @@ import com.redhat.ci.hosts.TargetHost
  */
 class Job {
     private static final String DEBUG_WORKSPACE = 'ls -a provisioning/workspace;'
+    protected static final String SANDBOX_DIR = 'sandbox'
 
     Script script
     List<TargetHost> targetHosts
@@ -56,7 +57,9 @@ class Job {
 
         // Run the onComplete closure now that the subJobs have completed
         script.node("provisioner-${config.version}") {
-            onComplete()
+            runInDirectory(SANDBOX_DIR) {
+                onComplete()
+            }
         }
     }
 
@@ -107,7 +110,9 @@ class Job {
                 script.sh(DEBUG_WORKSPACE)
             } catch (e) {
                 script.echo("Exception: ${e.message}")
-                onFailure(e, host)
+                runInDirectory(SANDBOX_DIR) {
+                    onFailure(e, host)
+                }
                 teardown(host)
                 return
             }
@@ -115,10 +120,14 @@ class Job {
             if (config.runOnSlave) {
                 script.node(host.displayName) {
                     try {
-                        body(host, config)
+                        runInDirectory(SANDBOX_DIR) {
+                            body(host, config)
+                        }
                     } catch (e) {
                         script.echo("Exception: ${e.message}")
-                        onFailure(e, host)
+                        runInDirectory(SANDBOX_DIR) {
+                            onFailure(e, host)
+                        }
                     }
                 }
 
@@ -128,11 +137,15 @@ class Job {
 
             try {
                 script.sh(DEBUG_WORKSPACE)
-                body(host, config)
+                runInDirectory(SANDBOX_DIR) {
+                    body(host, config)
+                }
                 script.sh(DEBUG_WORKSPACE)
             } catch (e) {
                 script.echo("Exception: ${e.message}")
-                onFailure(e, host)
+                runInDirectory(SANDBOX_DIR) {
+                    onFailure(e, host)
+                }
             } finally {
                 script.sh(DEBUG_WORKSPACE)
                 teardown(host)
@@ -143,5 +156,11 @@ class Job {
     private Closure jobWrapper(TargetHost targetHost) {
         Closure wrapJob = { target -> { -> runOnTarget(target) } }
         wrapJob(targetHost)
+    }
+
+    protected void runInDirectory(String dir, Closure body) {
+        script.dir(dir) {
+            body()
+        }
     }
 }
