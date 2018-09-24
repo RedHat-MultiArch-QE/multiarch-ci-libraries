@@ -10,7 +10,6 @@ import com.redhat.ci.hosts.TargetHost
  * Represents a job that provisions the resources it needs, and runs @param body on them.
  */
 class Job {
-    private static final String DEBUG_WORKSPACE = 'ls -a provisioning/workspace;'
     protected static final String SANDBOX_DIR = 'sandbox'
 
     Script script
@@ -107,7 +106,6 @@ class Job {
             ProvisionedHost host = new ProvisionedHost(targetHost)
             try {
                 host = provision(targetHost)
-                script.sh(DEBUG_WORKSPACE)
             } catch (e) {
                 script.echo("Exception: ${e.message}")
                 runInDirectory(SANDBOX_DIR) {
@@ -136,18 +134,15 @@ class Job {
             }
 
             try {
-                script.sh(DEBUG_WORKSPACE)
                 runInDirectory(SANDBOX_DIR) {
                     body(host, config)
                 }
-                script.sh(DEBUG_WORKSPACE)
             } catch (e) {
                 script.echo("Exception: ${e.message}")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
                 }
             } finally {
-                script.sh(DEBUG_WORKSPACE)
                 teardown(host)
             }
         }

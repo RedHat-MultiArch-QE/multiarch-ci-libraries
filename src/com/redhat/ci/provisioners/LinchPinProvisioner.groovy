@@ -15,7 +15,6 @@ import groovy.json.JsonOutput
 class LinchPinProvisioner extends AbstractProvisioner {
 
     private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate;'
-    private static final String DEBUG_WORKSPACE = 'ls -a provisioning/workspace;'
     private static final String PROVISIONING_DIR = 'provisioning'
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
@@ -62,13 +61,11 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Attempt provisioning
             String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
             script.sh(
-                DEBUG_WORKSPACE +
-                    ACTIVATE_VIRTUALENV +
+                ACTIVATE_VIRTUALENV +
                     "linchpin -vvv --workspace ${workspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
-            script.sh(DEBUG_WORKSPACE)
 
             // Parse the latest run info
             Map linchpinLatest = script.readJSON(file:"${workspaceDir}/resources/linchpin.latest")
@@ -92,21 +89,18 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 // (Already installed in SSH mode)
                 if (config.installAnsible) {
                     Utils.installAnsible(script, host)
-                    script.sh(DEBUG_WORKSPACE)
                 }
 
                 // In JNLP mode, install provisioning credentials directly on the provisioned host
                 // (Already installed in SSH mode)
                 if (config.installCredentials) {
                     Utils.installCredentials(script, config, host)
-                    script.sh(DEBUG_WORKSPACE)
                 }
             }
 
             // We can install the RHPKG tool if the user intends to use it.
             if (config.installRhpkg) {
                 Utils.installRhpkg(script, host)
-                script.sh(DEBUG_WORKSPACE)
             }
         } catch (e) {
             script.echo("Exception: ${e.message}")
@@ -153,11 +147,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
         String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
         try {
             script.sh(
-                DEBUG_WORKSPACE +
-                    ACTIVATE_VIRTUALENV +
+                ACTIVATE_VIRTUALENV +
                     "linchpin -vvv --workspace ${workspaceDir} " +
                     //"--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
+                "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
                     "--tx-id ${host.linchpinTxId}"
             )
         } catch (e) {
