@@ -62,7 +62,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                    "linchpin -vvv --workspace ${workspaceDir} " +
+                    "linchpin --workspace ${workspaceDir} " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
@@ -148,7 +148,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         try {
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                    "linchpin -vvv --workspace ${workspaceDir} " +
+                    "linchpin --workspace ${workspaceDir} " +
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " //+
                     //"--tx-id ${host.linchpinTxId}"
             )
