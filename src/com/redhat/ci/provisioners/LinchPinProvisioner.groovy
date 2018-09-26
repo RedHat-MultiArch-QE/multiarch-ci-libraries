@@ -14,7 +14,7 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
-    private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate;'
+    private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate; '
     private static final String PROVISIONING_DIR = 'provisioning'
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
@@ -148,6 +148,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         try {
             script.sh(
                 ACTIVATE_VIRTUALENV +
+                    "cat ${workspaceDir}/resources/beaker-slave.output; " +
                     "linchpin --workspace ${workspaceDir} " +
                     "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " //+
                     //"--tx-id ${host.linchpinTxId}"
