@@ -12,13 +12,13 @@ import com.redhat.ci.hosts.TargetHost
 class Job {
     protected static final String SANDBOX_DIR = 'sandbox'
 
-    Script script
-    List<TargetHost> targetHosts
-    ProvisioningConfig config
-    Closure body
-    Closure onFailure
-    Closure onComplete
-    ProvisioningService provSvc
+    protected Script script
+    protected List<TargetHost> targetHosts
+    protected ProvisioningConfig config
+    protected Closure body
+    protected Closure onFailure
+    protected Closure onComplete
+    protected ProvisioningService provSvc
 
     /**
      * @param script      Script             WorkflowScript that the job will run in.
