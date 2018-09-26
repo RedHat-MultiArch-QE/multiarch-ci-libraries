@@ -148,10 +148,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
         try {
             script.sh(
                 ACTIVATE_VIRTUALENV +
-                    "cat ${workspaceDir}/resources/beaker-slave.output; " +
                     "linchpin --workspace ${workspaceDir} " +
-                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " //+
-                    //"--tx-id ${host.linchpinTxId}"
+                    "--verbose destroy ${LINCHPIN_TARGETS[host.provider]} " +
+                    "--tx-id ${host.linchpinTxId}"
             )
         } catch (e) {
             script.echo("Exception: ${e.message}")
