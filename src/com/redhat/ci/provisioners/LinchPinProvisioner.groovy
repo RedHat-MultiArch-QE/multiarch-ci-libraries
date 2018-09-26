@@ -151,6 +151,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                     "linchpin --workspace ${workspaceDir} " +
                     "--verbose destroy --tx-id ${host.linchpinTxId}"
             )
+            script.sleep(time:2, unit:'HOURS')
         } catch (e) {
             script.echo("Exception: ${e.message}")
         }
