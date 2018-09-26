@@ -149,7 +149,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
             script.sh(
                 ACTIVATE_VIRTUALENV +
                     "linchpin --workspace ${workspaceDir} " +
-                    "--verbose destroy --tx-id ${host.linchpinTxId}"
+                    "--config ${workspaceDir}/linchpin.conf " +
+                    "-vvvv destroy --tx-id ${host.linchpinTxId}"
             )
         } catch (e) {
             script.echo("Exception: ${e.message}")
