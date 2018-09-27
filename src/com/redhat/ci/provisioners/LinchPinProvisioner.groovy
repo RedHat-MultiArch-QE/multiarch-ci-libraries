@@ -63,6 +63,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             script.sh(
                 ACTIVATE_VIRTUALENV +
                     "linchpin --workspace ${workspaceDir} " +
+                    "--config ${workspaceDir}/linchpin.conf " +
                     "--template-data \'${getTemplateData(host, config)}\' " +
                     "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
             )
