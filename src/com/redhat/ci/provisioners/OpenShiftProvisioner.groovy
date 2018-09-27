@@ -9,11 +9,6 @@ import com.redhat.ci.provisioner.Type
  * A stubbed provisioner template for OpenShift requests.
  */
 class OpenShiftProvisioner extends AbstractProvisioner {
-
-    OpenShiftProvisioner() {
-        this(null)
-    }
-
     OpenShiftProvisioner(Script script) {
         super(script)
         this.type = Type.OPENSHIFT

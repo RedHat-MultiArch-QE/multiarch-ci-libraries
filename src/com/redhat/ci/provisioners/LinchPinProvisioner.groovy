@@ -20,10 +20,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
 
-    LinchPinProvisioner() {
-        this(null)
-    }
-
     LinchPinProvisioner(Script script) {
         super(script)
         if (script) {

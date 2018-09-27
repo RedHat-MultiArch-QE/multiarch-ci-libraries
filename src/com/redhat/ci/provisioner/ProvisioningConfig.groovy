@@ -13,7 +13,7 @@ class ProvisioningConfig {
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
 
     // Provisioner version
-    String version = 'dev-v1.2.0'
+    String version = 'v1.2.0'
 
     // Jenkins kubernetes cloud name
     String cloudName = 'openshift'
@@ -34,7 +34,7 @@ class ProvisioningConfig {
     String provisioningImage = 'provisioner'
 
     // Provisioning repo url
-    String provisioningRepoUrl = 'https://github.com/jaypoulz/multiarch-ci-libraries'
+    String provisioningRepoUrl = 'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
 
     // Provisioning repo ref
     String provisioningRepoRef = this.version
