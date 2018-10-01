@@ -77,7 +77,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.provisioned = true
 
             if (config.mode == Mode.JNLP) {
-                // JNLP mode without Exception, so we must be connected
+                // Run Cinch if in JNLP mode
+                script.sh(
+                    ACTIVATE_VIRTUALENV +
+                        "cinch ${host.inventoryPath} --extra-vars='${getExtraVars(host, config)}'")
                 host.connectedToMaster = true
 
                 // In JNLP mode, we can install Ansible so the user can run playbooks
@@ -153,22 +156,21 @@ class LinchPinProvisioner extends AbstractProvisioner {
     }
 
     private String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
-        script.withCredentials(
-            [
-                script.usernamePassword(
-                    credentialsId:config.jenkinsSlaveCredentialId,
-                    usernameVariable:'JENKINS_SLAVE_USERNAME',
-                    passwordVariable:'JENKINS_SLAVE_PASSWORD'
-                ),
-            ]
-        ) {
-            // Build template data
-            Map templateData = [:]
-            templateData.arch = host.arch
-            templateData.job_group = config.jobgroup
-            templateData.hostrequires = config.hostrequires
-            templateData.hooks = [postUp:[connectToMaster:config.mode == Mode.JNLP]]
-            templateData.extra_vars = [
+        Map templateData = [:]
+        templateData.arch = host.arch
+        templateData.job_group = config.jobgroup
+        templateData.hostrequires = config.hostrequires
+
+        JsonOutput.toJson(templateData)
+    }
+
+    private String getExtraVars(ProvisionedHost host, ProvisioningConfig config) {
+        script.withCredentials([
+            script.usernamePassword(credentialsId:config.jenkinsSlaveCredentialId,
+                                    usernameVariable:'JENKINS_SLAVE_USERNAME',
+                                    passwordVariable:'JENKINS_SLAVE_PASSWORD'),
+        ]) {
+            Map extraVars = [
                 'rpm_key_imports':[],
                 'jenkins_master_repositories':[],
                 'jenkins_master_download_repositories':[],
@@ -187,8 +189,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 ]]
             ]
 
-            String templateDataJson = JsonOutput.toJson(templateData)
-            templateDataJson
+            JsonOutput.toJson(extraVars)
         }
     }
 

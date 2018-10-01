@@ -4,11 +4,11 @@ import com.redhat.ci.provisioner.ProvisioningConfig
 /**
  * Tests the API wrapper.
  */
-class APITest extends PipelineTestScript {
+class MAQEAPITest extends PipelineTestScript {
 
     @Test
     void canCallAPIVersion1Methods() {
-        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
+        ProvisioningConfig config = MAQEAPI.v1.getProvisioningConfig(this)
         assert(config != null)
     }
 }

@@ -67,7 +67,7 @@ class TestUtilsTest extends PipelineTestScript {
 
     @Test
     void shouldGetProvisioningConfigViaAPI() {
-        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
+        ProvisioningConfig config = MAQEAPI.v1.getProvisioningConfig(this)
         assert(config)
         assertNoExceptions()
     }
@@ -150,7 +150,7 @@ class TestUtilsTest extends PipelineTestScript {
 
     @Test
     void shouldFailWithNoProvisionerAvailable() {
-        ProvisioningConfig config = API.v1.getProvisioningConfig(this)
+        ProvisioningConfig config = MAQEAPI.v1.getProvisioningConfig(this)
 
         TargetHost target = new TargetHost(arch:X86_64, provisionerPriority:[])
         Boolean exceptionOccured = false
