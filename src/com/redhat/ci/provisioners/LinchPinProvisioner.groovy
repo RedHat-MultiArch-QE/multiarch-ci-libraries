@@ -14,8 +14,6 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
-    private static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate; '
-    private static final String PROVISIONING_DIR = 'provisioning'
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
