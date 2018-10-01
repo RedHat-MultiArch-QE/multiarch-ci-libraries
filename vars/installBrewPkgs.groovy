@@ -19,7 +19,6 @@ void call(Map params) {
             sudo sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/*download.eng.bos.redhat.com*
             echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/*download.eng.bos.redhat.com*
             sudo yum clean all
-            sudo yum install -y ansible
         '''
     }
 }
