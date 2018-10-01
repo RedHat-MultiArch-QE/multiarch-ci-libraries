@@ -9,6 +9,9 @@ import com.redhat.ci.hosts.ProvisionedHost
  * A base provisioner that defines shared utility methods to perform actions upon a provisioned host.
  */
 abstract class AbstractProvisioner implements Provisioner {
+    protected static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate; '
+    protected static final String PROVISIONING_DIR = 'provisioning'
+
     Script script = null
     String type = null
     protected List<String> supportedHostTypes = []
