@@ -17,7 +17,12 @@ class TestUtils {
      * @return ProvisioningConfig Configuration file for provisioning.
      */
     static ProvisioningConfig getProvisioningConfig(Script script) {
-        new ProvisioningConfig(script.params, script.env.environment)
+        Map env = [
+            JENKINS_MASTER_URL:script.env.JENKINS_MASTER_URL,
+            JSWARM_EXTRA_ARGS:script.env.JSWARM_EXTRA_ARGS,
+        ]
+
+        new ProvisioningConfig(script.params, env)
     }
 
     /**
