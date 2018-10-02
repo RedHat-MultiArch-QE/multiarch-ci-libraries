@@ -135,9 +135,7 @@ class PipelineTestScript extends Script {
             currentBuild = [
                 result:'SUCCESS',
             ]
-            env = [
-                environment:[:],
-            ]
+            env = [:]
             params = [:]
             scm = [:]
         }
