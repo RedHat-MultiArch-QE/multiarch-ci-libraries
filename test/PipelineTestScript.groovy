@@ -87,6 +87,12 @@ class PipelineTestScript extends Script {
         body()
     }
 
+    Closure readFile = {
+        file ->
+        LOG.info("readFile(${file})")
+        ''
+    }
+
     Closure readJSON = {
         file ->
         LOG.info("readJSON(${file})")

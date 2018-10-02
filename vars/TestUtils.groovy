@@ -17,7 +17,15 @@ class TestUtils {
      * @return ProvisioningConfig Configuration file for provisioning.
      */
     static ProvisioningConfig getProvisioningConfig(Script script) {
-        new ProvisioningConfig(script.params, script.env)
+        script.sh('env > env.txt')
+        String envFile = script.readFile('env.txt')
+        Map<String,String> env = envFile.split('\r?\n').collectEntries {
+            String entry ->
+            List<String> pair = entry.split('=')
+            [(pair.first()):pair.last()]
+        }
+
+        new ProvisioningConfig(script.params, env)
     }
 
     /**
