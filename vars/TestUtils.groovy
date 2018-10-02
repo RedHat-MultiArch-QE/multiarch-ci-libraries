@@ -17,13 +17,10 @@ class TestUtils {
      * @return ProvisioningConfig Configuration file for provisioning.
      */
     static ProvisioningConfig getProvisioningConfig(Script script) {
-        script.sh('env > env.txt')
-        String envFile = script.readFile('env.txt')
-        Map<String,String> env = envFile.split('\r?\n').collectEntries {
-            String entry ->
-            List<String> pair = entry.split('=')
-            [(pair.first()):pair.last()]
-        }
+        Map env = [
+            JENKINS_MASTER_URL:script.env.JENKINS_MASTER_URL,
+            JSWARM_EXTRA_ARGS:script.env.JSWARM_EXTRA_ARGS,
+        ]
 
         new ProvisioningConfig(script.params, env)
     }
