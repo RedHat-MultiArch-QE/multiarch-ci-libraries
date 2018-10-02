@@ -12,8 +12,6 @@ class ProvisioningConfigTest {
     private static final String SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT = 'test-sshprivkey'
     private static final String SSH_PUB_KEY_CREDENTIAL_ID_DEFAULT = 'test-sshpubkey'
     private static final String JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT = 'test-jenkins-slave-credentials'
-    private static final String JENKINS_MASTER_URL_DEFAULT    = 'https://test-jenkins.com'
-    private static final String JSWARM_EXTRA_ARGS_DEFAULT     = '-tunnel test-jenkins.com:8080'
 
     @Test
     void should_support_legacy_api() {
@@ -47,16 +45,13 @@ class ProvisioningConfigTest {
 
     @Test
     void should_load_customized_configuration() {
-        Map script = [:]
+        Script script = new PipelineTestScript()
         script.params = [:]
-        script.env = [:]
         script.params.KRBPRINCIPALCREDENTIALID = KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT
         script.params.KEYTABCREDENTIALID       = KEYTAB_CREDENTIAL_ID_DEFAULT
         script.params.SSHPRIVKEYCREDENTIALID   = SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT
         script.params.SSHPUBKEYCREDENTIALID    = SSH_PUB_KEY_CREDENTIAL_ID_DEFAULT
         script.params.JENKINSSLAVECREDENTIALID = JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT
-        script.env.JENKINS_MASTER_URL          = JENKINS_MASTER_URL_DEFAULT
-        script.env.JSWARM_EXTRA_ARGS           = JSWARM_EXTRA_ARGS_DEFAULT
 
         ProvisioningConfig config = new ProvisioningConfig(script.params, script.env)
         assert(config.krbPrincipalCredentialId == KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT)
@@ -64,7 +59,7 @@ class ProvisioningConfigTest {
         assert(config.sshPrivKeyCredentialId   == SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT)
         assert(config.sshPubKeyCredentialId    == SSH_PUB_KEY_CREDENTIAL_ID_DEFAULT)
         assert(config.jenkinsSlaveCredentialId == JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT)
-        assert(config.jenkinsMasterUrl         == JENKINS_MASTER_URL_DEFAULT)
-        assert(config.jswarmExtraArgs          == JSWARM_EXTRA_ARGS_DEFAULT)
+        assert(config.jenkinsMasterUrl         == PipelineTestScript.JENKINS_MASTER_URL_DEFAULT)
+        assert(config.jswarmExtraArgs          == PipelineTestScript.JSWARM_EXTRA_ARGS_DEFAULT)
     }
 }

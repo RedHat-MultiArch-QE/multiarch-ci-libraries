@@ -8,6 +8,8 @@ import groovy.json.JsonSlurper
 class PipelineTestScript extends Script {
 
     private static final Logger LOG = Logger.getLogger(PipelineTestScript.name)
+    public static final String JENKINS_MASTER_URL_DEFAULT = 'https://test-jenkins.com'
+    public static final String JSWARM_EXTRA_ARGS_DEFAULT = '-tunnel test-jenkins.com:8080'
 
     @Override
     Object run() {
@@ -135,7 +137,10 @@ class PipelineTestScript extends Script {
             currentBuild = [
                 result:'SUCCESS',
             ]
-            env = [:]
+            env = [
+                JENKINS_MASTER_URL:JENKINS_MASTER_URL_DEFAULT,
+                JSWARM_EXTRA_ARGS:JSWARM_EXTRA_ARGS_DEFAULT,
+            ]
             params = [:]
             scm = [:]
         }
