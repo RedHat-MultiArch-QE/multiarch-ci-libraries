@@ -133,15 +133,11 @@ class Utils {
                 throw new ProvisioningException('Installing in SSH mode but hostname is invalid.')
             }
 
-            Map remote = [:]
-            remote.user = 'root'
-            remote.host = host.hostname
-            remote.allowAnyHosts = true
-            remote.knownHosts = '/dev/null'
-
             installWrapper {
                 shCommand ->
-                script.sshCommand(remote:remote, command:shCommand)
+                String ssh = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
+                    "-i ~/.ssh/id_rsa root@${host.hostname};"
+                script.sh(ssh + shCommand)
             }
         }
     }
