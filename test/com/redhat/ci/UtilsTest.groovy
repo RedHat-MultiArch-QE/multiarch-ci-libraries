@@ -19,7 +19,7 @@ class UtilsTest {
     private PipelineTestScript script = null
 
     private final Closure genericInstall = {
-        sh ->
+        sudo, sh ->
         sh(INSTALLED)
     }
 
@@ -35,17 +35,12 @@ class UtilsTest {
         script.echo(INSTALLED)
     }
 
-    private final Closure sshCommand = {
-        sh ->
-        script.echo(INSTALLED)
-    }
-
     @Before
     void init() {
         validHost = new ProvisionedHost(hostname:TEST_HOSTNAME, displayName:TEST_HOSTNAME)
         invalidHost = new ProvisionedHost()
         config = new ProvisioningConfig()
-        script = new PipelineTestScript(node:node, sh:sh, sshCommand:sshCommand)
+        script = new PipelineTestScript(node:node, sh:sh)
     }
 
     @Test
