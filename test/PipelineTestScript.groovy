@@ -106,6 +106,11 @@ class PipelineTestScript extends Script {
         LOG.info(sh)
     }
 
+    Closure sshCommand = {
+        sh ->
+        LOG.info(sh.command)
+    }
+
     Closure stage = {
         stage, body ->
         LOG.info("stage(${stage})")
