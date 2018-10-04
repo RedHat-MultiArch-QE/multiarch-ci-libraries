@@ -133,8 +133,8 @@ class PipelineTestScript extends Script {
     }
 
     Closure writeFile = {
-        filename, command ->
-        LOG.info("writeFile(${filename}, ${command})")
+        args ->
+        LOG.info("writeFile(${args})")
     }
 
     PipelineTestScript() {

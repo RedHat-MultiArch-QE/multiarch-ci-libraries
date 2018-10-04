@@ -141,7 +141,7 @@ class Utils {
 
             installWrapper(NO_SUDO) {
                 shCommand ->
-                script.writeFile(INSTALL_FILE, shCommand)
+                script.writeFile(file:INSTALL_FILE, text:shCommand)
                 String runCommandOnHost = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
                     "-i ~/.ssh/id_rsa root@${host.hostname} < ${INSTALL_FILE}"
                 script.sh(runCommandOnHost)
