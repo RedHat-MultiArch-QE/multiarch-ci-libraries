@@ -18,7 +18,8 @@ class Utils {
     @SuppressWarnings('GStringExpressionWithinString')
     static void installAnsible(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
         genericInstall(script, config, host) {
-            sudo, sh ->
+            privileged, sh ->
+            String sudo = privileged ? SUDO : NO_SUDO
             sh("""
                 ${sudo} yum install python-devel openssl-devel libffi-devel -y &&
                 ${sudo} mkdir -p /home/jenkins &&
@@ -39,7 +40,8 @@ class Utils {
      */
     static void installCredentials(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
         genericInstall(script, config, host) {
-            sudo, sh ->
+            privileged, sh ->
+            String sudo = privileged ? SUDO : NO_SUDO
             script.withCredentials([
                 script.file(credentialsId:config.keytabCredentialId, variable:'KEYTAB'),
                 script.usernamePassword(credentialsId:config.krbPrincipalCredentialId,
@@ -80,7 +82,8 @@ class Utils {
     @SuppressWarnings('LineLength')
     static void installRhpkg(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
         genericInstall(script, config, host) {
-            sudo, sh ->
+            privileged, sh ->
+            String sudo = privileged ? SUDO : NO_SUDO
             sh("""
                 echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo} tee -a /etc/ssh/ssh_known_hosts
 
