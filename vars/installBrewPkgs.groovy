@@ -1,4 +1,5 @@
-void call(Map params, String sudo = '') {
+void call(Map params, Boolean privileged = false) {
+    String sudo = privileged ? 'sudo' : ''
     Boolean taskRepoCreated = false
     if (params.CI_MESSAGE != '') {
         tid = getTaskId(params.CI_MESSAGE)
