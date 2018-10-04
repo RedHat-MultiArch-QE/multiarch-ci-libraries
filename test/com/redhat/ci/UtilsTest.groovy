@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Before
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
+import com.redhat.ci.provisioner.Mode
 
 /**
  * Tests the install script wrapper.
@@ -12,13 +13,14 @@ class UtilsTest {
     private static final String INSTALLED = 'Installed'
     private static final String TEST_HOSTNAME = 'test-host'
     private static final String NODE_STEP = 'node'
-    private ProvisionedHost host = null
+    private ProvisionedHost validHost = null
+    private ProvisionedHost invalidHost = null
     private ProvisioningConfig config = null
     private PipelineTestScript script = null
 
     private final Closure genericInstall = {
-        host ->
-        script.sh(INSTALLED)
+        sudo, sh ->
+        sh(INSTALLED)
     }
 
     private final Closure node = {
@@ -35,30 +37,31 @@ class UtilsTest {
 
     @Before
     void init() {
-        host = new ProvisionedHost()
+        validHost = new ProvisionedHost(hostname:TEST_HOSTNAME, displayName:TEST_HOSTNAME)
+        invalidHost = new ProvisionedHost()
         config = new ProvisioningConfig()
         script = new PipelineTestScript(node:node, sh:sh)
     }
 
     @Test
     void shouldInstallAnsibleOnProvisionedHost() {
-        assert(host.ansibleInstalled == false)
-        Utils.installAnsible(script, host)
-        assert(host.ansibleInstalled == true)
+        assert(validHost.ansibleInstalled == false)
+        Utils.installAnsible(script, config, validHost)
+        assert(validHost.ansibleInstalled == true)
         assert(script.testLog.contains(INSTALLED))
     }
 
     @Test
     void shouldInstallAnsibleOnCurrentHost() {
-        Utils.installAnsible(script)
+        Utils.installAnsible(script, config)
         assert(script.testLog.contains(INSTALLED))
     }
 
     @Test
     void shouldInstallCredentialsOnProvisionedHost() {
-        assert(host.credentialsInstalled == false)
-        Utils.installCredentials(script, config, host)
-        assert(host.credentialsInstalled == true)
+        assert(validHost.credentialsInstalled == false)
+        Utils.installCredentials(script, config, validHost)
+        assert(validHost.credentialsInstalled == true)
         assert(script.testLog.contains(INSTALLED))
     }
 
@@ -70,36 +73,61 @@ class UtilsTest {
 
     @Test
     void shouldInstallRhpkgOnProvisionedHost() {
-        assert(host.rhpkgInstalled == false)
-        Utils.installRhpkg(script, host)
-        assert(host.rhpkgInstalled == true)
+        assert(validHost.rhpkgInstalled == false)
+        Utils.installRhpkg(script, config, validHost)
+        assert(validHost.rhpkgInstalled == true)
         assert(script.testLog.contains(INSTALLED))
     }
 
     @Test
     void shouldInstallRhpkgOnCurrentHost() {
-        Utils.installRhpkg(script)
+        Utils.installRhpkg(script, config)
         assert(script.testLog.contains(INSTALLED))
     }
 
     @Test
-    void installWrapperShouldntWrapNullHost() {
-        Utils.installWrapper(script, null, genericInstall)
-        assert(script.testLog.contains(INSTALLED))
-        assert(!script.testLog.contains(NODE_STEP))
-    }
-
-    @Test
-    void installWrapperShouldntWrapNamelessHost() {
-        Utils.installWrapper(script, host, genericInstall)
+    void genericInstallShouldntWrapNullHost() {
+        Utils.genericInstall(script, config, null, genericInstall)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
 
     @Test
-    void installWrapperShouldWrapNamedHost() {
-        host.displayName = TEST_HOSTNAME
-        Utils.installWrapper(script, host, genericInstall)
+    void genericInstallShouldntInstallOnNamelessHostInSSHMode() {
+        config.mode = Mode.SSH
+        Boolean exceptionOccured = false
+        try {
+            Utils.genericInstall(script, config, invalidHost, genericInstall)
+        } catch (e) {
+            exceptionOccured = true
+        }
+        assert(exceptionOccured)
+    }
+
+    @Test
+    void genericInstallShouldntInstallOnNamelessHostInJNLPMode() {
+        config.mode = Mode.JNLP
+        Boolean exceptionOccured = false
+        try {
+            Utils.genericInstall(script, config, invalidHost, genericInstall)
+        } catch (e) {
+            exceptionOccured = true
+        }
+        assert(exceptionOccured)
+    }
+
+    @Test
+    void genericInstallShouldntWrapNamedHostInSSHMode() {
+        config.mode = Mode.SSH
+        Utils.genericInstall(script, config, validHost, genericInstall)
+        assert(script.testLog.contains(INSTALLED))
+        assert(!script.testLog.contains(NODE_STEP))
+    }
+
+    @Test
+    void genericInstallShouldWrapNamedHostInJNLPMode() {
+        config.mode = Mode.JNLP
+        Utils.genericInstall(script, config, validHost, genericInstall)
         assert(script.testLog.contains(INSTALLED))
         assert(script.testLog.contains(NODE_STEP))
         assert(script.testLog.contains(TEST_HOSTNAME))

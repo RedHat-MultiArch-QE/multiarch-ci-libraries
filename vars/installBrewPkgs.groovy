@@ -1,5 +1,5 @@
-@SuppressWarnings('GStringExpressionWithinString')
-void call(Map params) {
+void call(Map params, Boolean privileged = false) {
+    String sudo = privileged ? 'sudo' : ''
     Boolean taskRepoCreated = false
     if (params.CI_MESSAGE != '') {
         tid = getTaskId(params.CI_MESSAGE)
@@ -11,14 +11,14 @@ void call(Map params) {
     }
 
     if (taskRepoCreated == true) {
-        sh '''
-            sudo yum install -y yum-utils
+        sh """
+            ${sudo} yum install -y yum-utils
             URL=\$(cat task-repo.properties | grep TASK_REPO_URLS= | sed 's/TASK_REPO_URLS=//' | sed 's/;/\\n/g')
-            sudo yum-config-manager --add-repo \${URL}
-            sudo cat /etc/yum.repos.d/*download.eng.bos.redhat.com*
-            sudo sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/*download.eng.bos.redhat.com*
-            echo "gpgcheck=0" | sudo tee -a /etc/yum.repos.d/*download.eng.bos.redhat.com*
-            sudo yum clean all
-        '''
+            ${sudo} yum-config-manager --add-repo \${URL}
+            ${sudo} cat /etc/yum.repos.d/*download.eng.bos.redhat.com*
+            ${sudo} sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/*download.eng.bos.redhat.com*
+            echo "gpgcheck=0" | ${sudo} tee -a /etc/yum.repos.d/*download.eng.bos.redhat.com*
+            ${sudo} yum clean all
+        """
     }
 }

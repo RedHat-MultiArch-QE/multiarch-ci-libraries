@@ -132,6 +132,11 @@ class PipelineTestScript extends Script {
         body()
     }
 
+    Closure writeFile = {
+        args ->
+        LOG.info("writeFile(${args})")
+    }
+
     PipelineTestScript() {
         binding.with {
             currentBuild = [
