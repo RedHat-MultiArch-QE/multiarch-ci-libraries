@@ -11,6 +11,7 @@ import com.redhat.ci.provisioner.Mode
 class Utils {
     private static final String SUDO = 'sudo'
     private static final String NO_SUDO = ''
+    private static final String INSTALL_FILE = 'install.sh'
 
     /**
      * Attemps to install Ansible.
@@ -140,9 +141,10 @@ class Utils {
 
             installWrapper(NO_SUDO) {
                 shCommand ->
-                String ssh = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
-                    "-i ~/.ssh/id_rsa root@${host.hostname};"
-                script.sh(ssh + shCommand)
+                script.writeFile(INSTALL_FILE, shCommand)
+                String runCommandOnHost = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
+                    "-i ~/.ssh/id_rsa root@${host.hostname} < ${INSTALL_FILE}"
+                script.sh(runCommandOnHost)
             }
         }
     }
