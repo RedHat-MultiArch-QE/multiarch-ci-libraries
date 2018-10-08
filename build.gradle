@@ -5,32 +5,37 @@
  * For more details take a look at the Groovy Quickstart chapter in the Gradle
  * user guide available at https://docs.gradle.org/4.7/userguide/tutorial_groovy_projects.html
  */
+import java.nio.file.Files
 
 plugins {
     // Apply the groovy plugin to add support for Groovy
     id 'groovy'
+    id 'codenarc'
+    id 'com.bmuschko.clover' version '2.2.1'
+    id 'com.dorongold.task-tree' version '1.3'
 }
 
 sourceSets {
     main {
         groovy {
-            srcDirs = ['src']
+            srcDirs = ['src', 'vars']
         }
     }
-
     test {
         groovy {
             srcDirs = ['test']
+        }
+        resources {
+            srcDirs = ['test/resources']
         }
     }
 }
 
 dependencies {
-    // Use the latest Groovy version for building this library
-    compile 'org.codehaus.groovy:groovy-all:2.4.13'
-    testCompile group:'com.lesfurets', name:'jenkins-pipeline-unit', version:'1.0'
-    testCompile group:'junit',         name:'junit',                 version: '4.11'
-
+    compile     group:'org.codehaus.groovy', name:'groovy-all',            version:'2.4.13'
+    testCompile group:'junit',               name:'junit',                 version:'4.11'
+    testCompile group:'org.mockito',         name:'mockito-core',          version:'2.+'
+    clover      group:'org.openclover',      name:'clover',                version:'4.2.0'
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -39,3 +44,19 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
+
+codenarc {
+    config = resources.text.fromFile("${project.projectDir}/config/codenarc/codenarc.groovy")
+    toolVersion = '1.2.1'
+}
+
+
+clover {
+    targetPercentage = '100%'
+
+    report {
+        html = true
+    }
+}
+
+test.finalizedBy cloverGenerateReport
