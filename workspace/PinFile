@@ -15,9 +15,18 @@ beaker-slave:
         attempt_wait_time: 60
         cancel_message: Beaker request timeout
         recipesets:
-        - distro: "RHEL-ALT-7.5"
+        - distro: {{ distro | default('RHEL-ALT-7.5') }}
           arch: {{ arch | default('x86_64') }}
-          variant: Server
+          variant: {{ variant | default('Server') }}
+          {% if ks_meta %}
+          ks_meta: {{ ks_meta | default('') }}
+          {% end_if %}
+          {% if method %}
+          method: {{ method | default('nfs') }}
+          {% end_if %}
+          {% if reserve_duration %}
+          reserve_duration: {{ reserve_duration | default('86400') }}
+          {% end_if %}
           count: 1
           name: "Jenkins Slave"
           {% if hostrequires %}
