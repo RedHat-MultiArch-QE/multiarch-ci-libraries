@@ -4,7 +4,6 @@ import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
-import com.redhat.ci.provisioner.ProvisioningException
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
 import groovy.json.JsonOutput
@@ -12,23 +11,23 @@ import groovy.json.JsonOutput
 /**
  * Emulates a provisioner for a preprovisioned resource.
  */
-class NoOPProvisioner extends AbstractProvisioner {
+class NoOpProvisioner extends AbstractProvisioner {
 
     private static final String PREPROVISIONED_INVENTORY = 'preprovisioned.inventory'
 
-    NoOPProvisioner(Script script) {
+    NoOpProvisioner(Script script) {
         super(script)
         if (script) {
             this.available = true
         }
         this.type = Type.NOOP
         this.supportedHostTypes = [
-            com.redhat.ci.host.CONTAINER, 
+            com.redhat.ci.host.CONTAINER,
             com.redhat.ci.host.Type.VM,
-            com.redhat.ci.host.Type.BAREMETAL
+            com.redhat.ci.host.Type.BAREMETAL,
         ]
         this.supportedProviders = [
-            null
+            null,
         ]
     }
 
@@ -42,14 +41,8 @@ class NoOPProvisioner extends AbstractProvisioner {
             Utils.installCredentials(script, config)
             host.initialized = true
 
-            // Attempt provisioning
-            String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
-
             // Build out the inventory if it does not exist
-            if (!host.inventoryPath) {
-                createInventory(host)
-                host.inventoryPath = PREPROVISIONED_INVENTORY
-            }
+            host.inventoryPath ?: writeInventory(host)
 
             // A pre-provisioned host must have a hostname
             if (!host.hostname) {
@@ -59,8 +52,6 @@ class NoOPProvisioner extends AbstractProvisioner {
 
             script.echo("inventoryPath:${host.inventoryPath}")
             script.echo("hostname:${host.hostname}")
-
-            // Parse the inventory file for the name of the master node
             host.provisioned = true
 
             if (config.mode == Mode.JNLP) {
@@ -130,13 +121,17 @@ class NoOPProvisioner extends AbstractProvisioner {
         }
     }
 
-    private String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
-        Map templateData = [:]
-        templateData.arch = host.arch
-        templateData.job_group = config.jobgroup
-        templateData.hostrequires = config.hostrequires
+    String writeInventory(ProvisionedHost host) {
+        // Create inventory file
+        String inventory = "[master_node]\n${host.hostname}"
 
-        JsonOutput.toJson(templateData)
+        // Create inventory filename
+        String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
+        String inventoryFile = "${workspaceDir}/${PREPROVISIONED_INVENTORY}"
+
+        // Write and return inventory file
+        script.writeFile(inventoryFile, inventory)
+        inventoryFile
     }
 
     private String getExtraVars(ProvisionedHost host, ProvisioningConfig config) {
