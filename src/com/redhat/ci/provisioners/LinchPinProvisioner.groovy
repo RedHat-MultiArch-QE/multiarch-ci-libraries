@@ -158,8 +158,13 @@ class LinchPinProvisioner extends AbstractProvisioner {
     private String getTemplateData(ProvisionedHost host, ProvisioningConfig config) {
         Map templateData = [:]
         templateData.arch = host.arch
-        templateData.job_group = config.jobgroup
-        templateData.hostrequires = config.hostrequires
+        templateData.distro = host.distro
+        templateData.variant = host.variant
+        templateData.ks_meta = host.bkrKsMeta
+        templateData.method = host.bkrMethod
+        templateData.reserve_duration = host.reserveDuration
+        templateData.job_group = host.bkrJobGroup ?: config.jobgroup
+        templateData.hostrequires = host.bkrHostRequires ?: config.hostrequires
 
         JsonOutput.toJson(templateData)
     }
