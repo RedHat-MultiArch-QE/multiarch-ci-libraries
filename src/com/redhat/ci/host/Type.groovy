@@ -7,6 +7,7 @@ package com.redhat.ci.host
  */
 class Type {
     public static final String BAREMETAL = 'BAREMETAL'
-    public static final String VM = 'VM'
     public static final String CONTAINER = 'CONTAINER'
+    public static final String UNKNOWN = 'UNKNOWN'
+    public static final String VM = 'VM'
 }

@@ -11,6 +11,7 @@ import groovy.json.JsonOutput
 /**
  * Emulates a provisioner for a preprovisioned resource.
  */
+@SuppressWarnings('AbcMetric')
 class NoOpProvisioner extends AbstractProvisioner {
 
     private static final String PREPROVISIONED_INVENTORY = 'preprovisioned.inventory'
@@ -22,12 +23,19 @@ class NoOpProvisioner extends AbstractProvisioner {
         }
         this.type = Type.NOOP
         this.supportedHostTypes = [
-            com.redhat.ci.host.CONTAINER,
-            com.redhat.ci.host.Type.VM,
             com.redhat.ci.host.Type.BAREMETAL,
+            com.redhat.ci.host.Type.CONTAINER,
+            com.redhat.ci.host.Type.UNKNOWN,
+            com.redhat.ci.host.Type.VM,
         ]
         this.supportedProviders = [
-            null,
+            com.redhat.ci.provider.Type.AWS,
+            com.redhat.ci.provider.Type.BEAKER,
+            com.redhat.ci.provider.Type.DUFFY,
+            com.redhat.ci.provider.Type.KUBEVIRT,
+            com.redhat.ci.provider.Type.OPENSHIFT,
+            com.redhat.ci.provider.Type.OPENSTACK,
+            com.redhat.ci.provider.Type.UNKNOWN,
         ]
     }
 
@@ -42,7 +50,13 @@ class NoOpProvisioner extends AbstractProvisioner {
             host.initialized = true
 
             // Build out the inventory if it does not exist
-            host.inventoryPath ?: writeInventory(host)
+            host.inventoryPath ?: writeInventory(host, config)
+
+            // A pre-provisioned host must specify the arch
+            if (!host.arch) {
+                error += 'Arch cannot be null for a pre-provisioned host.'
+                return host
+            }
 
             // A pre-provisioned host must have a hostname
             if (!host.hostname) {
@@ -121,7 +135,7 @@ class NoOpProvisioner extends AbstractProvisioner {
         }
     }
 
-    String writeInventory(ProvisionedHost host) {
+    String writeInventory(ProvisionedHost host, ProvisioningConfig config) {
         // Create inventory file
         String inventory = "[master_node]\n${host.hostname}"
 
@@ -130,7 +144,7 @@ class NoOpProvisioner extends AbstractProvisioner {
         String inventoryFile = "${workspaceDir}/${PREPROVISIONED_INVENTORY}"
 
         // Write and return inventory file
-        script.writeFile(inventoryFile, inventory)
+        script.writeFile(file:inventoryFile, text:inventory)
         inventoryFile
     }
 

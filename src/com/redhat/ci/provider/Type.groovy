@@ -12,4 +12,5 @@ class Type {
     public static final String KUBEVIRT = 'KUBEVIRT'
     public static final String OPENSHIFT = 'OPENSHIFT'
     public static final String OPENSTACK = 'OPENSTACK'
+    public static final String UNKNOWN = 'UNKNOWN'
 }
