@@ -96,7 +96,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnBareMetalHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(arch:X86_64, type:Type.BAREMETAL)
+        TargetHost target = TestUtils.newTargetHost(arch:X86_64, type:Type.BAREMETAL)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assertNoExceptions()
     }
@@ -104,7 +104,7 @@ class TestUtilsTest extends PipelineTestScript {
     @Test
     void shouldRunTestOnVMHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(
+        TargetHost target = TestUtils.newTargetHost(
             arch:X86_64,
             type:Type.VM,
             provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
@@ -123,7 +123,7 @@ class TestUtilsTest extends PipelineTestScript {
             config.installAnsible = true
             config.installRhpkg = true
 
-            TargetHost target = new TargetHost(arch:X86_64)
+            TargetHost target = TestUtils.newTargetHost(arch:X86_64)
             TestUtils.runTest(this, target, config, body, onFailure, onComplete)
             assertNoExceptions()
             reset()
@@ -152,7 +152,9 @@ class TestUtilsTest extends PipelineTestScript {
     void shouldFailWithNoProvisionerAvailable() {
         ProvisioningConfig config = MAQEAPI.v1.getProvisioningConfig(this)
 
-        TargetHost target = new TargetHost(arch:X86_64, provisionerPriority:[])
+        TargetHost target = MAQEAPI.v1.newTargetHost()
+        target.arch = X86_64
+        target.provisionerPriority = []
         Boolean exceptionOccured = false
         try {
             TestUtils.runTest(this, target, config, body, onFailure, onComplete)
@@ -163,13 +165,13 @@ class TestUtilsTest extends PipelineTestScript {
         assert(exceptionOccured)
     }
 
-    @Test
+    /*@Test
     void shouldRunTestOnPreProvisionedHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
-        TargetHost target = new TargetHost(hostname:'test-host.redhat.com', provisioner:'NOOP', arch:X86_64)
+        TargetHost target = TestUtils.newTargetHost(hostname:'test-host.redhat.com', provisioner:'NOOP', arch:X86_64)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assertNoExceptions()
-    }
+    }*/
 
     private void assertNoExceptions() {
         testLog.each {

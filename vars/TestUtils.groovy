@@ -189,7 +189,10 @@ class TestUtils {
      * See https://issues.jenkins-ci.org/browse/JENKINS-42730 and
      * https://stackoverflow.com/questions/51250161/library-jenkins-step-is-not-working-to-dynamically-load-methods?rq=1
      */
-    static TargetHost getNewTargetHost() {
-        new TargetHost()
+    static TargetHost newTargetHost(Map map = null) {
+        if (!map) {
+            return new TargetHost()
+        }
+        new TargetHost(map)
     }
 }

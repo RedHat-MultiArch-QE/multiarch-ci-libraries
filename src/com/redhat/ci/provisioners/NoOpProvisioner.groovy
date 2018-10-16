@@ -141,7 +141,7 @@ class NoOpProvisioner extends AbstractProvisioner {
 
     String writeInventory(ProvisionedHost host, ProvisioningConfig config) {
         // Create inventory file
-        String inventory = "[master_node]\n${host.hostname}"
+        String inventory = "[master_node]\nroot@${host.hostname}"
 
         // Create inventory filename
         String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"

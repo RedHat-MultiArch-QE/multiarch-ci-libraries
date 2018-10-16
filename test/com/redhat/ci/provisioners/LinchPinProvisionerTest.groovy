@@ -46,7 +46,7 @@ class LinchPinProvisionerTest {
             config.provisioningRepoUrl = null
 
             ProvisionedHost host = provisioner.provision(new TargetHost(), config)
-            assert(host)
+            assert(!host.error)
         }
     }
 
@@ -61,7 +61,7 @@ class LinchPinProvisionerTest {
             config.installRhpkg = true
 
             ProvisionedHost host = provisioner.provision(new TargetHost(), config)
-            assert(host)
+            assert(!host.error)
         }
     }
 
@@ -75,8 +75,6 @@ class LinchPinProvisionerTest {
         provisioner = new LinchPinProvisioner(script)
 
         ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
-
-        assert(host)
         assert(host.error == EXCEPTION_MESSAGE)
     }
 
