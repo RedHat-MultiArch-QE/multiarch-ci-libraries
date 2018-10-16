@@ -50,17 +50,21 @@ class NoOpProvisioner extends AbstractProvisioner {
             host.initialized = true
 
             // Build out the inventory if it does not exist
-            host.inventoryPath ?: writeInventory(host, config)
+            host.inventoryPath = host.inventoryPath ?: writeInventory(host, config)
+            if (!host.inventoryPath) {
+                host.error += 'Inventory could not be found.'
+                return host
+            }
 
             // A pre-provisioned host must specify the arch
             if (!host.arch) {
-                error += 'Arch cannot be null for a pre-provisioned host.'
+                host.error += 'Arch cannot be null for a pre-provisioned host.'
                 return host
             }
 
             // A pre-provisioned host must have a hostname
             if (!host.hostname) {
-                error += 'Hostname cannot be null for a pre-provisioned host.'
+                host.error += 'Hostname cannot be null for a pre-provisioned host.'
                 return host
             }
 

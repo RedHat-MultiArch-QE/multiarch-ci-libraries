@@ -190,6 +190,6 @@ class TestUtils {
      * https://stackoverflow.com/questions/51250161/library-jenkins-step-is-not-working-to-dynamically-load-methods?rq=1
      */
     static TargetHost getNewTargetHost() {
-        return new TargetHost()
-    } 
+        new TargetHost()
+    }
 }
