@@ -165,13 +165,13 @@ class TestUtilsTest extends PipelineTestScript {
         assert(exceptionOccured)
     }
 
-    /*@Test
+    @Test
     void shouldRunTestOnPreProvisionedHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TargetHost target = TestUtils.newTargetHost(hostname:'test-host.redhat.com', provisioner:'NOOP', arch:X86_64)
         TestUtils.runTest(this, target, config, body, onFailure, onComplete)
         assertNoExceptions()
-    }*/
+    }
 
     private void assertNoExceptions() {
         testLog.each {

@@ -80,7 +80,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 // Run Cinch if in JNLP mode
                 script.sh(
                     ACTIVATE_VIRTUALENV +
-                        "cinch ${host.inventoryPath} --extra-vars='${getExtraVars(host, config)}'")
+                        "cinch ${host.inventoryPath} --extra-vars='${getCinchExtraVars(host, config)}'")
                 host.connectedToMaster = true
 
                 // In JNLP mode, we can install Ansible so the user can run playbooks
@@ -168,35 +168,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
         ]
 
         JsonOutput.toJson(templateData)
-    }
-
-    private String getExtraVars(ProvisionedHost host, ProvisioningConfig config) {
-        script.withCredentials([
-            script.usernamePassword(credentialsId:config.jenkinsSlaveCredentialId,
-                                    usernameVariable:'JENKINS_SLAVE_USERNAME',
-                                    passwordVariable:'JENKINS_SLAVE_PASSWORD'),
-        ]) {
-            Map extraVars = [
-                'rpm_key_imports':[],
-                'jenkins_master_repositories':[],
-                'jenkins_master_download_repositories':[],
-                'jslave_name':"${host.displayName}",
-                'jslave_label':"${host.displayName}",
-                'arch':"${host.arch}",
-                'jenkins_master_url':"${config.jenkinsMasterUrl}",
-                'jenkins_slave_username':"${script.JENKINS_SLAVE_USERNAME}",
-                'jenkins_slave_password':"${script.JENKINS_SLAVE_PASSWORD}",
-                'jswarm_version':'3.9',
-                'jswarm_filename':'swarm-client-{{ jswarm_version }}.jar',
-                'jswarm_extra_args':"${config.jswarmExtraArgs}",
-                'jenkins_slave_repositories':[[
-                    'name':'epel',
-                    'mirrorlist':'https://mirrors.fedoraproject.org/metalink?arch=\$basearch&repo=epel-7'
-                ]]
-            ]
-
-            JsonOutput.toJson(extraVars)
-        }
     }
 
     private Integer getLinchpinTxId(Map linchpinLatest) {

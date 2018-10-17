@@ -7,6 +7,7 @@ import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Provisioner
+import com.redhat.ci.provisioner.ProvisioningException
 
 /**
  * Tests methods belonging to NoOpProvisioner.
@@ -47,6 +48,21 @@ class NoOpProvisionerTest {
     void provisioningFailsWhenMissingHostname() {
         ProvisioningConfig config = new ProvisioningConfig()
         ProvisionedHost host = provisioner.provision(new TargetHost(arch:X86_64), config)
+        assert(host.error)
+    }
+
+    @Test
+    void provisioningFailsWhenMissingInventoryPath() {
+        ProvisioningConfig config = new ProvisioningConfig()
+        Closure noWrite = {
+            Map map ->
+            throw new ProvisioningException('Error writing file')
+        }
+
+        script = new PipelineTestScript(writeFile:noWrite)
+        provisioner = new NoOpProvisioner(script)
+
+        ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME, arch:X86_64), config)
         assert(host.error)
     }
 

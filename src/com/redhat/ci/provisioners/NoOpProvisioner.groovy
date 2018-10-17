@@ -6,7 +6,6 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.provisioner.Type
-import groovy.json.JsonOutput
 
 /**
  * Emulates a provisioner for a preprovisioned resource.
@@ -57,13 +56,6 @@ class NoOpProvisioner extends AbstractProvisioner {
             Utils.installCredentials(script, config)
             host.initialized = true
 
-            // Build out the inventory if it does not exist
-            host.inventoryPath = host.inventoryPath ?: writeInventory(host, config)
-            if (!host.inventoryPath) {
-                host.error += 'Inventory could not be found.'
-                return host
-            }
-
             // A pre-provisioned host must specify the arch
             if (!host.arch) {
                 host.error += 'Arch cannot be null for a pre-provisioned host.'
@@ -76,6 +68,13 @@ class NoOpProvisioner extends AbstractProvisioner {
                 return host
             }
 
+            // Build out the inventory if it does not exist
+            host.inventoryPath = writeInventory(host, config)
+            if (!host.inventoryPath) {
+                host.error += 'Inventory could not be found.'
+                return host
+            }
+
             script.echo("inventoryPath:${host.inventoryPath}")
             script.echo("hostname:${host.hostname}")
             host.provisioned = true
@@ -84,7 +83,7 @@ class NoOpProvisioner extends AbstractProvisioner {
                 // Run Cinch if in JNLP mode
                 script.sh(
                     ACTIVATE_VIRTUALENV +
-                        "cinch ${host.inventoryPath} --extra-vars='${getExtraVars(host, config)}'")
+                        "cinch ${host.inventoryPath} --extra-vars='${getCinchExtraVars(host, config)}'")
                 host.connectedToMaster = true
 
                 // In JNLP mode, we can install Ansible so the user can run playbooks
@@ -147,63 +146,43 @@ class NoOpProvisioner extends AbstractProvisioner {
         }
     }
 
-    String writeInventory(ProvisionedHost host, ProvisioningConfig config) {
-        // Create inventory file
-        String inventory = ''
-        for (String group in LAYOUT_GROUPS) {
-            inventory += "[${group}]\n${host.hostname}\n"
-        }
+    private String writeInventory(ProvisionedHost host, ProvisioningConfig config) {
+        String inventoryFile = null
+        try {
+            // Create inventory filename
+            String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
+            String newInventoryFile = "${workspaceDir}/inventories/${PREPROVISIONED_INVENTORY}"
 
-        // Create inventory filename
-        String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
-        String inventoryFile = "${workspaceDir}/inventories/${PREPROVISIONED_INVENTORY}"
-
-        // Get Cinch workspace
-        if (config.mode == Mode.JNLP) {
-            script.dir(PROVISIONING_DIR) {
-                if (config.provisioningRepoUrl != null) {
-                    script.checkout(
-                        scm:[$class:'GitSCM',
-                             userRemoteConfigs:[[url:config.provisioningRepoUrl]],
-                             branches:[[name:config.provisioningRepoRef]]],
-                        poll:false)
-                } else {
-                    script.checkout(script.scm)
+            // Get Cinch workspace
+            if (config.mode == Mode.JNLP) {
+                script.dir(PROVISIONING_DIR) {
+                    if (config.provisioningRepoUrl != null) {
+                        script.checkout(
+                            scm:[$class:'GitSCM',
+                                 userRemoteConfigs:[[url:config.provisioningRepoUrl]],
+                                 branches:[[name:config.provisioningRepoRef]]],
+                            poll:false)
+                    } else {
+                        script.checkout(script.scm)
+                    }
                 }
             }
+
+            // Create inventory file, or copy it over if it was passed in
+            String inventory = ''
+
+            // Build a cinch-compatible inventory using the passing in hostname
+            for (String group in LAYOUT_GROUPS) {
+                inventory += "[${group}]\n${host.hostname}\n\n"
+            }
+
+            // Write and return inventory file path
+            script.writeFile(file:newInventoryFile, text:inventory)
+            inventoryFile = newInventoryFile
+        } catch (e) {
+            host.error += e.message
         }
 
-        // Write and return inventory file
-        script.writeFile(file:inventoryFile, text:inventory)
         inventoryFile
-    }
-
-    private String getExtraVars(ProvisionedHost host, ProvisioningConfig config) {
-        script.withCredentials([
-            script.usernamePassword(credentialsId:config.jenkinsSlaveCredentialId,
-                                    usernameVariable:'JENKINS_SLAVE_USERNAME',
-                                    passwordVariable:'JENKINS_SLAVE_PASSWORD'),
-        ]) {
-            Map extraVars = [
-                'rpm_key_imports':[],
-                'jenkins_master_repositories':[],
-                'jenkins_master_download_repositories':[],
-                'jslave_name':"${host.displayName}",
-                'jslave_label':"${host.displayName}",
-                'arch':"${host.arch}",
-                'jenkins_master_url':"${config.jenkinsMasterUrl}",
-                'jenkins_slave_username':"${script.JENKINS_SLAVE_USERNAME}",
-                'jenkins_slave_password':"${script.JENKINS_SLAVE_PASSWORD}",
-                'jswarm_version':'3.9',
-                'jswarm_filename':'swarm-client-{{ jswarm_version }}.jar',
-                'jswarm_extra_args':"${config.jswarmExtraArgs}",
-                'jenkins_slave_repositories':[[
-                    'name':'epel',
-                    'mirrorlist':'https://mirrors.fedoraproject.org/metalink?arch=\$basearch&repo=epel-7'
-                ]]
-            ]
-
-            JsonOutput.toJson(extraVars)
-        }
     }
 }
