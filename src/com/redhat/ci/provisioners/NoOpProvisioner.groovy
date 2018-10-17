@@ -156,7 +156,7 @@ class NoOpProvisioner extends AbstractProvisioner {
 
         // Create inventory filename
         String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
-        String inventoryFile = "${workspaceDir}/${PREPROVISIONED_INVENTORY}"
+        String inventoryFile = "${workspaceDir}/inventories/${PREPROVISIONED_INVENTORY}"
 
         // Get Cinch workspace
         if (config.mode == Mode.JNLP) {
