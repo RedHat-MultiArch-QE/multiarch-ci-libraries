@@ -15,6 +15,14 @@ import groovy.json.JsonOutput
 class NoOpProvisioner extends AbstractProvisioner {
 
     private static final String PREPROVISIONED_INVENTORY = 'preprovisioned.inventory'
+    private static final List<String> LAYOUT_GROUPS = [
+        'all',
+        'rhel7',
+        'certificate_authority',
+        'repositories',
+        'jenkins_slave',
+        'master_node',
+    ]
 
     NoOpProvisioner(Script script) {
         super(script)
@@ -141,11 +149,29 @@ class NoOpProvisioner extends AbstractProvisioner {
 
     String writeInventory(ProvisionedHost host, ProvisioningConfig config) {
         // Create inventory file
-        String inventory = "[master_node]\nroot@${host.hostname}"
+        String inventory = ''
+        for (String group in LAYOUT_GROUPS) {
+            inventory += "[${group}]\n${host.hostname}\n"
+        }
 
         // Create inventory filename
         String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
         String inventoryFile = "${workspaceDir}/${PREPROVISIONED_INVENTORY}"
+
+        // Get Cinch workspace
+        if (config.mode == Mode.JNLP) {
+            script.dir(PROVISIONING_DIR) {
+                if (config.provisioningRepoUrl != null) {
+                    script.checkout(
+                        scm:[$class:'GitSCM',
+                             userRemoteConfigs:[[url:config.provisioningRepoUrl]],
+                             branches:[[name:config.provisioningRepoRef]]],
+                        poll:false)
+                } else {
+                    script.checkout(script.scm)
+                }
+            }
+        }
 
         // Write and return inventory file
         script.writeFile(file:inventoryFile, text:inventory)
