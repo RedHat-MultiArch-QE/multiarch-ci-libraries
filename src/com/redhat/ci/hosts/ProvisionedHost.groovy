@@ -48,5 +48,10 @@ class ProvisionedHost extends TargetHost {
         this.providerPriority = target.providerPriority
         this.provisioner = target.provisioner
         this.provisionerPriority = target.provisionerPriority
+        this.bkrHostRequires = target.bkrHostRequires
+        this.bkrJobGroup = target.bkrJobGroup
+        this.bkrKsMeta = target.bkrKsMeta
+        this.bkrMethod = target.bkrMethod
+        this.reserveDuration = target.reserveDuration
     }
 }

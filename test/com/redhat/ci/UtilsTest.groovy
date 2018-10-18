@@ -132,4 +132,12 @@ class UtilsTest {
         assert(script.testLog.contains(NODE_STEP))
         assert(script.testLog.contains(TEST_HOSTNAME))
     }
+
+    @Test
+    void genericInstallNotARealMode() {
+        config.mode = 'FAKE'
+        Utils.genericInstall(script, config, validHost, genericInstall)
+        assert(!script.testLog.contains(INSTALLED))
+        assert(!script.testLog.contains(NODE_STEP))
+    }
 }

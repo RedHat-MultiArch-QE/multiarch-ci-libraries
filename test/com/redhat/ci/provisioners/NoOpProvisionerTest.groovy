@@ -7,31 +7,63 @@ import com.redhat.ci.provisioner.Mode
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Provisioner
+import com.redhat.ci.provisioner.ProvisioningException
 
 /**
- * Tests methods belonging to LinchPinProvisioner.
+ * Tests methods belonging to NoOpProvisioner.
  */
-class LinchPinProvisionerTest {
+class NoOpProvisionerTest {
     private static final List<String> TEST_MODES = [Mode.SSH, Mode.JNLP]
     private static final String EXCEPTION_MESSAGE = 'An exception occured!'
-    private LinchPinProvisioner provisioner
+    private static final String TEST_HOSTNAME = 'test-host.redhat.com'
+    private static final String X86_64 = 'x86_64'
+    private NoOpProvisioner provisioner
     private PipelineTestScript script
 
     @Before
     void init() {
         script = new PipelineTestScript()
-        provisioner = new LinchPinProvisioner(script)
+        provisioner = new NoOpProvisioner(script)
     }
 
     @Test
     void ensureUnavailableOnlyWhenScriptIsNull() {
-        Provisioner nullScriptProvisioner = new LinchPinProvisioner()
+        Provisioner nullScriptProvisioner = new NoOpProvisioner()
         assert(!nullScriptProvisioner.available)
     }
 
     @Test
     void ensureAvailableWhenScriptIsNonNull() {
         assert(provisioner.available)
+    }
+
+    @Test
+    void provisioningFailsWhenMissingArch() {
+        ProvisioningConfig config = new ProvisioningConfig()
+        ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME), config)
+        assert(host.error)
+    }
+
+    @Test
+    void provisioningFailsWhenMissingHostname() {
+        ProvisioningConfig config = new ProvisioningConfig()
+        ProvisionedHost host = provisioner.provision(new TargetHost(arch:X86_64), config)
+        assert(host.error)
+    }
+
+    @Test
+    void provisioningFailsWhenMissingInventoryPath() {
+        ProvisioningConfig config = new ProvisioningConfig()
+        Closure noWrite = {
+            Map map ->
+            throw new ProvisioningException('Error writing file')
+        }
+
+        script = new PipelineTestScript(writeFile:noWrite)
+        provisioner = new NoOpProvisioner(script)
+
+        ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME, arch:X86_64), config)
+        assert(host.error)
     }
 
     @Test
@@ -45,7 +77,7 @@ class LinchPinProvisionerTest {
             config.installRhpkg = false
             config.provisioningRepoUrl = null
 
-            ProvisionedHost host = provisioner.provision(new TargetHost(), config)
+            ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME, arch:X86_64), config)
             assert(!host.error)
         }
     }
@@ -60,9 +92,7 @@ class LinchPinProvisionerTest {
             config.installCredentials = true
             config.installRhpkg = true
 
-            ProvisionedHost host = provisioner.provision(
-                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[tag:'hostname', value:'test', op:'=']),
-                config)
+            ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME, arch:X86_64), config)
             assert(!host.error)
         }
     }
@@ -74,25 +104,10 @@ class LinchPinProvisionerTest {
         }
 
         script = new PipelineTestScript(sh:sh)
-        provisioner = new LinchPinProvisioner(script)
+        provisioner = new NoOpProvisioner(script)
 
         ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
         assert(host.error == EXCEPTION_MESSAGE)
-    }
-
-    @Test
-    void testProvisionWithInvalidLinchpinLatest() {
-        Closure readJSON = {
-            file ->
-            [:]
-        }
-
-        script = new PipelineTestScript(readJSON:readJSON)
-        provisioner = new LinchPinProvisioner(script)
-
-        ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
-
-        assert(host.error)
     }
 
     @Test
@@ -123,7 +138,7 @@ class LinchPinProvisionerTest {
         }
 
         script = new PipelineTestScript(sh:sh)
-        provisioner = new LinchPinProvisioner(script)
+        provisioner = new NoOpProvisioner(script)
 
         ProvisioningConfig config = new ProvisioningConfig()
         config.mode = Mode.JNLP
@@ -131,6 +146,6 @@ class LinchPinProvisionerTest {
 
         provisioner.teardown(host, config)
 
-        assert(script.testLog.count("Exception: ${EXCEPTION_MESSAGE}") == 2)
+        assert(script.testLog.count("Exception: ${EXCEPTION_MESSAGE}") == 1)
     }
 }

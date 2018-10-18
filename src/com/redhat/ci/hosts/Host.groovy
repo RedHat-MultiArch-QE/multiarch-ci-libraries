@@ -15,7 +15,7 @@ class Host {
 
     // Host type specification (Baremetal, VM, container)
     String type = null
-    
+
     // OS distro
     String distro = null
 

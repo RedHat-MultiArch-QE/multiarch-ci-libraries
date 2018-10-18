@@ -3,6 +3,7 @@ package com.redhat.ci.provisioner
 import com.redhat.ci.provisioners.LinchPinProvisioner
 import com.redhat.ci.provisioners.KubeVirtProvisioner
 import com.redhat.ci.provisioners.OpenShiftProvisioner
+import com.redhat.ci.provisioners.NoOpProvisioner
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.host.Type
@@ -11,6 +12,7 @@ import com.redhat.ci.host.Type
  * Utilities for smart provisioning.
  * Attempts to minimize resource footprint.
  */
+@SuppressWarnings('AbcMetric')
 class ProvisioningService {
     public static final String UNAVAILABLE = 'No available provisioner could provision target host.'
 
@@ -18,14 +20,21 @@ class ProvisioningService {
     ProvisionedHost provision(TargetHost host, ProvisioningConfig config, Script script) {
         Provisioner provisioner = null
 
-        // Users can override the priority list by manually entering their desired host type
-        if (host.type) {
-            host.typePriority = [host.type]
-        }
-
         // Users can override the priority list by manually entering their desired provisioner type
         if (host.provisioner) {
             host.provisionerPriority = [host.provisioner]
+
+            // We explicitly set the host type and provider to UNKNOWN to prevent propagation of inaccurate information
+            // since the NoOpProvisioner doesn't care what kind of host it's provisioning
+            if (host.provisioner == com.redhat.ci.provisioner.Type.NOOP) {
+                host.provider = host.provider ?: com.redhat.ci.provider.Type.UNKNOWN
+                host.type = host.type ?: Type.UNKNOWN
+            }
+        }
+
+        // Users can override the priority list by manually entering their desired host type
+        if (host.type) {
+            host.typePriority = [host.type]
         }
 
         // Users can override the priority list by manually entering their desired provider type
@@ -114,6 +123,8 @@ class ProvisioningService {
                 return new OpenShiftProvisioner(script)
             case com.redhat.ci.provisioner.Type.KUBEVIRT:
                 return new KubeVirtProvisioner(script)
+            case com.redhat.ci.provisioner.Type.NOOP:
+                return new NoOpProvisioner(script)
             default:
                 script.echo("Unrecognized provisioner:${provisioner}")
                 throw new ProvisioningException(UNAVAILABLE)
