@@ -140,6 +140,32 @@ class ProvisioningServiceTest {
     }
 
     @Test
+    void noOpProvisionerIsAvailable() {
+        TargetHost target = new TargetHost(provisioner:Type.NOOP)
+
+        ProvisionedHost host = mockSvc.provision(target, config, script)
+
+        verify(mockSvc, times(1)).provision(target, config, script)
+        assert(host.provider == com.redhat.ci.provider.Type.UNKNOWN)
+        assert(host.type == com.redhat.ci.host.Type.UNKNOWN)
+    }
+
+    @Test
+    void noOpProvisionerAllowsOverrides() {
+        TargetHost target = new TargetHost(
+            provisioner:Type.NOOP,
+            provider:com.redhat.ci.provider.Type.AWS,
+            type:com.redhat.ci.host.Type.CONTAINER
+        )
+
+        ProvisionedHost host = mockSvc.provision(target, config, script)
+
+        verify(mockSvc, times(1)).provision(target, config, script)
+        assert(host.provider == com.redhat.ci.provider.Type.AWS)
+        assert(host.type == com.redhat.ci.host.Type.CONTAINER)
+    }
+
+    @Test
     void defaultTargetProvisionsAndTearsdownSuccessfully() {
         TargetHost target = new TargetHost()
         ProvisionedHost host = new ProvisionedHost(type:BAREMETAL, provisioner:Type.LINCHPIN, provider:BEAKER)

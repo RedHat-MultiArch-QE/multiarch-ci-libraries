@@ -22,7 +22,7 @@ class TargetHost extends Host {
     // Beaker hostrequires
     // Overrides ProvisioningConfig's hostrequires
     Map bkrHostRequires = null
-    
+
     // Beaker jobgroup
     // Overrides ProvisioningConfig's jobgroup
     String bkrJobGroup = null
