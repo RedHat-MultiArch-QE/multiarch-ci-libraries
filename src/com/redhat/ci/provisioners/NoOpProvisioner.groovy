@@ -150,7 +150,7 @@ class NoOpProvisioner extends AbstractProvisioner {
         String inventoryFile = null
         try {
             // Create inventory filename
-            String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
+            String workspaceDir = "${script.pwd()}/${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
             String newInventoryFile = "${workspaceDir}/inventories/${PREPROVISIONED_INVENTORY}"
 
             // Get Cinch workspace
