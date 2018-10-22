@@ -41,6 +41,8 @@ class ProvisionedHost extends TargetHost {
         super()
         this.id = target.id
         this.arch = target.arch
+        this.distro = target.distro
+        this.variant = target.variant
         this.hostname = target.hostname
         this.type = target.type
         this.typePriority = target.typePriority

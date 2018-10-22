@@ -20,13 +20,13 @@ beaker-slave:
           variant: {{ variant | default('Server') }}
           {% if ks_meta %}
           ks_meta: {{ ks_meta | default('') }}
-          {% end_if %}
+          {% endif %}
           {% if method %}
           method: {{ method | default('nfs') }}
-          {% end_if %}
+          {% endif %}
           {% if reserve_duration %}
           reserve_duration: {{ reserve_duration | default('86400') }}
-          {% end_if %}
+          {% endif %}
           count: 1
           name: "Jenkins Slave"
           {% if hostrequires %}

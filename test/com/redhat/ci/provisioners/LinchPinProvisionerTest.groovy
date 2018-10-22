@@ -61,7 +61,7 @@ class LinchPinProvisionerTest {
             config.installRhpkg = true
 
             ProvisionedHost host = provisioner.provision(
-                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[tag:'hostname', value:'test', op:'=']),
+                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hostname', value:'test', op:'=']]),
                 config)
             assert(!host.error)
         }
