@@ -34,10 +34,10 @@ class ProvisioningConfig {
     String provisioningImage = 'provisioner'
 
     // Provisioning repo url
-    String provisioningRepoUrl = 'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
+    String provisioningRepoUrl = 'https://github.com/jaypoulz/multiarch-ci-libraries'
 
     // Provisioning repo ref
-    String provisioningRepoRef = this.version
+    String provisioningRepoRef = 'dev-v1.2.1'
 
     // Provisioning workspace location (needed for LinchPin)
     // This can reference a relative path in the above repo
