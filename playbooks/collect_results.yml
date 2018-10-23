@@ -1,0 +1,17 @@
+---
+- name:  Collect Artifacts and Reports
+  hosts: all
+  gather_facts: true
+
+  vars_prompt:
+    - name: test_dir
+      prompt: "Please enter the path to your tests"
+  
+  tasks:
+   - debug: msg="{{ test_dir }}"
+
+   - synchronize:
+       src: "{{ test_dir }}/"
+       dest: "{{ test_dir }}"
+       mode: pull
+     ignore_errors: true
