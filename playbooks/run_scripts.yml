@@ -1,0 +1,30 @@
+---
+- name:  Run Scripts on each Inventory Host
+  hosts: all
+  gather_facts: true
+
+  vars_prompt:
+    - name: test_dir
+      prompt: "Please enter the path to your tests"
+
+  tasks:
+   - debug: msg="{{ test_dir }}"
+
+   - synchronize:
+       src: "{{ test_dir }}/scripts"
+       dest: "{{ test_dir }}"
+       mode: push
+     ignore_errors: true
+
+   - find:
+       recurse: false
+       paths: "{{ test_dir }}/scripts"
+       file_type: directory
+     register: scripts
+
+   - shell: "mkdir -p artifacts; bash test.sh {{ script_args | default('') }} &> artifacts/output.txt"
+     args:
+       chdir: "{{ script_dir }}"
+     loop: "{{ scripts.files | map(attribute='path') | list }}"
+     loop_control:
+        loop_var: script_dir
