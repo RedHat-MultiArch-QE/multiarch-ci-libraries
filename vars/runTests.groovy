@@ -30,7 +30,8 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         try {
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
+                    ${params.TEST_DIR}/ansible-playbooks/*/playbook.yml
             """)
         } catch (e) {
             exceptions.add(e)
@@ -40,7 +41,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String runScripts = libraryResource('playbooks/run_scripts.yml')
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' ${runScripts} \
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa ${runScripts} \
                     -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}'
             """)
         } catch (e) {
@@ -51,7 +52,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String collectResults = libraryResource('playbooks/collect_results.yml')
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' ${collectResults} \
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" ${collectResults} \
                     -e '{test_dir:"${params.TEST_DIR}"}'
             """)
         } catch (e) {
