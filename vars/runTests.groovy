@@ -37,9 +37,10 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
         // Run Scripts
         try {
+            String runScripts = libraryResource('playbooks/run_scripts.yml')
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' playbooks/run_scripts.yml \
+                ansible-playbook -i '${host.inventoryPath}' ${runScripts} \
                     -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}'
             """)
         } catch (e) {
@@ -47,9 +48,10 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
         // Collect Artifacts
         try {
+            String collectResults = libraryResource('playbooks/collect_results.yml')
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' playbooks/collect_results.yml \
+                ansible-playbook -i '${host.inventoryPath}' ${collectResults} \
                     -e '{test_dir:"${params.TEST_DIR}"}'
             """)
         } catch (e) {
