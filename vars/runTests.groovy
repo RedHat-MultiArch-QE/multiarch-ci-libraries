@@ -3,8 +3,7 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Mode
 
 void call(ProvisioningConfig config, ProvisionedHost host) {
-
-    private final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/provisioner/bin/activate;'
+    final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/provisioner/bin/activate;'
     List<Exception> exceptions = []
 
     // JNLP Mode
@@ -40,8 +39,8 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         try {
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' ${config.SCRIPT_RUNNER_PLAYBOOK} \
-                    --extra_vars '{script_params:"${host.scriptParams}"}'
+                ansible-playbook -i '${host.inventoryPath}' playbooks/run_scripts.yml \
+                    -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}'
             """)
         } catch (e) {
             exceptions.add(e)
@@ -50,8 +49,11 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         try {
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' ${config.ARTIFACT_COLLECTOR_PLAYBOOK}
+                ansible-playbook -i '${host.inventoryPath}' playbooks/collect_results.yml \
+                    -e '{test_dir:"${params.TEST_DIR}"}'
             """)
+        } catch (e) {
+            exceptions.add(e)
         }
     }
 
