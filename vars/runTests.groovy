@@ -41,7 +41,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String runScripts = libraryResource('playbooks/run_scripts.yml')
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa ${runScripts} \
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" ${runScripts} \
                     -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}'
             """)
         } catch (e) {
