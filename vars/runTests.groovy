@@ -41,12 +41,15 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String runScriptsPath = 'run_scripts.yml'
             String runScripts = libraryResource(runScriptsPath)
             writeFile(file:runScriptsPath, text:runScripts)
-            sh("cat ${runScriptsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-galaxy install wtanaka.rsync;
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
+<<<<<<< HEAD
                     -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
+=======
+                    -e '{"test_dir":"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}' \
+>>>>>>> Adding quotes around the invalid JSON
                     ${runScriptsPath}
             """)
         } catch (e) {
@@ -57,7 +60,6 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String collectResultsPath = 'collect_results.yml'
             String collectResults = libraryResource(collectResultsPath)
             writeFile(file:collectResultsPath, text:collectResults)
-            sh("cat ${collectResultsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \

@@ -1,5 +1,5 @@
 ---
-- name:  Run Scripts on each Inventory Host
+- name: "Run Scripts on each Inventory Host"
   hosts: all
   gather_facts: true
 
