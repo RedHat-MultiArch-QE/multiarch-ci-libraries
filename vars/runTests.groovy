@@ -44,8 +44,9 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             sh("cat ${runScriptsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" ${runScriptsPath} \
-                    -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}'
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
+                    -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}' \
+                    ${runScriptsPath}
             """)
         } catch (e) {
             exceptions.add(e)
@@ -58,8 +59,9 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             sh("cat ${collectResultsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" ${collectResultsPath} \
-                    -e '{test_dir:"${params.TEST_DIR}"}'
+                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
+                    -e '{test_dir:"${params.TEST_DIR}"}' \
+                    ${collectResultsPath}
             """)
         } catch (e) {
             exceptions.add(e)
