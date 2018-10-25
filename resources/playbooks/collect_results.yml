@@ -11,7 +11,7 @@
    - debug: msg="{{ test_dir }}"
 
    - synchronize:
-       src: "{{ test_dir }}/"
+       src: "/tmp/tests/"
        dest: "{{ test_dir }}"
        mode: pull
      ignore_errors: true
