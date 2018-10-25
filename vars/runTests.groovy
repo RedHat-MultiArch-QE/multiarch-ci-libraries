@@ -41,11 +41,10 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String runScriptsPath = 'playbooks/run_scripts.yml'
             String runScripts = libraryResource(runScriptsPath)
             writeFile(file:runScriptsPath, text:runScripts)
-            sh("cat ${runScriptsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
-                    -e '{test_dir:"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}' \
+                    -e '{"test_dir":"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}' \
                     ${runScriptsPath}
             """)
         } catch (e) {
@@ -56,11 +55,10 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String collectResultsPath = 'playbooks/collect_results.yml'
             String collectResults = libraryResource(collectResultsPath)
             writeFile(file:collectResultsPath, text:collectResults)
-            sh("cat ${collectResultsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
-                    -e '{test_dir:"${params.TEST_DIR}"}' \
+                    -e '{"test_dir":"${params.TEST_DIR}"}' \
                     ${collectResultsPath}
             """)
         } catch (e) {
