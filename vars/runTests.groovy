@@ -44,7 +44,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
-                    -e '{"test_dir":"${params.TEST_DIR}", script_params:"${host.scriptParams ?: ''}"}' \
+                    -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
                     ${runScriptsPath}
             """)
         } catch (e) {
