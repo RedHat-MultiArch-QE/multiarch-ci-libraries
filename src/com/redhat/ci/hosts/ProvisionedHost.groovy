@@ -55,5 +55,6 @@ class ProvisionedHost extends TargetHost {
         this.bkrKsMeta = target.bkrKsMeta
         this.bkrMethod = target.bkrMethod
         this.reserveDuration = target.reserveDuration
+        this.scriptParams = target.scriptParams
     }
 }
