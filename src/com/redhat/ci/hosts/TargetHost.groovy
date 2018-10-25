@@ -35,4 +35,7 @@ class TargetHost extends Host {
 
     // Reservation duration
     Integer reserveDuration = null
+
+    // String of parameters to pass to script tests
+    String scriptParams = null
 }
