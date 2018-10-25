@@ -28,7 +28,7 @@
        file_type: directory
      register: scripts
 
-   - shell: "mkdir -p artifacts; bash test.sh {{ script_args | default('') }} &> artifacts/output.txt"
+   - shell: "mkdir -p artifacts; bash -x test.sh {{ script_args | default('') }} &> artifacts/output.txt"
      args:
        chdir: "{{ script_dir }}"
      loop: "{{ scripts.files | map(attribute='path') | list }}"
