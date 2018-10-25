@@ -41,6 +41,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String runScriptsPath = 'run_scripts.yml'
             String runScripts = libraryResource(runScriptsPath)
             writeFile(file:runScriptsPath, text:runScripts)
+            sh("cat ${runScriptsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-galaxy install wtanaka.rsync;
@@ -56,6 +57,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             String collectResultsPath = 'collect_results.yml'
             String collectResults = libraryResource(collectResultsPath)
             writeFile(file:collectResultsPath, text:collectResults)
+            sh("cat ${collectResultsPath}")
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
