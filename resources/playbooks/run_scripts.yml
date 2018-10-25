@@ -13,18 +13,18 @@
    - debug: msg="{{ test_dir }}"
 
    - file:
-       path: /tmp/tests
+       path: "/tmp/{{ test_dir }}"
        state: directory
 
    - synchronize:
        src: "{{ test_dir }}/scripts"
-       dest: "/tmp/tests"
+       dest: "/tmp/{{ test_dir }}"
        mode: push
      ignore_errors: true
 
    - find:
        recurse: false
-       paths: "/tmp/scripts"
+       paths: "/tmp/{{ test_dir }}/scripts"
        file_type: directory
      register: scripts
 
