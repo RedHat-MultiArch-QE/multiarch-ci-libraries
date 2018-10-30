@@ -67,10 +67,12 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             // Populate the linchpin transaction ID, inventory path, and hostname
             host.linchpinTxId = getLinchpinTxId(linchpinLatest)
-            host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
-            host.hostname = getHostname(host)
             script.echo("linchpinTxId:${host.linchpinTxId}")
+           
+            host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             script.echo("inventoryPath:${host.inventoryPath}")
+            
+            host.hostname = getHostname(host)
             script.echo("hostname:${host.hostname}")
 
             // Parse the inventory file for the name of the master node
@@ -114,16 +116,19 @@ class LinchPinProvisioner extends AbstractProvisioner {
      * @param host Provisioned host to be torn down.
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
+        script.echo('Entered teardown') 
         // Check if the host was even created
         if (!host) {
             return
         }
+        script.echo("Host exists: ${host}")
 
         // Host exists, so if there's an error, the job should fail
         if (host.error) {
             script.currentBuild.result = 'FAILURE'
         }
 
+        script.echo("Host initialized: ${host.initialized}")
         // The provisioning job did not successfully provision a machine,
         // so there is nothing to teardown
         if (!host.initialized) {
