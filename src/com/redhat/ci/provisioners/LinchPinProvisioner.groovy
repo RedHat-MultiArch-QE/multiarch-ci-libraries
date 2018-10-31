@@ -28,13 +28,14 @@ class LinchPinProvisioner extends AbstractProvisioner {
         this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
     }
 
+    @SuppressWarnings('AbcMetric')
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
-        host.displayName = "${target.arch}-slave"
-        host.provisioner = this.type
-        host.provider = com.redhat.ci.provider.Type.BEAKER
-
         try {
+            host.displayName = "${target.arch}-slave"
+            host.provisioner = this.type
+            host.provider = com.redhat.ci.provider.Type.BEAKER
+
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
 
@@ -54,13 +55,17 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             // Attempt provisioning
             String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
-            script.sh(
-                ACTIVATE_VIRTUALENV +
-                    "linchpin --workspace ${workspaceDir} " +
-                    "--config ${workspaceDir}/linchpin.conf " +
-                    "--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
-            )
+            try {
+                script.sh(
+                    ACTIVATE_VIRTUALENV +
+                        "linchpin --workspace ${workspaceDir} " +
+                        "--config ${workspaceDir}/linchpin.conf " +
+                        "--template-data \'${getTemplateData(host, config)}\' " +
+                        "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                )
+            } catch (e) {
+                host.error = e.message
+            }
 
             // Parse the latest run info
             Map linchpinLatest = script.readJSON(file:"${workspaceDir}/resources/linchpin.latest")
@@ -68,10 +73,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
             // Populate the linchpin transaction ID, inventory path, and hostname
             host.linchpinTxId = getLinchpinTxId(linchpinLatest)
             script.echo("linchpinTxId:${host.linchpinTxId}")
-           
+
             host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             script.echo("inventoryPath:${host.inventoryPath}")
-            
+
             host.hostname = getHostname(host)
             script.echo("hostname:${host.hostname}")
 
@@ -103,8 +108,8 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, config, host)
             }
         } catch (e) {
-            script.echo("Exception: ${e.message}")
-            host.error = e.message
+            host.error = host.error ? host.error + ", ${e.message}" : e.message
+            script.echo("Error provisioning from LinchPin: ${host.error}")
         }
 
         host
@@ -116,9 +121,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
      * @param host Provisioned host to be torn down.
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
-        script.echo('Entered teardown') 
+        script.echo('Entered teardown')
         // Check if the host was even created
         if (!host) {
+            script.echo(TEARDOWN_NOOP)
             return
         }
         script.echo("Host exists: ${host}")
@@ -132,6 +138,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         // The provisioning job did not successfully provision a machine,
         // so there is nothing to teardown
         if (!host.initialized) {
+            script.echo(TEARDOWN_NOOP)
             return
         }
 

@@ -70,14 +70,17 @@ class LinchPinProvisionerTest {
     @Test
     void testFailedProvision() {
         Closure sh = {
-            throw new TestException(EXCEPTION_MESSAGE)
+            text ->
+            if (text && text instanceof String && text.contains('linchpin')) {
+                throw new TestException(EXCEPTION_MESSAGE)
+            }
         }
 
         script = new PipelineTestScript(sh:sh)
         provisioner = new LinchPinProvisioner(script)
 
         ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
-        assert(host.error == EXCEPTION_MESSAGE)
+        assert(host.error.contains(EXCEPTION_MESSAGE))
     }
 
     @Test
@@ -98,14 +101,14 @@ class LinchPinProvisionerTest {
     @Test
     void testTeardown() {
         provisioner.teardown(new ProvisionedHost(initialized:true), new ProvisioningConfig())
-        assert(!script.testLog)
+        assert(!script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test
     void testTeardownHostIsNullNoOp() {
         provisioner.teardown(null, new ProvisioningConfig())
         assert(script.currentBuild.result == 'SUCCESS')
-        assert(!script.testLog)
+        assert(script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test
@@ -113,7 +116,7 @@ class LinchPinProvisionerTest {
         provisioner.teardown(new ProvisionedHost(initialized:false, error:EXCEPTION_MESSAGE),
                              new ProvisioningConfig())
         assert(script.currentBuild.result == 'FAILURE')
-        assert(!script.testLog)
+        assert(script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test

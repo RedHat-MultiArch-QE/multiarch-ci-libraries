@@ -10,6 +10,7 @@ import groovy.json.JsonOutput
  * A base provisioner that defines shared utility methods to perform actions upon a provisioned host.
  */
 abstract class AbstractProvisioner implements Provisioner {
+    public static final String TEARDOWN_NOOP = 'Teardown NoOp'
     protected static final String ACTIVATE_VIRTUALENV = '. /home/jenkins/envs/provisioner/bin/activate; '
     protected static final String PROVISIONING_DIR = 'provisioning'
 

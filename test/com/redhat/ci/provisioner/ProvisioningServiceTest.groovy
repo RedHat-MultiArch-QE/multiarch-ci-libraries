@@ -24,7 +24,8 @@ import com.redhat.ci.hosts.ProvisionedHost
 @RunWith(MockitoJUnitRunner)
 class ProvisioningServiceTest {
     private static final String EXCEPTION_MESSAGE = 'This is exceptional.'
-
+    private static final String TEST_HOSTNAME = 'test.example.com'
+    private static final String X86_64 = 'x86_64'
     private final Script script = new PipelineTestScript()
     private final ProvisioningConfig config = new ProvisioningConfig()
 
@@ -141,7 +142,7 @@ class ProvisioningServiceTest {
 
     @Test
     void noOpProvisionerIsAvailable() {
-        TargetHost target = new TargetHost(provisioner:Type.NOOP)
+        TargetHost target = new TargetHost(arch:X86_64, provisioner:Type.NOOP, hostname:TEST_HOSTNAME)
 
         ProvisionedHost host = mockSvc.provision(target, config, script)
 
@@ -153,6 +154,8 @@ class ProvisioningServiceTest {
     @Test
     void noOpProvisionerAllowsOverrides() {
         TargetHost target = new TargetHost(
+            arch:X86_64,
+            hostname:TEST_HOSTNAME,
             provisioner:Type.NOOP,
             provider:com.redhat.ci.provider.Type.AWS,
             type:com.redhat.ci.host.Type.CONTAINER
