@@ -37,13 +37,16 @@ class LinchPinProvisionerTest {
     @Test
     void testMinimalProvision() {
         TEST_MODES.each {
-            mode ->
+            testMode ->
             ProvisioningConfig config = new ProvisioningConfig()
-            config.mode = mode
-            config.installAnsible = false
-            config.installCredentials = false
-            config.installRhpkg = false
-            config.provisioningRepoUrl = null
+            config.with {
+                mode = testMode
+                installAnsible = false
+                installCredentials = false
+                installRhpkg = false
+                provisioningRepoUrl = null
+                hostrequires = [[tag:'hostname', value:'test-host', op:'=']]
+            }
 
             ProvisionedHost host = provisioner.provision(new TargetHost(), config)
             assert(!host.error)
@@ -53,15 +56,17 @@ class LinchPinProvisionerTest {
     @Test
     void testFullProvision() {
         TEST_MODES.each {
-            mode ->
+            testMode ->
             ProvisioningConfig config = new ProvisioningConfig()
-            config.mode = mode
-            config.installAnsible = true
-            config.installCredentials = true
-            config.installRhpkg = true
+            config.with {
+                mode = testMode
+                installAnsible = true
+                installCredentials = true
+                installRhpkg = true
+            }
 
             ProvisionedHost host = provisioner.provision(
-                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hostname', value:'test', op:'=']]),
+                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hypervisor', value:'', op:'=']]),
                 config)
             assert(!host.error)
         }
