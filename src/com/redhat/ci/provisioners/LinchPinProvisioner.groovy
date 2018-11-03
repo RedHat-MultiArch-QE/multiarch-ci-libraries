@@ -51,7 +51,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.provider = com.redhat.ci.provider.Type.BEAKER
 
             // Determine whether the host type is known
-            script.echo('About to filer host types')
             host.typePriority = filterSupportedHostTypes(host.typePriority)
             host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
 
@@ -151,14 +150,12 @@ class LinchPinProvisioner extends AbstractProvisioner {
             script.echo(TEARDOWN_NOOP)
             return
         }
-        script.echo("Host exists: ${host}")
 
         // Host exists, so if there's an error, the job should fail
         if (host.error) {
             script.currentBuild.result = 'FAILURE'
         }
 
-        script.echo("Host initialized: ${host.initialized}")
         // The provisioning job did not successfully provision a machine,
         // so there is nothing to teardown
         if (!host.initialized) {
