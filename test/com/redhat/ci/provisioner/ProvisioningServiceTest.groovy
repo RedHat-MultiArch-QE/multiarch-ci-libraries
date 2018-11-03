@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when
 import static org.mockito.Mockito.thenReturn
 import static org.mockito.Mockito.thenThrow
 import static org.mockito.Mockito.anyString
+import static org.mockito.Mockito.anyList
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.times
 import static com.redhat.ci.provider.Type.BEAKER
@@ -64,7 +65,7 @@ class ProvisioningServiceTest {
             .thenThrow(new NullPointerException(EXCEPTION_MESSAGE))
         when(mockProv.available).thenReturn(true)
         when(mockProv.supportsProvider(anyString())).thenReturn(true)
-        when(mockProv.supportsHostType(anyString())).thenReturn(true)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([BAREMETAL])
         when(mockSvc.getProvisioner(target.provisioner, script)).thenReturn(mockProv)
 
         ProvisionedHost provisionedHost = null
@@ -79,7 +80,7 @@ class ProvisioningServiceTest {
         assert(exceptionOccured)
         assert(!provisionedHost)
         assert(script.testLog.contains("Exception: ${EXCEPTION_MESSAGE}"))
-        assert(script.testLog.contains("Provisioning ${target.type} " +
+        assert(script.testLog.contains("Provisioning ${target.typePriority} " +
                                        "host with ${target.provisioner} provisioner " +
                                        "and ${target.provider} provider failed."))
     }
@@ -176,8 +177,8 @@ class ProvisioningServiceTest {
         Provisioner mockProv = mock(Provisioner)
         when(mockProv.provision(target, config)).thenReturn(host)
         when(mockProv.available).thenReturn(true)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([BAREMETAL])
         when(mockProv.supportsProvider(BEAKER)).thenReturn(true)
-        when(mockProv.supportsHostType(BAREMETAL)).thenReturn(true)
         when(mockSvc.getProvisioner(Type.LINCHPIN, script)).thenReturn(mockProv)
 
         ProvisionedHost provisionedHost = mockSvc.provision(target, config, script)

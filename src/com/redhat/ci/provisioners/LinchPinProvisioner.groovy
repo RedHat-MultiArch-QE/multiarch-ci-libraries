@@ -1,5 +1,6 @@
 package com.redhat.ci.provisioners
 
+import static com.redhat.ci.host.Type.UNKNOWN
 import static com.redhat.ci.host.Type.VM
 import static com.redhat.ci.host.Type.BAREMETAL
 
@@ -48,6 +49,11 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.displayName = "${target.arch}-slave"
             host.provisioner = this.type
             host.provider = com.redhat.ci.provider.Type.BEAKER
+
+            // Determine whether the host type is known
+            script.echo('About to filer host types')
+            host.typePriority = filterSupportedHostTypes(host.typePriority)
+            host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
 
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)

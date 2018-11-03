@@ -47,6 +47,17 @@ abstract class AbstractProvisioner implements Provisioner {
     }
 
     /**
+     * Filters a list of host types to those that are supported for provisioning.
+     */
+    @Override
+    List<String> filterSupportedHostTypes(List<String> hostTypes) {
+        hostTypes.findAll {
+            hostType ->
+            supportsHostType(hostType)
+        }
+    }
+
+    /**
      * Determines whether a provider is supported for provisioning.
      */
     @Override

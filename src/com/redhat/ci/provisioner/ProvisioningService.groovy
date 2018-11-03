@@ -66,57 +66,54 @@ class ProvisioningService {
                 continue
             }
 
-            // Loop through each host type by priority
-            for (hostType in target.typePriority) {
-                // Check if provisioner supports host type
-                if (!provisioner.supportsHostType(hostType)) {
-                    script.echo("Provisioning ${hostType} host " +
-                                "with ${provisionerType} provisioner is not supported.")
+            // Filter out each supported host type
+            List<String> supportedHostTypes = provisioner.filterSupportedHostTypes(target.typePriority)
+            if (supportedHostTypes.size() == 0) {
+                script.echo("Provisioning with ${provisionerType} provisioner cannot be done " +
+                            "because host types in ${target.typePriority} are not supported.")
+                continue
+            }
+
+            // Now that we've found a suitable provisioner, let's loop through providers
+            for (providerType in target.providerPriority) {
+                // Verify that the selected provisioner supports the selected provider
+                if (!provisioner.supportsProvider(providerType)) {
+                    script.echo("Provisioning ${target.typePriority} hosts " +
+                                "with ${provisionerType} provisioner " +
+                                "and ${providerType} provider is not supported.")
                     continue
                 }
 
-                // Now that we've found a suitable provisioner, let's loop through providers
-                for (providerType in target.providerPriority) {
-                    // Verify that the selected provisioner supports the selected provider
-                    if (!provisioner.supportsProvider(providerType)) {
-                        script.echo("Provisioning ${hostType} host " +
-                                    "with ${provisionerType} provisioner " +
-                                    "and ${providerType} provider is not supported.")
-                        continue
-                    }
+                // Attempt to provision with the selected provisioner and provider pair
+                target.provisioner = provisionerType
+                target.provider = providerType
 
-                    // Attempt to provision with the selected provisioner and provider pair
-                    target.provisioner = provisionerType
-                    target.provider = providerType
-                    target.type = hostType
+                script.echo("Attempting to provision ${target.typePriority} host " +
+                            "with ${provisionerType} provisioner " +
+                            "and ${providerType} provider.")
 
-                    script.echo("Attempting to provision ${hostType} host " +
-                                "with ${provisionerType} provisioner " +
-                                "and ${providerType} provider.")
-
-                    try {
-                        host = provisioner.provision(target, config)
-                    } catch (e) {
-                        host = new ProvisionedHost(target)
-                        host.error = e.message
-                    }
-
-                    if (host.error) {
-                        // Provisioning failed, so try next provider
-                        script.echo("Provisioning ${hostType} host " +
-                                    "with ${provisionerType} provisioner " +
-                                    "and ${providerType} provider failed.")
-                        script.echo("Exception: ${host.error}")
-                        continue
-                    }
-
-                    return host
+                try {
+                    host = provisioner.provision(target, config)
+                } catch (e) {
+                    host = new ProvisionedHost(target)
+                    host.error = e.message
                 }
+
+                if (host.error) {
+                    // Provisioning failed, so try next provider
+                    script.echo("Provisioning ${target.typePriority} host " +
+                                "with ${provisionerType} provisioner " +
+                                "and ${providerType} provider failed.")
+                    script.echo("Exception: ${host.error}")
+                    continue
+                }
+
+                return host
             }
         }
 
         // If we haven't returned from the function yet, we are out of available
-        // hostType, provisioner, and provider combinations.
+        // provisioner and provider combinations for these host type priorities.
         throw new ProvisioningException(UNAVAILABLE)
     }
 
