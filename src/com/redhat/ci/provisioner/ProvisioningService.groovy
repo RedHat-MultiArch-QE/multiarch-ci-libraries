@@ -16,7 +16,7 @@ import com.redhat.ci.host.Type
 class ProvisioningService {
     public static final String UNAVAILABLE = 'No available provisioner could provision target.'
 
-    @SuppressWarnings(['NestedForLoop', 'MethodSize'])
+    @SuppressWarnings('NestedForLoop')
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config, Script script) {
         Provisioner provisioner = null
         ProvisionedHost host = null
@@ -69,8 +69,8 @@ class ProvisioningService {
             // Filter out each supported host type
             List<String> supportedHostTypes = provisioner.filterSupportedHostTypes(target.typePriority)
             if (supportedHostTypes.size() == 0) {
-                script.echo("Provisioning with ${provisionerType} provisioner cannot be done " +
-                            "because host types in ${target.typePriority} are not supported.")
+                script.echo("Provisioning host with ${provisionerType} provisioner cannot be done. " +
+                            "Host types ${target.typePriority} are not supported.")
                 continue
             }
 

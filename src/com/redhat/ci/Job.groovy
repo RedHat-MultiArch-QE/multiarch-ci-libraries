@@ -93,6 +93,12 @@ class Job {
     }
 
     protected void teardown(ProvisionedHost host) {
+        if (!host || !host.provisioner) {
+            // If there isn't a host or a set provisioner, skip teardown
+            script.echo('Skipping teardown since host is null or host.provisioner is not set')
+            return
+        }
+
         try {
             // Ensure teardown runs before the pipeline exits
             provSvc.teardown(host, config, script)

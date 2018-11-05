@@ -54,6 +54,29 @@ class ProvisioningServiceTest {
     }
 
     @Test
+    void provisioningSkipsProviderNoHostTypesAreSupported() {
+        TargetHost target = new TargetHost(type:BAREMETAL, provider:BEAKER, provisioner:Type.LINCHPIN)
+
+        Provisioner mockProv = mock(Provisioner)
+        when(mockProv.available).thenReturn(true)
+        when(mockProv.supportsProvider(anyString())).thenReturn(false)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([])
+        when(mockSvc.getProvisioner(target.provisioner, script)).thenReturn(mockProv)
+
+        ProvisionedHost provisionedHost = null
+        Boolean exceptionOccured = false
+        try {
+            provisionedHost = mockSvc.provision(target, config, script)
+        } catch (e) {
+            assert(e.message == ProvisioningService.UNAVAILABLE)
+            exceptionOccured = true
+        }
+
+        assert(exceptionOccured)
+        assert(!provisionedHost)
+    }
+
+    @Test
     void provisionFailureThrowsException() {
         TargetHost target = new TargetHost(type:BAREMETAL, provider:BEAKER, provisioner:Type.LINCHPIN)
 
