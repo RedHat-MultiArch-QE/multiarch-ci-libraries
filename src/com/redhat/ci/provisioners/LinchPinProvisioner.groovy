@@ -46,13 +46,15 @@ class LinchPinProvisioner extends AbstractProvisioner {
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
         try {
-            host.displayName = "${target.arch}-slave"
-            host.provisioner = this.type
-            host.provider = com.redhat.ci.provider.Type.BEAKER
-
-            // Determine whether the host type is known
-            host.typePriority = filterSupportedHostTypes(host.typePriority)
-            host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
+            host.with {
+                displayName = "${target.arch}-slave"
+                provisioner = this.type
+                provider = com.redhat.ci.provider.Type.BEAKER
+                typePriority = filterSupportedHostTypes(host.typePriority)
+                type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
+                distro = host.distro ?: 'RHEL-ALT-7.5'
+                variant = host.variant ?: 'Server'
+            }
 
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
