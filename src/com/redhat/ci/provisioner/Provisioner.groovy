@@ -11,5 +11,6 @@ interface Provisioner {
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config)
     void teardown(ProvisionedHost host, ProvisioningConfig config)
     Boolean supportsHostType(String hostType)
+    List<String> filterSupportedHostTypes(List<String> hostTypes)
     Boolean supportsProvider(String providerType)
 }

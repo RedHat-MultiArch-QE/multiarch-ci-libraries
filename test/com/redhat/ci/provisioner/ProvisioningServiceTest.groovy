@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when
 import static org.mockito.Mockito.thenReturn
 import static org.mockito.Mockito.thenThrow
 import static org.mockito.Mockito.anyString
+import static org.mockito.Mockito.anyList
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.times
 import static com.redhat.ci.provider.Type.BEAKER
@@ -24,7 +25,8 @@ import com.redhat.ci.hosts.ProvisionedHost
 @RunWith(MockitoJUnitRunner)
 class ProvisioningServiceTest {
     private static final String EXCEPTION_MESSAGE = 'This is exceptional.'
-
+    private static final String TEST_HOSTNAME = 'test.example.com'
+    private static final String X86_64 = 'x86_64'
     private final Script script = new PipelineTestScript()
     private final ProvisioningConfig config = new ProvisioningConfig()
 
@@ -52,6 +54,29 @@ class ProvisioningServiceTest {
     }
 
     @Test
+    void provisioningSkipsProviderNoHostTypesAreSupported() {
+        TargetHost target = new TargetHost(type:BAREMETAL, provider:BEAKER, provisioner:Type.LINCHPIN)
+
+        Provisioner mockProv = mock(Provisioner)
+        when(mockProv.available).thenReturn(true)
+        when(mockProv.supportsProvider(anyString())).thenReturn(false)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([])
+        when(mockSvc.getProvisioner(target.provisioner, script)).thenReturn(mockProv)
+
+        ProvisionedHost provisionedHost = null
+        Boolean exceptionOccured = false
+        try {
+            provisionedHost = mockSvc.provision(target, config, script)
+        } catch (e) {
+            assert(e.message == ProvisioningService.UNAVAILABLE)
+            exceptionOccured = true
+        }
+
+        assert(exceptionOccured)
+        assert(!provisionedHost)
+    }
+
+    @Test
     void provisionFailureThrowsException() {
         TargetHost target = new TargetHost(type:BAREMETAL, provider:BEAKER, provisioner:Type.LINCHPIN)
 
@@ -63,7 +88,7 @@ class ProvisioningServiceTest {
             .thenThrow(new NullPointerException(EXCEPTION_MESSAGE))
         when(mockProv.available).thenReturn(true)
         when(mockProv.supportsProvider(anyString())).thenReturn(true)
-        when(mockProv.supportsHostType(anyString())).thenReturn(true)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([BAREMETAL])
         when(mockSvc.getProvisioner(target.provisioner, script)).thenReturn(mockProv)
 
         ProvisionedHost provisionedHost = null
@@ -78,7 +103,7 @@ class ProvisioningServiceTest {
         assert(exceptionOccured)
         assert(!provisionedHost)
         assert(script.testLog.contains("Exception: ${EXCEPTION_MESSAGE}"))
-        assert(script.testLog.contains("Provisioning ${target.type} " +
+        assert(script.testLog.contains("Provisioning ${target.typePriority} " +
                                        "host with ${target.provisioner} provisioner " +
                                        "and ${target.provider} provider failed."))
     }
@@ -141,7 +166,7 @@ class ProvisioningServiceTest {
 
     @Test
     void noOpProvisionerIsAvailable() {
-        TargetHost target = new TargetHost(provisioner:Type.NOOP)
+        TargetHost target = new TargetHost(arch:X86_64, provisioner:Type.NOOP, hostname:TEST_HOSTNAME)
 
         ProvisionedHost host = mockSvc.provision(target, config, script)
 
@@ -153,6 +178,8 @@ class ProvisioningServiceTest {
     @Test
     void noOpProvisionerAllowsOverrides() {
         TargetHost target = new TargetHost(
+            arch:X86_64,
+            hostname:TEST_HOSTNAME,
             provisioner:Type.NOOP,
             provider:com.redhat.ci.provider.Type.AWS,
             type:com.redhat.ci.host.Type.CONTAINER
@@ -173,8 +200,8 @@ class ProvisioningServiceTest {
         Provisioner mockProv = mock(Provisioner)
         when(mockProv.provision(target, config)).thenReturn(host)
         when(mockProv.available).thenReturn(true)
+        when(mockProv.filterSupportedHostTypes(anyList())).thenReturn([BAREMETAL])
         when(mockProv.supportsProvider(BEAKER)).thenReturn(true)
-        when(mockProv.supportsHostType(BAREMETAL)).thenReturn(true)
         when(mockSvc.getProvisioner(Type.LINCHPIN, script)).thenReturn(mockProv)
 
         ProvisionedHost provisionedHost = mockSvc.provision(target, config, script)
