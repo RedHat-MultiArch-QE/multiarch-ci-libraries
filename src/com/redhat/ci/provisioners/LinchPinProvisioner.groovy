@@ -1,5 +1,9 @@
 package com.redhat.ci.provisioners
 
+import static com.redhat.ci.host.Type.UNKNOWN
+import static com.redhat.ci.host.Type.VM
+import static com.redhat.ci.host.Type.BAREMETAL
+
 import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
@@ -14,8 +18,18 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
+    private static final String HYPERVISOR = 'hypervisor'
+
     private static final Map<String, String> LINCHPIN_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
+    ]
+
+    private static final Map<String, String> REQUIRES_VM = [
+        tag:HYPERVISOR, op:'!=', value:'',
+    ]
+
+    private static final Map<String, String> REQUIRES_BAREMETAL = [
+        tag:HYPERVISOR, op:'=', value:'',
     ]
 
     LinchPinProvisioner(Script script) {
@@ -24,17 +38,22 @@ class LinchPinProvisioner extends AbstractProvisioner {
             this.available = true
         }
         this.type = Type.LINCHPIN
-        this.supportedHostTypes = [com.redhat.ci.host.Type.VM, com.redhat.ci.host.Type.BAREMETAL]
+        this.supportedHostTypes = [VM, BAREMETAL]
         this.supportedProviders = [com.redhat.ci.provider.Type.BEAKER]
     }
 
+    @SuppressWarnings('AbcMetric')
     ProvisionedHost provision(TargetHost target, ProvisioningConfig config) {
         ProvisionedHost host = new ProvisionedHost(target)
-        host.displayName = "${target.arch}-slave"
-        host.provisioner = this.type
-        host.provider = com.redhat.ci.provider.Type.BEAKER
-
         try {
+            host.displayName = "${target.arch}-slave"
+            host.provisioner = this.type
+            host.provider = com.redhat.ci.provider.Type.BEAKER
+
+            // Determine whether the host type is known
+            host.typePriority = filterSupportedHostTypes(host.typePriority)
+            host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
+
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
 
@@ -54,23 +73,29 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             // Attempt provisioning
             String workspaceDir = "${PROVISIONING_DIR}/${config.provisioningWorkspaceDir}"
-            script.sh(
-                ACTIVATE_VIRTUALENV +
-                    "linchpin --workspace ${workspaceDir} " +
-                    "--config ${workspaceDir}/linchpin.conf " +
-                    "--template-data \'${getTemplateData(host, config)}\' " +
-                    "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
-            )
+            try {
+                script.sh(
+                    ACTIVATE_VIRTUALENV +
+                        "linchpin --workspace ${workspaceDir} " +
+                        "--config ${workspaceDir}/linchpin.conf " +
+                        "--template-data \'${getTemplateData(host, config)}\' " +
+                        "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                )
+            } catch (e) {
+                host.error = e.message
+            }
 
             // Parse the latest run info
             Map linchpinLatest = script.readJSON(file:"${workspaceDir}/resources/linchpin.latest")
 
             // Populate the linchpin transaction ID, inventory path, and hostname
             host.linchpinTxId = getLinchpinTxId(linchpinLatest)
-            host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
-            host.hostname = getHostname(host)
             script.echo("linchpinTxId:${host.linchpinTxId}")
+
+            host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             script.echo("inventoryPath:${host.inventoryPath}")
+
+            host.hostname = getHostname(host)
             script.echo("hostname:${host.hostname}")
 
             // Parse the inventory file for the name of the master node
@@ -101,8 +126,13 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, config, host)
             }
         } catch (e) {
-            script.echo("Exception: ${e.message}")
-            host.error = e.message
+            host.error = host.error ? host.error + ", ${e.message}" : e.message
+            script.echo("Error provisioning from LinchPin: ${host.error}")
+        }
+
+        // An error occured, so we should ensure resources are cleaned up
+        if (host.error) {
+            teardown(host, config)
         }
 
         host
@@ -116,6 +146,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
         // Check if the host was even created
         if (!host) {
+            script.echo(TEARDOWN_NOOP)
             return
         }
 
@@ -127,6 +158,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         // The provisioning job did not successfully provision a machine,
         // so there is nothing to teardown
         if (!host.initialized) {
+            script.echo(TEARDOWN_NOOP)
             return
         }
 
@@ -164,10 +196,42 @@ class LinchPinProvisioner extends AbstractProvisioner {
             method:host.bkrMethod,
             reserve_duration:host.reserveDuration,
             job_group:host.bkrJobGroup ?: config.jobgroup,
-            hostrequires:host.bkrHostRequires ?: config.hostrequires,
+            hostrequires:getHostRequires(host, config),
         ]
 
         JsonOutput.toJson(templateData)
+    }
+
+    private List<Map> getHostRequires(ProvisionedHost host, ProvisioningConfig config) {
+        List<Map> hostrequires = host.bkrHostRequires ?: (config.hostrequires ?: [])
+
+        Closure specifiesHypervisorTag = {
+            requirement ->
+            requirement.tag == HYPERVISOR
+        }
+
+        // If the hypervisor tag is already specified, return default list
+        if (hostrequires.findAll(specifiesHypervisorTag).size() > 0) {
+            return hostrequires
+        }
+
+        // If the type priority only allows a single type, add the hypervisor
+        // hostrequirement manually
+        if (host.typePriority && host.typePriority.size() == 1) {
+            switch (host.type) {
+                case VM:
+                    hostrequires.add(REQUIRES_VM)
+                    break
+                case BAREMETAL:
+                    hostrequires.add(REQUIRES_BAREMETAL)
+                    break
+                default:
+                    // Do nothing
+                    break
+            }
+        }
+
+        hostrequires
     }
 
     private Integer getLinchpinTxId(Map linchpinLatest) {
