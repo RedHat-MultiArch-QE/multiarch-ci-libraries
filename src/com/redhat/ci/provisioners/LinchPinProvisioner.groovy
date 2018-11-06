@@ -144,7 +144,6 @@ class LinchPinProvisioner extends AbstractProvisioner {
      * @param host Provisioned host to be torn down.
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
-        script.echo('Entered teardown')
         // Check if the host was even created
         if (!host) {
             script.echo(TEARDOWN_NOOP)
