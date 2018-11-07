@@ -22,7 +22,7 @@ class Utils {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             sh("""
-                ${sudo}yum install python-devel openssl-devel libffi-devel -y &&
+                ${sudo}yum install python2-devel openssl-devel libffi-devel -y &&
                 ${sudo}mkdir -p /home/jenkins &&
                 ${sudo}chown --recursive \${USER}:\${USER} /home/jenkins &&
                 ${sudo}pip install --upgrade pip &&

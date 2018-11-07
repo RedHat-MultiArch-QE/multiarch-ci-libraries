@@ -2,15 +2,21 @@
 - name: "Run Scripts on each Inventory Host"
   hosts: all
   gather_facts: true
-  roles:
-      - role: wtanaka.rsync
-
   vars_prompt:
     - name: test_dir
       prompt: "Please enter the path to your tests"
 
   tasks:
-   - debug: msg="{{ test_dir }}"
+   - debug: 
+       msg: "{{ test_dir }}"
+
+   - package:
+       name: "{{ item }}"
+       state: latest
+     with_items:
+       - rsync
+       - libselinux-python
+       - python2
 
    - file:
        path: "/tmp/{{ test_dir }}"
