@@ -43,7 +43,6 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             writeFile(file:runScriptsPath, text:runScripts)
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-galaxy install wtanaka.rsync;
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
                     -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
                     ${runScriptsPath}
