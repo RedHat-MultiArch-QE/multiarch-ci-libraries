@@ -41,6 +41,8 @@ class ProvisionedHost extends TargetHost {
         super()
         this.id = target.id
         this.arch = target.arch
+        this.distro = target.distro
+        this.variant = target.variant
         this.hostname = target.hostname
         this.type = target.type
         this.typePriority = target.typePriority
@@ -48,5 +50,11 @@ class ProvisionedHost extends TargetHost {
         this.providerPriority = target.providerPriority
         this.provisioner = target.provisioner
         this.provisionerPriority = target.provisionerPriority
+        this.bkrHostRequires = target.bkrHostRequires
+        this.bkrJobGroup = target.bkrJobGroup
+        this.bkrKsMeta = target.bkrKsMeta
+        this.bkrMethod = target.bkrMethod
+        this.reserveDuration = target.reserveDuration
+        this.scriptParams = target.scriptParams
     }
 }

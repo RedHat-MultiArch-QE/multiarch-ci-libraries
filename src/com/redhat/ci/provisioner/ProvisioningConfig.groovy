@@ -13,7 +13,7 @@ class ProvisioningConfig {
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
 
     // Provisioner version
-    String version = 'v1.2.0'
+    String version = 'v1.2.1'
 
     // Jenkins kubernetes cloud name
     String cloudName = 'openshift'
