@@ -37,47 +37,55 @@ class LinchPinProvisionerTest {
     @Test
     void testMinimalProvision() {
         TEST_MODES.each {
-            mode ->
+            testMode ->
             ProvisioningConfig config = new ProvisioningConfig()
-            config.mode = mode
-            config.installAnsible = false
-            config.installCredentials = false
-            config.installRhpkg = false
-            config.provisioningRepoUrl = null
+            config.with {
+                mode = testMode
+                installAnsible = false
+                installCredentials = false
+                installRhpkg = false
+                provisioningRepoUrl = null
+                hostrequires = [[tag:'hostname', value:'test-host', op:'=']]
+            }
 
             ProvisionedHost host = provisioner.provision(new TargetHost(), config)
-            assert(host)
+            assert(!host.error)
         }
     }
 
     @Test
     void testFullProvision() {
         TEST_MODES.each {
-            mode ->
+            testMode ->
             ProvisioningConfig config = new ProvisioningConfig()
-            config.mode = mode
-            config.installAnsible = true
-            config.installCredentials = true
-            config.installRhpkg = true
+            config.with {
+                mode = testMode
+                installAnsible = true
+                installCredentials = true
+                installRhpkg = true
+            }
 
-            ProvisionedHost host = provisioner.provision(new TargetHost(), config)
-            assert(host)
+            ProvisionedHost host = provisioner.provision(
+                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hypervisor', value:'', op:'=']]),
+                config)
+            assert(!host.error)
         }
     }
 
     @Test
     void testFailedProvision() {
         Closure sh = {
-            throw new TestException(EXCEPTION_MESSAGE)
+            text ->
+            if (text && text instanceof String && text.contains('linchpin')) {
+                throw new TestException(EXCEPTION_MESSAGE)
+            }
         }
 
         script = new PipelineTestScript(sh:sh)
         provisioner = new LinchPinProvisioner(script)
 
         ProvisionedHost host = provisioner.provision(new TargetHost(), new ProvisioningConfig())
-
-        assert(host)
-        assert(host.error == EXCEPTION_MESSAGE)
+        assert(host.error.contains(EXCEPTION_MESSAGE))
     }
 
     @Test
@@ -98,14 +106,14 @@ class LinchPinProvisionerTest {
     @Test
     void testTeardown() {
         provisioner.teardown(new ProvisionedHost(initialized:true), new ProvisioningConfig())
-        assert(!script.testLog)
+        assert(!script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test
     void testTeardownHostIsNullNoOp() {
         provisioner.teardown(null, new ProvisioningConfig())
         assert(script.currentBuild.result == 'SUCCESS')
-        assert(!script.testLog)
+        assert(script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test
@@ -113,7 +121,7 @@ class LinchPinProvisionerTest {
         provisioner.teardown(new ProvisionedHost(initialized:false, error:EXCEPTION_MESSAGE),
                              new ProvisioningConfig())
         assert(script.currentBuild.result == 'FAILURE')
-        assert(!script.testLog)
+        assert(script.testLog.contains(LinchPinProvisioner.TEARDOWN_NOOP))
     }
 
     @Test

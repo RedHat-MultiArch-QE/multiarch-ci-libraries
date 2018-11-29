@@ -9,7 +9,7 @@ import com.redhat.ci.provisioner.Mode
  * Utility class to perform actions upon CI hosts.
  */
 class Utils {
-    private static final String SUDO = 'sudo'
+    private static final String SUDO = 'sudo '
     private static final String NO_SUDO = ''
     private static final String INSTALL_FILE = 'install.sh'
 
@@ -22,12 +22,12 @@ class Utils {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             sh("""
-                ${sudo} yum install python-devel openssl-devel libffi-devel -y &&
-                ${sudo} mkdir -p /home/jenkins &&
-                ${sudo} chown --recursive \${USER}:\${USER} /home/jenkins &&
-                ${sudo} pip install --upgrade pip &&
-                ${sudo} pip install --upgrade setuptools &&
-                ${sudo} pip install --upgrade ansible
+                ${sudo}yum install python2-devel openssl-devel libffi-devel -y &&
+                ${sudo}mkdir -p /home/jenkins &&
+                ${sudo}chown --recursive \${USER}:\${USER} /home/jenkins &&
+                ${sudo}pip install --upgrade pip &&
+                ${sudo}pip install --upgrade setuptools &&
+                ${sudo}pip install --upgrade ansible
             """)
             if (host == null) {
                 return
@@ -55,12 +55,12 @@ class Utils {
             ]) {
                 script.env.HOME = '/home/jenkins'
                 sh("""
-                    ${sudo} yum install -y krb5-workstation
-                    ${sudo} cp ${script.KRBCONF} /etc/krb5.conf
-                    ${sudo} mkdir -p /etc/beaker
-                    ${sudo} cp ${script.BKRCONF} /etc/beaker/client.conf
-                    ${sudo} chmod 644 /etc/krb5.conf
-                    ${sudo} chmod 644 /etc/beaker/client.conf
+                    ${sudo}yum install -y krb5-workstation
+                    ${sudo}cp ${script.KRBCONF} /etc/krb5.conf
+                    ${sudo}mkdir -p /etc/beaker
+                    ${sudo}cp ${script.BKRCONF} /etc/beaker/client.conf
+                    ${sudo}chmod 644 /etc/krb5.conf
+                    ${sudo}chmod 644 /etc/beaker/client.conf
                     kinit ${script.KRB_PRINCIPAL} -k -t ${script.KEYTAB}
                     mkdir -p ~/.ssh
                     cp ${script.SSHPRIVKEY} ~/.ssh/id_rsa
@@ -86,15 +86,15 @@ class Utils {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             sh("""
-                echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo} tee -a /etc/ssh/ssh_known_hosts
+                echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo}tee -a /etc/ssh/ssh_known_hosts
 
-                echo "Host pkgs.devel.redhat.com" | ${sudo} tee -a /etc/ssh/ssh_config
-                echo "IdentityFile /home/jenkins/.ssh/id_rsa" | ${sudo} tee -a /etc/ssh/ssh_config
+                echo "Host pkgs.devel.redhat.com" | ${sudo}tee -a /etc/ssh/ssh_config
+                echo "IdentityFile /home/jenkins/.ssh/id_rsa" | ${sudo}tee -a /etc/ssh/ssh_config
 
-                ${sudo} yum install -y yum-utils git
+                ${sudo}yum install -y yum-utils git
                 curl -L -O http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo
-                ${sudo} yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
-                ${sudo} yum install -y rhpkg
+                ${sudo}yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
+                ${sudo}yum install -y rhpkg
                 git config --global user.name "jenkins"
             """)
             if (host != null) {
