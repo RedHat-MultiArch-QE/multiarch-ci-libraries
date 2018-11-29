@@ -139,17 +139,24 @@ class JobTest extends Job {
 
     @Test
     void teardownNullHost() {
-        doThrow(new NullPointerException('Null host cannot be torn down.'))
-            .when(provSvc).teardown(null, config, script)
-
         teardown(null)
 
-        verify(provSvc, times(1)).teardown(null, config, script)
+        verify(provSvc, times(0)).teardown(null, config, script)
     }
 
     @Test
     void teardownValidHost() {
         doNothing().when(provSvc).teardown(validHost, config, script)
+
+        teardown(validHost)
+
+        verify(provSvc, times(1)).teardown(validHost, config, script)
+    }
+
+    @Test
+    void teardownThrowsException() {
+        doThrow(new NullPointerException('Teardown failed with null value'))
+            .when(provSvc).teardown(validHost, config, script)
 
         teardown(validHost)
 
@@ -173,12 +180,11 @@ class JobTest extends Job {
         when(provSvc.provision(target, config, script))
             .thenThrow(new NullPointerException('Null host cannot provisioned.'))
             .thenReturn(null)
-        doNothing().when(provSvc).teardown(any(ProvisionedHost), eq(config), eq(script))
 
         runOnTarget(target)
 
         verify(provSvc, times(1)).provision(target, config, script)
-        verify(provSvc, times(1)).teardown(any(ProvisionedHost), eq(config), eq(script))
+        verify(provSvc, times(0)).teardown(any(ProvisionedHost), eq(config), eq(script))
     }
 
     @Test
