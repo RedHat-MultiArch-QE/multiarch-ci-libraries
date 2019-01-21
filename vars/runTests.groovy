@@ -66,6 +66,12 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
     }
 
+    try {
+        archiveArtifacts()
+    } catch (e) {
+        exceptions.add(e)
+    }
+
     exceptions.each {
         e ->
         error(e.message)
