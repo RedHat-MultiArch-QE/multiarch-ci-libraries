@@ -7,10 +7,8 @@
       prompt: "Please enter the path to your tests"
 
   tasks:
-   - debug: 
-       msg: "{{ test_dir }}"
-
-   - package:
+   - name: install rsync and the utilities to copy the tests to the remote host
+     package:
        name: "{{ item }}"
        state: latest
      with_items:
@@ -18,30 +16,46 @@
        - libselinux-python
        - python2
 
-   - file:
+   - name: create a directory for the tests on the remote host
+     file:
        path: "/tmp/{{ test_dir }}"
        state: directory
 
-   - synchronize:
+   - name: copy the tests onto the hosts where they will be executed
+     synchronize:
        src: "{{ test_dir }}/scripts"
        dest: "/tmp/{{ test_dir }}"
        mode: push
      ignore_errors: true
 
-   - find:
+   - name: scan and find the test scripts directory
+     find:
        recurse: false
        paths: "/tmp/{{ test_dir }}/scripts"
        file_type: directory
-     register: scripts
+     register: scripts_dir
 
-   - file:
-       path: "/tmp/{{ test_dir }}/artifacts"
+   - name: loop through script directories and create artifacts directory
+     file:
+       path: "artifacts"
        state: directory
-
-   - shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
      args:
        chdir: "{{ script_dir }}"
-     loop: "{{ scripts.files | map(attribute='path') | list }}"
+     loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
+     loop_control:
+        loop_var: script_dir
+
+   - name: loop through script directories, run test, and store artifacts
+     shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
+     args:
+       chdir: "{{ script_dir }}"
+     loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
      loop_control:
         loop_var: script_dir
      ignore_errors: yes
+     register: scripts
+
+   - name: fail if the return code is not 0
+     fail:
+       msg: "The command ({{ item.cmd }}) failed with return code {{ item.rc }}"     when: item.rc != 0
+     with_items: "{{ script.results }}"
