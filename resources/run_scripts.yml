@@ -37,10 +37,8 @@
 
    - name: loop through script directories and create artifacts directory
      file:
-       path: "artifacts"
+       path: "{{ script_dir }}/artifacts"
        state: directory
-     args:
-       chdir: "{{ script_dir }}"
      loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
      loop_control:
         loop_var: script_dir
