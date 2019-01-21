@@ -35,7 +35,7 @@
      register: scripts
 
    - file:
-       path: artifacts
+       path: "/tmp/{{ test_dir }}/artifacts"
        state: directory
 
    - shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
