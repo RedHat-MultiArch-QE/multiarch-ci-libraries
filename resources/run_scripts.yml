@@ -34,9 +34,14 @@
        file_type: directory
      register: scripts
 
-   - shell: "mkdir -p artifacts; bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
+   - file:
+       path: artifacts
+       state: directory
+
+   - shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
      args:
        chdir: "{{ script_dir }}"
      loop: "{{ scripts.files | map(attribute='path') | list }}"
      loop_control:
         loop_var: script_dir
+     ignore_errors: yes
