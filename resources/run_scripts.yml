@@ -57,4 +57,4 @@
      fail:
        msg: "The command ({{ item.cmd }}) failed with return code {{ item.rc }}"
      when: item.rc != 0
-     with_items: "{{ script.results }}"
+     with_items: "{{ scripts.results }}"
