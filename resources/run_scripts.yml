@@ -57,5 +57,6 @@
 
    - name: fail if the return code is not 0
      fail:
-       msg: "The command ({{ item.cmd }}) failed with return code {{ item.rc }}"     when: item.rc != 0
+       msg: "The command ({{ item.cmd }}) failed with return code {{ item.rc }}"
+     when: item.rc != 0
      with_items: "{{ script.results }}"
