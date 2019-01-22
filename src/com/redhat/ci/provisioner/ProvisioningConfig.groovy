@@ -12,7 +12,8 @@ class ProvisioningConfig {
     private static final String JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT = 'jenkins-slave-credentials'
     private static final String JENKINS_MASTER_URL_DEFAULT = ''
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
-    private static final String PROVISIONING_REPO_URL_DEFAULT = 'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
+    private static final String PROVISIONING_REPO_URL_DEFAULT =
+      'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
     private static final String PROVISIONING_REPO_REF_DEFAULT = RELEASE_VERSION
 
     // Provisioner version
