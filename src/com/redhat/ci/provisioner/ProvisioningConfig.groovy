@@ -4,7 +4,7 @@ package com.redhat.ci.provisioner
  * Configuration needed to provision resources with a Provisioner.
  */
 class ProvisioningConfig {
-    private static final String RELEASE_VERSION = 'v1.2.1'
+    private static final String RELEASE_VERSION = 'v1.2.2'
     private static final String KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-krbprincipal'
     private static final String KEYTAB_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-keytab'
     private static final String SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-sshprivkey'
