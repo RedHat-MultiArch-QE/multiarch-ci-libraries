@@ -92,6 +92,8 @@ class Utils {
                 echo "IdentityFile /home/jenkins/.ssh/id_rsa" | ${sudo}tee -a /etc/ssh/ssh_config
 
                 ${sudo}yum install -y yum-utils git
+                curl -L -O http://hdn.corp.redhat.com/rhel7-csb-stage/RPMS/noarch/redhat-internal-cert-install-0.1-9.el7.csb.noarch.rpm
+                ${sudo}rpm -i redhat-internal-cert-install-0.1-9.el7.csb.noarch.rpm
                 curl -L -O http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo
                 ${sudo}yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
                 ${sudo}yum install -y rhpkg
