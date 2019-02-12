@@ -91,9 +91,9 @@ class Utils {
                 echo "Host pkgs.devel.redhat.com" | ${sudo}tee -a /etc/ssh/ssh_config
                 echo "IdentityFile /home/jenkins/.ssh/id_rsa" | ${sudo}tee -a /etc/ssh/ssh_config
 
-                ${sudo}curl -o RedHat_CA.crt --insecure -L https://password.corp.redhat.com/cacert.crt /etc/pki/ca-trust/source/anchors/cacert.crt
-                ${sudo}curl -o PnTDevOps_CA.crt --insecure -L https://engineering.redhat.com/Eng-CA.crt /etc/pki/ca-trust/source/anchors/Eng-CA.crt
-                ${sudo}curl -o RH-IT-Root-CA.crt --insecure -L https://password.corp.redhat.com/RH-IT-Root-CA.crt /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt
+                ${sudo}curl -o /etc/pki/ca-trust/source/anchors/RedHat_CA.crt -k -L https://password.corp.redhat.com/cacert.crt
+                ${sudo}curl -o /etc/pki/ca-trust/source/anchors/PnTDevOps_CA.crt -k -L https://engineering.redhat.com/Eng-CA.crt
+                ${sudo}curl -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt -k -L https://password.corp.redhat.com/RH-IT-Root-CA.crt
                 ${sudo}update-ca-trust extract
 
                 ${sudo}yum install -y yum-utils git
