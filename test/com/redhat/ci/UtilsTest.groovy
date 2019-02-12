@@ -20,7 +20,7 @@ class UtilsTest {
 
     private final Closure genericInstall = {
         sudo, sh ->
-        sh(INSTALLED)
+        sh(script, INSTALLED)
     }
 
     private final Closure node = {
@@ -87,7 +87,7 @@ class UtilsTest {
 
     @Test
     void genericInstallShouldntWrapNullHost() {
-        Utils.genericInstall(script, config, null, genericInstall)
+        Utils.genericInstall(config, null, genericInstall)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
@@ -97,7 +97,7 @@ class UtilsTest {
         config.mode = Mode.SSH
         Boolean exceptionOccured = false
         try {
-            Utils.genericInstall(script, config, invalidHost, genericInstall)
+            Utils.genericInstall(config, invalidHost, genericInstall)
         } catch (e) {
             exceptionOccured = true
         }
@@ -109,7 +109,7 @@ class UtilsTest {
         config.mode = Mode.JNLP
         Boolean exceptionOccured = false
         try {
-            Utils.genericInstall(script, config, invalidHost, genericInstall)
+            Utils.genericInstall(config, invalidHost, genericInstall)
         } catch (e) {
             exceptionOccured = true
         }
@@ -119,7 +119,7 @@ class UtilsTest {
     @Test
     void genericInstallShouldntWrapNamedHostInSSHMode() {
         config.mode = Mode.SSH
-        Utils.genericInstall(script, config, validHost, genericInstall)
+        Utils.genericInstall(config, validHost, genericInstall)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
@@ -127,7 +127,7 @@ class UtilsTest {
     @Test
     void genericInstallShouldWrapNamedHostInJNLPMode() {
         config.mode = Mode.JNLP
-        Utils.genericInstall(script, config, validHost, genericInstall)
+        Utils.genericInstall(config, validHost, genericInstall)
         assert(script.testLog.contains(INSTALLED))
         assert(script.testLog.contains(NODE_STEP))
         assert(script.testLog.contains(TEST_HOSTNAME))
@@ -136,7 +136,7 @@ class UtilsTest {
     @Test
     void genericInstallNotARealMode() {
         config.mode = 'FAKE'
-        Utils.genericInstall(script, config, validHost, genericInstall)
+        Utils.genericInstall(config, validHost, genericInstall)
         assert(!script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }

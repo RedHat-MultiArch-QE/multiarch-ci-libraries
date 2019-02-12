@@ -18,10 +18,10 @@ class Utils {
      */
     @SuppressWarnings('GStringExpressionWithinString')
     static void installAnsible(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(script, config, host) {
+        genericInstall(config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
-            sh("""
+            sh(script, """
                 ${sudo}yum install python2-devel openssl-devel libffi-devel -y &&
                 ${sudo}mkdir -p /home/jenkins &&
                 ${sudo}chown --recursive \${USER}:\${USER} /home/jenkins &&
@@ -40,7 +40,7 @@ class Utils {
      * Attempts to install SSH and Beaker credentials.
      */
     static void installCredentials(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(script, config, host) {
+        genericInstall(config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             script.withCredentials([
@@ -54,7 +54,7 @@ class Utils {
                 script.file(credentialsId:config.bkrConfCredentialId,    variable:'BKRCONF'),
             ]) {
                 script.env.HOME = '/home/jenkins'
-                sh("""
+                sh(script, """
                     ${sudo}yum install -y krb5-workstation
                     ${sudo}cp ${script.KRBCONF} /etc/krb5.conf
                     ${sudo}mkdir -p /etc/beaker
@@ -82,10 +82,10 @@ class Utils {
      */
     @SuppressWarnings('LineLength')
     static void installRhpkg(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(script, config, host) {
+        genericInstall(config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
-            sh("""
+            sh(script, """
                 echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo}tee -a /etc/ssh/ssh_known_hosts
 
                 echo "Host pkgs.devel.redhat.com" | ${sudo}tee -a /etc/ssh/ssh_config
@@ -97,8 +97,6 @@ class Utils {
                 ${sudo}update-ca-trust extract
 
                 ${sudo}yum install -y yum-utils git
-                #curl -L -O http://hdn.corp.redhat.com/rhel7-csb-stage/RPMS/noarch/redhat-internal-cert-install-0.1-9.el7.csb.noarch.rpm
-                #${sudo}rpm -i redhat-internal-cert-install-0.1-9.el7.csb.noarch.rpm
                 curl -L -O http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo
                 ${sudo}yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
                 ${sudo}yum install -y rhpkg
@@ -115,11 +113,11 @@ class Utils {
      * If a provisioned host with a non-null displayName is passed in, the install step will be
      * attempted on that host; otherwise, the install with target the current node.
      */
-    static void genericInstall(Script script, ProvisioningConfig config, ProvisionedHost host, Closure installWrapper) {
+    static void genericInstall(ProvisioningConfig config, ProvisionedHost host, Closure installWrapper) {
         // Installation should occur on current node
         if (host == null) {
             installWrapper(NO_SUDO) {
-                shCommand ->
+                script, shCommand ->
                 script.sh(shCommand)
             }
             return
@@ -131,9 +129,9 @@ class Utils {
                 throw new ProvisioningException('Installing in SSH mode but displayName is invalid.')
             }
 
-            script.node(host.displayName) {
-                installWrapper(SUDO) {
-                    shCommand ->
+            installWrapper(SUDO) {
+                script, shCommand ->
+                script.node(host.displayName) {
                     script.sh(shCommand)
                 }
             }
@@ -147,7 +145,7 @@ class Utils {
             }
 
             installWrapper(NO_SUDO) {
-                shCommand ->
+                script, shCommand ->
                 script.writeFile(file:INSTALL_FILE, text:shCommand)
                 String runCommandOnHost = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
                     "-i ~/.ssh/id_rsa root@${host.hostname} < ${INSTALL_FILE}"
