@@ -12,6 +12,9 @@ class Utils {
     private static final String SUDO = 'sudo '
     private static final String NO_SUDO = ''
     private static final String INSTALL_FILE = 'install.sh'
+    private static final String SSH_ARGS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+    private static final String SSH_IDENTITY = '-i ~/.ssh/id_rsa'
+    private static final String HOME = '/home/jenkins'
 
     /**
      * Attemps to install Ansible.
@@ -28,7 +31,7 @@ class Utils {
                 ${sudo}pip install --upgrade pip &&
                 ${sudo}pip install --upgrade setuptools &&
                 ${sudo}pip install --upgrade ansible
-            """)
+            """, null)
             if (host == null) {
                 return
             }
@@ -53,7 +56,13 @@ class Utils {
                 script.file(credentialsId:config.krbConfCredentialId,    variable:'KRBCONF'),
                 script.file(credentialsId:config.bkrConfCredentialId,    variable:'BKRCONF'),
             ]) {
-                script.env.HOME = '/home/jenkins'
+                script.env.HOME = HOME
+                Map context = [
+                    env:[HOME:HOME],
+                    files:["${script.KEYTAB}", "${script.KRB_PRINCIPAL}", "${script.SSHPRIVKEY}",
+                           "${script.SSHPUBKEY}", "${script.KRBCONF}", "${script.BKRCONF}",],
+                ]
+
                 sh(script, """
                     ${sudo}yum install -y krb5-workstation
                     ${sudo}cp ${script.KRBCONF} /etc/krb5.conf
@@ -69,7 +78,7 @@ class Utils {
                     chmod 644 ~/.ssh/id_rsa.pub
                     eval "\$(ssh-agent -s)"
                     ssh-add ~/.ssh/id_rsa
-                """)
+                """, context)
                 if (host != null) {
                     host.credentialsInstalled = true
                 }
@@ -101,7 +110,7 @@ class Utils {
                 ${sudo}yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
                 ${sudo}yum install -y rhpkg
                 git config --global user.name "jenkins"
-            """)
+            """, null)
             if (host != null) {
                 host.rhpkgInstalled = true
             }
@@ -117,7 +126,7 @@ class Utils {
         // Installation should occur on current node
         if (host == null) {
             installWrapper(NO_SUDO) {
-                script, shCommand ->
+                script, shCommand, context=[:] ->
                 script.sh(shCommand)
             }
             return
@@ -130,7 +139,7 @@ class Utils {
             }
 
             installWrapper(SUDO) {
-                script, shCommand ->
+                script, shCommand, context=[:] ->
                 script.node(host.displayName) {
                     script.sh(shCommand)
                 }
@@ -144,12 +153,29 @@ class Utils {
                 throw new ProvisioningException('Installing in SSH mode but hostname is invalid.')
             }
 
-            installWrapper(NO_SUDO) {
-                script, shCommand ->
-                script.writeFile(file:INSTALL_FILE, text:shCommand)
-                String runCommandOnHost = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' +
-                    "-i ~/.ssh/id_rsa root@${host.hostname} < ${INSTALL_FILE}"
-                script.sh(runCommandOnHost)
+            installWrapper(host.remoteUser == 'root' ? NO_SUDO : SUDO) {
+                script, shCommand, context=[:] ->
+                // Copy files onto target host
+                String files = ''
+                if (context && context.files) {
+                    for (file in context.files) {
+                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} ${file} " +
+                            "${host.remoteUser}@${host.hostname}:${file};\n"
+                    }
+                }
+                script.sh(files)
+
+                // Export env vars
+                String exports = ''
+                if (context && context.env) {
+                    for (envVar in context.env) {
+                        exports += "export ${envVar.key}=${envVar.value};\n"
+                    }
+                }
+
+                // Run the actual script
+                script.writeFile(file:INSTALL_FILE, text:"${exports}${shCommand}")
+                script.sh("ssh ${SSH_ARGS} ${SSH_IDENTITY} ${host.remoteUser}@${host.hostname} < ${INSTALL_FILE}")
             }
         }
     }
