@@ -165,8 +165,8 @@ class Utils {
                 String files = ''
                 if (context && context.files) {
                     for (file in context.files) {
-                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} ${script[file]} " +
-                            "${host.remoteUser}@${host.hostname}:${script[file]};\n"
+                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} \$${file} " +
+                            "${host.remoteUser}@${host.hostname}:\$${file};\n"
                     }
                 }
                 script.sh(files)
