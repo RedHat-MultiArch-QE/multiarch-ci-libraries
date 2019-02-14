@@ -14,6 +14,8 @@ class Utils {
     private static final String INSTALL_FILE = 'install.sh'
     private static final String SSH_ARGS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
     private static final String SSH_IDENTITY = '-i ~/.ssh/id_rsa'
+    private static final String SSH = "ssh ${SSH_ARGS} ${SSH_IDENTITY}"
+    private static final String SCP = "scp ${SSH_ARGS} ${SSH_IDENTITY}"
     private static final String HOME = '/home/jenkins'
     private static final String KEYTAB = 'KEYTAB'
     private static final String KRB_PRINCIPAL = 'KRB_PRINCIPAL'
@@ -65,8 +67,8 @@ class Utils {
                 script.env.HOME = HOME
                 Map context = [
                     env:[HOME:HOME],
-                    files:[KEYTAB, KRB_PRINCIPAL, SSHPRIVKEY,
-                           SSHPUBKEY, KRBCONF, BKRCONF],
+                    files:[script.KEYTAB, script.KRB_PRINCIPAL, script.SSHPRIVKEY,
+                           script.SSHPUBKEY, script.KRBCONF, script.BKRCONF],
                 ]
 
                 sh(script, """
@@ -165,8 +167,10 @@ class Utils {
                 String files = ''
                 if (context && context.files) {
                     for (file in context.files) {
-                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} \$${file} " +
-                            "${host.remoteUser}@${host.hostname}:\$${file};\n"
+                        files += """
+                            $SSH ${host.remoteUser}@${host.hostname} mkdir -p \$(dirname "$file") &&
+                            $SCP $file ${host.remoteUser}@${host.hostname}:$file;\n
+                        """
                     }
                 }
                 script.sh(files)
@@ -180,8 +184,8 @@ class Utils {
                 }
 
                 // Run the actual script
-                script.writeFile(file:INSTALL_FILE, text:"${exports}${shCommand}")
-                script.sh("ssh ${SSH_ARGS} ${SSH_IDENTITY} ${host.remoteUser}@${host.hostname} < ${INSTALL_FILE}")
+                script.writeFile(file:INSTALL_FILE, text:"$exports $shCommand")
+                script.sh("$SSH ${host.remoteUser}@${host.hostname} < $INSTALL_FILE")
             }
         }
     }
