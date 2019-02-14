@@ -67,7 +67,7 @@ class Utils {
                 script.env.HOME = HOME
                 Map context = [
                     env:[HOME:HOME],
-                    files:[script.KEYTAB, script.KRB_PRINCIPAL, script.SSHPRIVKEY,
+                    files:[script.KEYTAB, script.SSHPRIVKEY,
                            script.SSHPUBKEY, script.KRBCONF, script.BKRCONF],
                 ]
 
