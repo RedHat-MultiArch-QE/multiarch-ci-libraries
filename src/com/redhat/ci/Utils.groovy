@@ -15,6 +15,12 @@ class Utils {
     private static final String SSH_ARGS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
     private static final String SSH_IDENTITY = '-i ~/.ssh/id_rsa'
     private static final String HOME = '/home/jenkins'
+    private static final String KEYTAB = 'KEYTAB'
+    private static final String KRB_PRINCIPAL = 'KRB_PRINCIPAL'
+    private static final String SSHPRIVKEY = 'SSHPRIVKEY'
+    private static final String SSHPUBKEY = 'SSHPUBKEY'
+    private static final String KRBCONF = 'KRBCONF'
+    private static final String BKRCONF = 'BKRCONF'
 
     /**
      * Attemps to install Ansible.
@@ -47,20 +53,20 @@ class Utils {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             script.withCredentials([
-                script.file(credentialsId:config.keytabCredentialId, variable:'KEYTAB'),
+                script.file(credentialsId:config.keytabCredentialId, variable:KEYTAB),
                 script.usernamePassword(credentialsId:config.krbPrincipalCredentialId,
-                                        usernameVariable:'KRB_PRINCIPAL',
+                                        usernameVariable:KRB_PRINCIPAL,
                                         passwordVariable:''),
-                script.file(credentialsId:config.sshPrivKeyCredentialId, variable:'SSHPRIVKEY'),
-                script.file(credentialsId:config.sshPubKeyCredentialId,  variable:'SSHPUBKEY'),
-                script.file(credentialsId:config.krbConfCredentialId,    variable:'KRBCONF'),
-                script.file(credentialsId:config.bkrConfCredentialId,    variable:'BKRCONF'),
+                script.file(credentialsId:config.sshPrivKeyCredentialId, variable:SSHPRIVKEY),
+                script.file(credentialsId:config.sshPubKeyCredentialId,  variable:SSHPUBKEY),
+                script.file(credentialsId:config.krbConfCredentialId,    variable:KRBCONF),
+                script.file(credentialsId:config.bkrConfCredentialId,    variable:BKRCONF),
             ]) {
                 script.env.HOME = HOME
                 Map context = [
                     env:[HOME:HOME],
-                    files:['KEYTAB', 'KRB_PRINCIPAL', 'SSHPRIVKEY',
-                           'SSHPUBKEY', 'KRBCONF', 'BKRCONF'],
+                    files:[KEYTAB, KRB_PRINCIPAL, SSHPRIVKEY,
+                           SSHPUBKEY, KRBCONF, BKRCONF],
                 ]
 
                 sh(script, """
