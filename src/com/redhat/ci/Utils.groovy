@@ -59,8 +59,8 @@ class Utils {
                 script.env.HOME = HOME
                 Map context = [
                     env:[HOME:HOME],
-                    files:[script.KEYTAB, script.KRB_PRINCIPAL, script.SSHPRIVKEY,
-                           script.SSHPUBKEY, script.KRBCONF, script.BKRCONF],
+                    files:['KEYTAB', 'KRB_PRINCIPAL', 'SSHPRIVKEY',
+                           'SSHPUBKEY', 'KRBCONF', 'BKRCONF'],
                 ]
 
                 sh(script, """
@@ -159,8 +159,8 @@ class Utils {
                 String files = ''
                 if (context && context.files) {
                     for (file in context.files) {
-                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} ${file} " +
-                            "${host.remoteUser}@${host.hostname}:${file};\n"
+                        files += "scp ${SSH_ARGS} ${SSH_IDENTITY} ${script[file]} " +
+                            "${host.remoteUser}@${host.hostname}:${script[file]};\n"
                     }
                 }
                 script.sh(files)
