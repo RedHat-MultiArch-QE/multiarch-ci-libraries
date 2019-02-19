@@ -102,6 +102,17 @@ class Utils {
         genericInstall(config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
+            String distro = host ? host.distro : 'RHEL-7'
+            String variant = host ? host.variant : 'Server'
+            if (!distro || !variant || !distro.startsWith('RHEL')) {
+                script.echo("Installing rhpkg tool is not supported for distro=[${distro}] and variant=[${variant}]")
+                return
+            }
+            String osMajorVersion = distro.find('[0-9]+')
+            if (!osMajorVersion || osMajorVersion.toInteger() < 5 || osMajorVersion.toInteger() > 8) {
+                script.echo("RCM rhpkg tool is not available for distro=[${distro}]. Invalid major version=[${osMajorVersion}]")
+                return
+            }
             sh(script, """
                 echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo}tee -a /etc/ssh/ssh_known_hosts
 
@@ -114,8 +125,9 @@ class Utils {
                 ${sudo}update-ca-trust extract
 
                 ${sudo}yum install -y yum-utils git
-                curl -L -O http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo
-                ${sudo}yum-config-manager --add-repo rcm-tools-rhel-7-server.repo
+
+                curl -L -o rcm-tools.repo http://download.devel.redhat.com/rel-eng/internal/rcm-tools-rhel-${osMajorVersion}-${variant.toLowerCase()}.repo
+                ${sudo}yum-config-manager --add-repo rcm-tools.repo
                 ${sudo}yum install -y rhpkg
                 git config --global user.name "jenkins"
             """, null)

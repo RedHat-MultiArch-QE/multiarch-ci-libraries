@@ -41,7 +41,12 @@ class UtilsTest {
 
     @Before
     void init() {
-        validHost = new ProvisionedHost(hostname:TEST_HOSTNAME, displayName:TEST_HOSTNAME)
+        validHost = new ProvisionedHost(
+            hostname:TEST_HOSTNAME,
+            displayName:TEST_HOSTNAME,
+            distro:'RHEL-ALT-7.5',
+            variant:'Server'
+        )
         invalidHost = new ProvisionedHost()
         config = new ProvisioningConfig()
         script = new PipelineTestScript(node:node, sh:sh)
@@ -87,6 +92,47 @@ class UtilsTest {
     void shouldInstallRhpkgOnCurrentHost() {
         Utils.installRhpkg(script, config)
         assert(script.testLog.contains(INSTALLED))
+    }
+
+    @Test
+    void shouldntInstallRhpkgOnInvalidProvisionedHost() {
+        assert(!validHost.rhpkgInstalled)
+
+        ProvisionedHost noDistro = new ProvisionedHost(validHost)
+        noDistro.distro = ''
+        Utils.installRhpkg(script, config, noDistro)
+        assert(!noDistro.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
+
+        ProvisionedHost noVariant = new ProvisionedHost(validHost)
+        noVariant.variant = ''
+        Utils.installRhpkg(script, config, noVariant)
+        assert(!noVariant.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
+
+        ProvisionedHost invalidDistro = new ProvisionedHost(validHost)
+        invalidDistro.distro = 'CentOS'
+        Utils.installRhpkg(script, config, invalidDistro)
+        assert(!invalidDistro.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
+
+        ProvisionedHost noMajorVersion = new ProvisionedHost(validHost)
+        noMajorVersion.distro = 'RHEL'
+        Utils.installRhpkg(script, config, noMajorVersion)
+        assert(!noMajorVersion.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
+
+        ProvisionedHost majorVersionTooLow = new ProvisionedHost(validHost)
+        majorVersionTooLow.distro = 'RHEL-4'
+        Utils.installRhpkg(script, config, majorVersionTooLow)
+        assert(!majorVersionTooLow.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
+
+        ProvisionedHost majorVersionTooHigh = new ProvisionedHost(validHost)
+        majorVersionTooHigh.distro = 'RHEL-72.0'
+        Utils.installRhpkg(script, config, majorVersionTooHigh)
+        assert(!majorVersionTooHigh.rhpkgInstalled)
+        assert(!script.testLog.contains(INSTALLED))
     }
 
     @Test
