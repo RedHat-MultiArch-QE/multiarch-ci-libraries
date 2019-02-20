@@ -39,9 +39,9 @@ beaker-slave:
           {% endif %}
   layout:
     inventory_layout:
-      {% if inventoryVars %}
+      {% if inventory_vars %}
       vars:
-        {% for key, value in inventoryVars.items() %}
+        {% for key, value in inventory_vars.items() %}
           {{ key }}: "{{ value }}"
         {% endfor %}
       {% endif %}

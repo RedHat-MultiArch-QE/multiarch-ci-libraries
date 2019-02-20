@@ -197,7 +197,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             reserve_duration:host.reserveDuration,
             job_group:host.bkrJobGroup ?: config.jobgroup,
             hostrequires:getHostRequires(host, config),
-            inventoryVars:host.inventoryVars,
+            inventory_vars:host.inventoryVars,
         ]
 
         JsonOutput.toJson(templateData)
