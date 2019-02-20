@@ -252,7 +252,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
     }
 
     private String getHostname(ProvisionedHost host) {
-        String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
+        String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath} | cut -d ' ' -f 1"
         script.sh(returnStdout:true, script:getMasterNode).trim()
     }
 }
