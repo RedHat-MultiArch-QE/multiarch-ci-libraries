@@ -175,7 +175,7 @@ class NoOpProvisioner extends AbstractProvisioner {
                 inventory += "[${group}]\n${host.hostname}"
                 host.inventoryFileVars.each {
                     key, value ->
-                    inventory += " ${key}: ${value}"
+                    inventory += " ${key}=${value}"
                 }
                 inventory += '\n\n'
             }
