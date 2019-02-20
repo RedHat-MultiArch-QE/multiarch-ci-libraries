@@ -41,4 +41,7 @@ class TargetHost extends Host {
 
     // Remote user to connect with in SSH mode
     String remoteUser = 'root'
+
+    // Inventory file variables
+    Map inventoryFileVars = [:]
 }

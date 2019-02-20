@@ -172,7 +172,12 @@ class NoOpProvisioner extends AbstractProvisioner {
 
             // Build a cinch-compatible inventory using the passing in hostname
             for (String group in LAYOUT_GROUPS) {
-                inventory += "[${group}]\n${host.hostname}\n\n"
+                inventory += "[${group}]\n${host.hostname}"
+                host.inventoryFileVars.each {
+                    key, value ->
+                    inventory += " ${key}: ${value}"
+                }
+                inventory += '\n\n'
             }
 
             // Write and return inventory file path
