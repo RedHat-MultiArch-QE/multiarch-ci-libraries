@@ -13,7 +13,9 @@
        state: latest
      with_items:
        - rsync
-       - libselinux-python
+       - "{{ (ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'CentOS') and 
+             ansible_facts['distribution_major_version'] >= 8 | 
+                 ternary('libselinux-python2', 'libselinux-python') }}"
        - python2
 
    - name: create a directory for the tests on the remote host
