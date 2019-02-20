@@ -38,7 +38,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
         // Run Scripts
         try {
-            String runScriptsPath = 'run_scripts.yml'
+            String runScriptsPath = 'playbooks/run_scripts.yml'
             String runScripts = libraryResource(runScriptsPath)
             writeFile(file:runScriptsPath, text:runScripts)
             sh("""
@@ -52,7 +52,7 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
         // Collect Artifacts
         try {
-            String collectResultsPath = 'collect_results.yml'
+            String collectResultsPath = 'playbooks/collect_results.yml'
             String collectResults = libraryResource(collectResultsPath)
             writeFile(file:collectResultsPath, text:collectResults)
             sh("""
