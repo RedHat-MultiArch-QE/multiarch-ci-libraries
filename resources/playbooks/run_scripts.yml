@@ -13,8 +13,8 @@
        state: latest
      with_items:
        - rsync
-       - "{{ (ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
-             ansible_facts['distribution_major_version'] >= 8 | 
+       - "{{ ((ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
+              ansible_facts['distribution_major_version'] >= 8) | 
                  ternary('libselinux-python2', 'libselinux-python') }}"
        - python2
 
