@@ -43,5 +43,5 @@ class TargetHost extends Host {
     String remoteUser = 'root'
 
     // Inventory file variables
-    Map inventoryFileVars = [:]
+    Map inventoryVars = [:]
 }
