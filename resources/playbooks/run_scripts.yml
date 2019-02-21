@@ -14,10 +14,10 @@
      with_items:
        - rsync
        - "{{ ((ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
-              ansible_facts['distribution_major_version'] >= 8) | 
+              ansible_facts['distribution_major_version'] | int >= 8) | 
                  ternary('python3-libselinux', 'libselinux-python') }}"
        - "{{ ((ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
-              ansible_facts['distribution_major_version'] >= 8) | 
+              ansible_facts['distribution_major_version'] | int >= 8) | 
                  ternary('python3', 'python2') }}"
 
    - name: create a directory for the tests on the remote host
