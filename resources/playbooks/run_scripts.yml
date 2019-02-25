@@ -13,8 +13,12 @@
        state: latest
      with_items:
        - rsync
-       - libselinux-python
-       - python2
+       - "{{ ((ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
+              ansible_facts['distribution_major_version'] | int >= 8) | 
+                 ternary('python3-libselinux', 'libselinux-python') }}"
+       - "{{ ((ansible_facts['distribution'] == 'RedHat' or ansible_facts['distribution'] == 'CentOS') and 
+              ansible_facts['distribution_major_version'] | int >= 8) | 
+                 ternary('python3', 'python2') }}"
 
    - name: create a directory for the tests on the remote host
      file:
@@ -44,7 +48,7 @@
         loop_var: script_dir
 
    - name: loop through script directories, run test, and store artifacts
-     shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-output.txt"
+     shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-runlog.txt"
      args:
        chdir: "{{ script_dir }}"
      loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
