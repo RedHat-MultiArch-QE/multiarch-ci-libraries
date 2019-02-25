@@ -38,4 +38,10 @@ class TargetHost extends Host {
 
     // String of parameters to pass to script tests
     String scriptParams = null
+
+    // Remote user to connect with in SSH mode
+    String remoteUser = 'root'
+
+    // Inventory file variables
+    Map inventoryVars = [:]
 }

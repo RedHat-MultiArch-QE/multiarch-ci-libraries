@@ -38,28 +38,28 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
         }
         // Run Scripts
         try {
-            String runScriptsPath = 'run_scripts.yml'
-            String runScripts = libraryResource(runScriptsPath)
-            writeFile(file:runScriptsPath, text:runScripts)
+            String runScriptsPlaybook = 'run_scripts.yml'
+            String runScripts = libraryResource("playbooks/${runScriptsPlaybook}")
+            writeFile(file:runScriptsPlaybook, text:runScripts)
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
                     -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
-                    ${runScriptsPath}
+                    ${runScriptsPlaybook}
             """)
         } catch (e) {
             exceptions.add(e)
         }
         // Collect Artifacts
         try {
-            String collectResultsPath = 'collect_results.yml'
-            String collectResults = libraryResource(collectResultsPath)
-            writeFile(file:collectResultsPath, text:collectResults)
+            String collectResultsPlaybook = 'collect_results.yml'
+            String collectResults = libraryResource("playbooks/${collectResultsPlaybook}")
+            writeFile(file:collectResultsPlaybook, text:collectResults)
             sh("""
                 ${ACTIVATE_PROVISIONER}
                 ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
                     -e '{"test_dir":"${params.TEST_DIR}"}' \
-                    ${collectResultsPath}
+                    ${collectResultsPlaybook}
             """)
         } catch (e) {
             exceptions.add(e)

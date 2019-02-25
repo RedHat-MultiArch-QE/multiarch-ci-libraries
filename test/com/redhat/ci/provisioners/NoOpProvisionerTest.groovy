@@ -92,7 +92,12 @@ class NoOpProvisionerTest {
             config.installCredentials = true
             config.installRhpkg = true
 
-            ProvisionedHost host = provisioner.provision(new TargetHost(hostname:TEST_HOSTNAME, arch:X86_64), config)
+            ProvisionedHost host = provisioner.provision(
+                new TargetHost(
+                    hostname:TEST_HOSTNAME,
+                    arch:X86_64,
+                    inventoryVars:[ ansible_python_interpreter:'/usr/libexec/platform-python' ]
+                ), config)
             assert(!host.error)
         }
     }
