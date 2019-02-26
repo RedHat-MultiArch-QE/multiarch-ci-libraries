@@ -29,10 +29,10 @@ class Utils {
      */
     @SuppressWarnings('GStringExpressionWithinString')
     static void installAnsible(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(config, host) {
+        genericInstall(script, config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
-            sh(script, """
+            sh("""
                 ${sudo}yum install python2-devel openssl-devel libffi-devel -y &&
                 ${sudo}mkdir -p /home/jenkins &&
                 ${sudo}chown --recursive \${USER}:\${USER} /home/jenkins &&
@@ -51,7 +51,7 @@ class Utils {
      * Attempts to install SSH and Beaker credentials.
      */
     static void installCredentials(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(config, host) {
+        genericInstall(script, config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             script.withCredentials([
@@ -71,7 +71,7 @@ class Utils {
                            script.SSHPUBKEY, script.KRBCONF, script.BKRCONF],
                 ]
 
-                sh(script, """
+                sh("""
                     ${sudo}yum install -y krb5-workstation
                     ${sudo}cp ${script.KRBCONF} /etc/krb5.conf
                     ${sudo}mkdir -p /etc/beaker
@@ -99,7 +99,7 @@ class Utils {
      */
     @SuppressWarnings('LineLength')
     static void installRhpkg(Script script, ProvisioningConfig config, ProvisionedHost host = null) {
-        genericInstall(config, host) {
+        genericInstall(script, config, host) {
             privileged, sh ->
             String sudo = privileged ? SUDO : NO_SUDO
             String distro = host ? host.distro : 'RHEL-7'
@@ -113,7 +113,7 @@ class Utils {
                 script.echo("RCM rhpkg tool is not available for distro=[${distro}]. Invalid major version=[${osMajorVersion}]")
                 return
             }
-            sh(script, """
+            sh("""
                 echo "pkgs.devel.redhat.com,10.19.208.80 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAplqWKs26qsoaTxvWn3DFcdbiBxqRLhFngGiMYhbudnAj4li9/VwAJqLm1M6YfjOoJrj9dlmuXhNzkSzvyoQODaRgsjCG5FaRjuN8CSM/y+glgCYsWX1HFZSnAasLDuW0ifNLPR2RBkmWx61QKq+TxFDjASBbBywtupJcCsA5ktkjLILS+1eWndPJeSUJiOtzhoN8KIigkYveHSetnxauxv1abqwQTk5PmxRgRt20kZEFSRqZOJUlcl85sZYzNC/G7mneptJtHlcNrPgImuOdus5CW+7W49Z/1xqqWI/iRjwipgEMGusPMlSzdxDX4JzIx6R53pDpAwSAQVGDz4F9eQ==" | ${sudo}tee -a /etc/ssh/ssh_known_hosts
 
                 echo "Host pkgs.devel.redhat.com" | ${sudo}tee -a /etc/ssh/ssh_config
@@ -142,11 +142,11 @@ class Utils {
      * If a provisioned host with a non-null displayName is passed in, the install step will be
      * attempted on that host; otherwise, the install with target the current node.
      */
-    static void genericInstall(ProvisioningConfig config, ProvisionedHost host, Closure installWrapper) {
+    static void genericInstall(Script script, ProvisioningConfig config, ProvisionedHost host, Closure installWrapper) {
         // Installation should occur on current node
         if (host == null) {
             installWrapper(NO_SUDO) {
-                script, shCommand, context=[:] ->
+                shCommand, context=[:] ->
                 script.sh(shCommand)
             }
             return
@@ -158,9 +158,9 @@ class Utils {
                 throw new ProvisioningException('Installing in SSH mode but displayName is invalid.')
             }
 
-            installWrapper(SUDO) {
-                script, shCommand, context=[:] ->
-                script.node(host.displayName) {
+            script.node(host.displayName) {
+                installWrapper(SUDO) {
+                    shCommand, context=[:] ->
                     script.sh(shCommand)
                 }
             }
@@ -174,7 +174,7 @@ class Utils {
             }
 
             installWrapper(host.remoteUser == 'root' ? NO_SUDO : SUDO) {
-                script, shCommand, context=[:] ->
+                shCommand, context=[:] ->
                 // Copy files onto target host
                 String files = ''
                 if (context && context.files) {
