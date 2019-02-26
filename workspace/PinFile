@@ -39,6 +39,12 @@ beaker-slave:
           {% endif %}
   layout:
     inventory_layout:
+      {% if inventory_vars %}
+      vars:
+        {% for key, value in inventory_vars.items() %}
+          {{ key }}: "{{ value }}"
+        {% endfor %}
+      {% endif %}
       hosts:
         beaker-slave:
           count: 1

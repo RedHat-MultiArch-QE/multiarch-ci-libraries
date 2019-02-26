@@ -114,12 +114,11 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 if (config.installAnsible) {
                     Utils.installAnsible(script, config, host)
                 }
+            }
 
-                // In JNLP mode, install provisioning credentials directly on the provisioned host
-                // (Already installed in SSH mode)
-                if (config.installCredentials) {
-                    Utils.installCredentials(script, config, host)
-                }
+            // Install credentials directly on the provisioned host
+            if (config.installCredentials || config.installRhpkg) {
+                Utils.installCredentials(script, config, host)
             }
 
             // We can install the RHPKG tool if the user intends to use it.
@@ -198,6 +197,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
             reserve_duration:host.reserveDuration,
             job_group:host.bkrJobGroup ?: config.jobgroup,
             hostrequires:getHostRequires(host, config),
+            inventory_vars:host.inventoryVars,
         ]
 
         JsonOutput.toJson(templateData)
@@ -252,7 +252,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
     }
 
     private String getHostname(ProvisionedHost host) {
-        String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath}"
+        String getMasterNode = "awk '/\\[master_node\\]/{getline; print}' ${host.inventoryPath} | cut -d ' ' -f 1"
         script.sh(returnStdout:true, script:getMasterNode).trim()
     }
 }
