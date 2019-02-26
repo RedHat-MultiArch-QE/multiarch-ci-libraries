@@ -66,7 +66,8 @@ class LinchPinProvisionerTest {
             }
 
             ProvisionedHost host = provisioner.provision(
-                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hypervisor', value:'', op:'=']]),
+                new TargetHost(bkrJobGroup:'maqe', bkrHostRequires:[[tag:'hypervisor', value:'', op:'=']],
+                               variant:'workstation', distro:'RHEL-7.6'),
                 config)
             assert(!host.error)
         }

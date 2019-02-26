@@ -12,6 +12,8 @@ class ProvisioningConfigTest {
     private static final String SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT = 'test-sshprivkey'
     private static final String SSH_PUB_KEY_CREDENTIAL_ID_DEFAULT = 'test-sshpubkey'
     private static final String JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT = 'test-jenkins-slave-credentials'
+    private static final String PROVISIONING_REPO_URL_DEFAULT = 'test-repo'
+    private static final String PROVISIONING_REPO_REF_DEFAULT = 'test-ref'
 
     @Test
     void should_support_legacy_api() {
@@ -41,6 +43,8 @@ class ProvisioningConfigTest {
         assert(config.jenkinsSlaveCredentialId == ProvisioningConfig.JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT)
         assert(config.jenkinsMasterUrl         == ProvisioningConfig.JENKINS_MASTER_URL_DEFAULT)
         assert(config.jswarmExtraArgs          == ProvisioningConfig.JSWARM_EXTRA_ARGS_DEFAULT)
+        assert(config.provisioningRepoUrl      == ProvisioningConfig.PROVISIONING_REPO_URL_DEFAULT)
+        assert(config.provisioningRepoRef      == ProvisioningConfig.PROVISIONING_REPO_REF_DEFAULT)
     }
 
     @Test
@@ -52,6 +56,8 @@ class ProvisioningConfigTest {
         script.params.SSHPRIVKEYCREDENTIALID   = SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT
         script.params.SSHPUBKEYCREDENTIALID    = SSH_PUB_KEY_CREDENTIAL_ID_DEFAULT
         script.params.JENKINSSLAVECREDENTIALID = JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT
+        script.params.LIBRARIES_REPO           = PROVISIONING_REPO_URL_DEFAULT
+        script.params.LIBRARIES_REF            = PROVISIONING_REPO_REF_DEFAULT
 
         ProvisioningConfig config = new ProvisioningConfig(script.params, script.env)
         assert(config.krbPrincipalCredentialId == KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT)
@@ -61,5 +67,7 @@ class ProvisioningConfigTest {
         assert(config.jenkinsSlaveCredentialId == JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT)
         assert(config.jenkinsMasterUrl         == PipelineTestScript.JENKINS_MASTER_URL_DEFAULT)
         assert(config.jswarmExtraArgs          == PipelineTestScript.JSWARM_EXTRA_ARGS_DEFAULT)
+        assert(config.provisioningRepoUrl      == PROVISIONING_REPO_URL_DEFAULT)
+        assert(config.provisioningRepoRef      == PROVISIONING_REPO_REF_DEFAULT)
     }
 }

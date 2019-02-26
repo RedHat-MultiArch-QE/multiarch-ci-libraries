@@ -4,6 +4,7 @@ package com.redhat.ci.provisioner
  * Configuration needed to provision resources with a Provisioner.
  */
 class ProvisioningConfig {
+    private static final String RELEASE_VERSION = 'v1.2.2'
     private static final String KRB_PRINCIPAL_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-krbprincipal'
     private static final String KEYTAB_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-keytab'
     private static final String SSH_PRIV_KEY_CREDENTIAL_ID_DEFAULT = 'redhat-multiarch-qe-sshprivkey'
@@ -11,9 +12,12 @@ class ProvisioningConfig {
     private static final String JENKINS_SLAVE_CREDENTIAL_ID_DEFAULT = 'jenkins-slave-credentials'
     private static final String JENKINS_MASTER_URL_DEFAULT = ''
     private static final String JSWARM_EXTRA_ARGS_DEFAULT  = ''
+    private static final String PROVISIONING_REPO_URL_DEFAULT =
+      'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
+    private static final String PROVISIONING_REPO_REF_DEFAULT = RELEASE_VERSION
 
     // Provisioner version
-    String version = 'v1.2.1'
+    String version = RELEASE_VERSION
 
     // Jenkins kubernetes cloud name
     String cloudName = 'openshift'
@@ -34,10 +38,10 @@ class ProvisioningConfig {
     String provisioningImage = 'provisioner'
 
     // Provisioning repo url
-    String provisioningRepoUrl = 'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries'
+    String provisioningRepoUrl = PROVISIONING_REPO_URL_DEFAULT
 
     // Provisioning repo ref
-    String provisioningRepoRef = this.version
+    String provisioningRepoRef = PROVISIONING_REPO_REF_DEFAULT
 
     // Provisioning workspace location (needed for LinchPin)
     // This can reference a relative path in the above repo
@@ -116,6 +120,8 @@ class ProvisioningConfig {
         this.jenkinsSlaveCredentialId = params.JENKINSSLAVECREDENTIALID ?: this.jenkinsSlaveCredentialId
         this.jenkinsMasterUrl = env.JENKINS_MASTER_URL ?: this.jenkinsMasterUrl
         this.jswarmExtraArgs = env.JSWARM_EXTRA_ARGS ?: this.jswarmExtraArgs
+        this.provisioningRepoUrl = params.LIBRARIES_REPO ?: this.provisioningRepoUrl
+        this.provisioningRepoRef = params.LIBRARIES_REF ?: this.provisioningRepoRef
 
         hostTypePriority = [
             com.redhat.ci.host.Type.CONTAINER,
