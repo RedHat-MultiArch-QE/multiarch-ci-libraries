@@ -24,7 +24,7 @@ class UtilsTest {
         if (sudo) {
             script.echo(SUDO)
         }
-        sh(script, null)
+        sh(null)
     }
 
     private final Closure node = {
@@ -137,7 +137,7 @@ class UtilsTest {
 
     @Test
     void genericInstallShouldntWrapNullHost() {
-        Utils.genericInstall(config, null, installWrapper)
+        Utils.genericInstall(script, config, null, installWrapper)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
@@ -147,7 +147,7 @@ class UtilsTest {
         config.mode = Mode.SSH
         Boolean exceptionOccured = false
         try {
-            Utils.genericInstall(config, invalidHost, installWrapper)
+            Utils.genericInstall(script, config, invalidHost, installWrapper)
         } catch (e) {
             exceptionOccured = true
         }
@@ -159,7 +159,7 @@ class UtilsTest {
         config.mode = Mode.JNLP
         Boolean exceptionOccured = false
         try {
-            Utils.genericInstall(config, invalidHost, installWrapper)
+            Utils.genericInstall(script, config, invalidHost, installWrapper)
         } catch (e) {
             exceptionOccured = true
         }
@@ -169,7 +169,7 @@ class UtilsTest {
     @Test
     void genericInstallShouldntWrapNamedHostInSSHMode() {
         config.mode = Mode.SSH
-        Utils.genericInstall(config, validHost, installWrapper)
+        Utils.genericInstall(script, config, validHost, installWrapper)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
@@ -177,7 +177,7 @@ class UtilsTest {
     @Test
     void genericInstallShouldWrapNamedHostInJNLPMode() {
         config.mode = Mode.JNLP
-        Utils.genericInstall(config, validHost, installWrapper)
+        Utils.genericInstall(script, config, validHost, installWrapper)
         assert(script.testLog.contains(INSTALLED))
         assert(script.testLog.contains(NODE_STEP))
         assert(script.testLog.contains(TEST_HOSTNAME))
@@ -186,7 +186,7 @@ class UtilsTest {
     @Test
     void genericInstallNotARealMode() {
         config.mode = 'FAKE'
-        Utils.genericInstall(config, validHost, installWrapper)
+        Utils.genericInstall(script, config, validHost, installWrapper)
         assert(!script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(NODE_STEP))
     }
@@ -194,7 +194,7 @@ class UtilsTest {
     @Test
     void noSudoInSSHModeAsRoot() {
         config.mode = Mode.SSH
-        Utils.genericInstall(config, validHost, installWrapper)
+        Utils.genericInstall(script, config, validHost, installWrapper)
         assert(script.testLog.contains(INSTALLED))
         assert(!script.testLog.contains(SUDO))
     }
@@ -203,7 +203,7 @@ class UtilsTest {
     void sudoInSSHModeAsNonRoot() {
         config.mode = Mode.SSH
         validHost.remoteUser = 'custom'
-        Utils.genericInstall(config, validHost, installWrapper)
+        Utils.genericInstall(script, config, validHost, installWrapper)
         assert(script.testLog.contains(INSTALLED))
         assert(script.testLog.contains(SUDO))
     }
