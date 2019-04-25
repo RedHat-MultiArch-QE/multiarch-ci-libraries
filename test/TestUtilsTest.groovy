@@ -94,6 +94,36 @@ class TestUtilsTest extends PipelineTestScript {
     }
 
     @Test
+    void shouldRunTestOnMultiHosts() {
+        ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
+        List<TargetHost> targets = [
+            TestUtils.newTargetHost(
+                provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
+                provider:com.redhat.ci.provider.Type.BEAKER,
+            ),
+            TestUtils.newTargetHost(
+                provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
+                provider:com.redhat.ci.provider.Type.BEAKER,
+                linchpinTargetEnabled:false
+            ),
+            TestUtils.newTargetHost(
+                provisioner:com.redhat.ci.provisioner.Type.LINCHPIN,
+                provider:com.redhat.ci.provider.Type.BEAKER,
+                linchpinTarget:'custom-target'
+            ),
+        ]
+        TestUtils.runTest(
+            this,
+            targets,
+            config,
+            body,
+            onFailure,
+            onComplete)
+
+        assertNoExceptions()
+    }
+
+    @Test
     void shouldRunTestOnBareMetalHost() {
         ProvisioningConfig config = TestUtils.getProvisioningConfig(this)
         TargetHost target = TestUtils.newTargetHost(arch:X86_64, type:Type.BAREMETAL)

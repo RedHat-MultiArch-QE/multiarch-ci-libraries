@@ -4,6 +4,8 @@ import static com.redhat.ci.host.Type.UNKNOWN
 import static com.redhat.ci.host.Type.VM
 import static com.redhat.ci.host.Type.BAREMETAL
 
+import java.util.logging.Logger
+import java.util.logging.Level
 import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
@@ -18,9 +20,10 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
+    private static final Logger LOG = Logger.getLogger(LinchPinProvisioner.name)
     private static final String HYPERVISOR = 'hypervisor'
 
-    private static final Map<String, String> LINCHPIN_TARGETS = [
+    private static final Map<String, String> DEFAULT_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
 
@@ -52,8 +55,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.provider = com.redhat.ci.provider.Type.BEAKER
             host.typePriority = filterSupportedHostTypes(host.typePriority)
             host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
+            host.arch = host.arch ?: 'x86_64'
             host.distro = host.distro ?: 'RHEL-ALT-7.5'
             host.variant = host.variant ?: 'Server'
+            host.linchpinTarget = host.linchpinTarget ?: DEFAULT_TARGETS[host.provider]
 
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
@@ -80,7 +85,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "linchpin --workspace ${workspaceDir} " +
                         "--config ${workspaceDir}/linchpin.conf " +
                         "--template-data \'${getTemplateData(host, config)}\' " +
-                        "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                        "--verbose up ${host.linchpinTargetEnabled ? host.linchpinTarget : ''}"
                 )
             } catch (e) {
                 host.error = e.message
@@ -126,6 +131,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, config, host)
             }
         } catch (e) {
+            LOG.log(Level.SEVERE, e.message, e)
             host.error = host.error ? host.error + ", ${e.message}" : e.message
             script.echo("Error provisioning from LinchPin: ${host.error}")
         }
@@ -247,8 +253,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     private String getLinchpinInventoryPath(Map linchpinLatest, ProvisionedHost host) {
         Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
-        String linchpinTarget = LINCHPIN_TARGETS[host.provider]
-        linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
+        linchpinTargets[host.linchpinTarget]['outputs']['inventory_path'][0]
     }
 
     private String getHostname(ProvisionedHost host) {
