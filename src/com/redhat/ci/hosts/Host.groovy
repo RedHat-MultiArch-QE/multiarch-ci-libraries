@@ -4,6 +4,9 @@ package com.redhat.ci.hosts
  * Host primitives.
  */
 class Host {
+    // Name for the host
+    String name = null
+
     // ID for the host
     String id = UUID.randomUUID()
 

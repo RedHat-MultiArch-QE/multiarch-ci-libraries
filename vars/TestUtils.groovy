@@ -44,8 +44,7 @@ class TestUtils {
         Closure test,
         Closure onFailure,
         Closure postRun = { })  {
-        TargetHost target = new TargetHost()
-        target.arch = arch
+        TargetHost target = new TargetHost(arch:arch, name:arch)
         runTest(
             script,
             target,
@@ -77,7 +76,7 @@ class TestUtils {
         Closure postRun = { }) {
         List<TargetHost> targets = []
         for (arch in arches) {
-            targets.push(new TargetHost(arch:arch))
+            targets.push(new TargetHost(arch:arch, name:arch))
         }
         runTest(
             script,
@@ -108,6 +107,7 @@ class TestUtils {
         Closure test,
         Closure onFailure,
         Closure postRun = { }) {
+        target.name ?: target.arch
         runTest(
             script,
             [ target ],

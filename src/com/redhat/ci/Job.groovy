@@ -1,5 +1,7 @@
 package com.redhat.ci
 
+import java.util.logging.Logger
+import java.util.logging.Level
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
 import com.redhat.ci.provisioner.ProvisioningException
@@ -10,6 +12,7 @@ import com.redhat.ci.hosts.TargetHost
  * Represents a job that provisions the resources it needs, and runs @param body on them.
  */
 class Job {
+    private static final Logger LOG = Logger.getLogger(Job.name)
     protected static final String SANDBOX_DIR = 'sandbox'
 
     protected Script script
@@ -48,7 +51,7 @@ class Job {
     void run() {
         Map subJobs = [:]
         for (targetHost in targetHosts) {
-            subJobs[targetHost.arch] = jobWrapper(targetHost)
+            subJobs[targetHost.name ?: targetHost.id] = jobWrapper(targetHost)
         }
 
         // Run each single host job in parallel on each specified host
@@ -113,6 +116,7 @@ class Job {
             try {
                 host = provision(targetHost)
             } catch (e) {
+                LOG.log(Level.SEVERE, "Exception: ${e.message}", e)
                 script.echo("Exception: ${e.message}")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
