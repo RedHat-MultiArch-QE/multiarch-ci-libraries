@@ -4,8 +4,6 @@ import static com.redhat.ci.host.Type.UNKNOWN
 import static com.redhat.ci.host.Type.VM
 import static com.redhat.ci.host.Type.BAREMETAL
 
-import java.util.logging.Logger
-import java.util.logging.Level
 import com.redhat.ci.Utils
 import com.redhat.ci.hosts.TargetHost
 import com.redhat.ci.hosts.ProvisionedHost
@@ -20,7 +18,6 @@ import groovy.json.JsonOutput
  */
 class LinchPinProvisioner extends AbstractProvisioner {
 
-    private static final Logger LOG = Logger.getLogger(LinchPinProvisioner.name)
     private static final String HYPERVISOR = 'hypervisor'
 
     private static final Map<String, String> DEFAULT_TARGETS = [
@@ -131,9 +128,9 @@ class LinchPinProvisioner extends AbstractProvisioner {
                 Utils.installRhpkg(script, config, host)
             }
         } catch (e) {
-            LOG.log(Level.SEVERE, e.message, e)
             host.error = host.error ? host.error + ", ${e.message}" : e.message
             script.echo("Error provisioning from LinchPin: ${host.error}")
+            script.echo("Stacktrace: $e.stackTrace")
         }
 
         // An error occured, so we should ensure resources are cleaned up

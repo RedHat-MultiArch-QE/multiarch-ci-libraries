@@ -1,7 +1,5 @@
 package com.redhat.ci
 
-import java.util.logging.Logger
-import java.util.logging.Level
 import com.redhat.ci.provisioner.ProvisioningConfig
 import com.redhat.ci.provisioner.ProvisioningService
 import com.redhat.ci.provisioner.ProvisioningException
@@ -12,7 +10,6 @@ import com.redhat.ci.hosts.TargetHost
  * Represents a job that provisions the resources it needs, and runs @param body on them.
  */
 class Job {
-    private static final Logger LOG = Logger.getLogger(Job.name)
     protected static final String SANDBOX_DIR = 'sandbox'
 
     protected Script script
@@ -116,8 +113,8 @@ class Job {
             try {
                 host = provision(targetHost)
             } catch (e) {
-                LOG.log(Level.SEVERE, "Exception: ${e.message}", e)
-                script.echo("Exception: ${e.message}")
+                script.echo("Exception: ${e}")
+                script.echo("Stacktrace: $e.stackTrace")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
                 }
@@ -132,7 +129,7 @@ class Job {
                             body(host, config)
                         }
                     } catch (e) {
-                        script.echo("Exception: ${e.message}")
+                        script.echo("Exception: ${e}")
                         runInDirectory(SANDBOX_DIR) {
                             onFailure(e, host)
                         }
@@ -148,7 +145,7 @@ class Job {
                     body(host, config)
                 }
             } catch (e) {
-                script.echo("Exception: ${e.message}")
+                script.echo("Exception: ${e}")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
                 }
