@@ -3,7 +3,7 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Mode
 
 void call(ProvisioningConfig config, ProvisionedHost host) {
-    final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/provisioner/bin/activate;'
+    final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/ansible/bin/activate;'
     List<Exception> exceptions = []
 
     // JNLP Mode
