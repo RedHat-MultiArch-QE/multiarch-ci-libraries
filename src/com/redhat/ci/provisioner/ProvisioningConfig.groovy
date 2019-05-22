@@ -109,6 +109,9 @@ class ProvisioningConfig {
     // This is only needed for tests that will use it to install from pkgs.devel.redhat.com
     Boolean installRhpkg = false
 
+    // Whether the job should teardown resources when complete
+    Boolean teardown = true
+
     @SuppressWarnings('AbcMetric')
     ProvisioningConfig(Map params = [:], Map env = [:]) {
         params = params ?: [:]
