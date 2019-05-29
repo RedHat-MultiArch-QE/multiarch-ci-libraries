@@ -29,12 +29,21 @@ class TargetHost extends Host {
     // Overrides ProvisioningConfig's hostrequires
     List<Map> bkrHostRequires = null
 
+    // Beaker keyvalue
+    List<String> bkrKeyValue = null
+
     // Beaker jobgroup
     // Overrides ProvisioningConfig's jobgroup
     String bkrJobGroup = null
 
     // Beaker ks_meta
     String bkrKsMeta = null
+
+    // Beaker kernel_options
+    String bkrKernelOptions = null
+
+    // Beaker kernel_options_post
+    String bkrKernelOptionsPost = null
 
     // Beaker installation method
     String bkrMethod = null
