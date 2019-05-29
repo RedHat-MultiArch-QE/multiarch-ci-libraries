@@ -21,6 +21,12 @@ beaker-slave:
           {% if ks_meta %}
           ks_meta: {{ ks_meta | default('') }}
           {% endif %}
+          {% if kernel_options %}
+          kernel_options: {{ kernel_options | default('') }}
+          {% endif %}
+          {% if kernel_options_post %}
+          kernel_options_post: {{ kernel_options_post | default('') }}
+          {% endif %}
           {% if method %}
           method: {{ method | default('nfs') }}
           {% endif %}
@@ -32,9 +38,23 @@ beaker-slave:
           {% if hostrequires %}
           hostrequires:
             {% for req in hostrequires %}
+            {% if req.tag %}
             - tag: "{{ req.tag }}"
               op: "{{ req.op }}"
               value: "{{ req.value }}"
+              {% if req.type %}
+              type: "{{ req.type }}"
+              {% endif %}
+            {% endif %}
+            {% if req.rawxml %}
+            - rawxml: '{{ req.rawxml }}'
+            {% endif %}
+            {% endfor %}
+          {% endif %}
+          {% if keyvalue %}
+          keyvalue:
+            {% for kv in keyvalue %}
+            - "{{ kv }}"
             {% endfor %}
           {% endif %}
   layout:
@@ -42,7 +62,7 @@ beaker-slave:
       {% if inventory_vars %}
       vars:
         {% for key, value in inventory_vars.items() %}
-          {{ key }}: "{{ value }}"
+          {{ key }}: '{{ value }}'
         {% endfor %}
       {% endif %}
       hosts:
