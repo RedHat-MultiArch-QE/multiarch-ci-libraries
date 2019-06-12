@@ -97,6 +97,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             script.echo("inventoryPath:${host.inventoryPath}")
+            script.sh("cat ${host.inventoryPath}")
 
             host.hostname = getHostname(host)
             script.echo("hostname:${host.hostname}")

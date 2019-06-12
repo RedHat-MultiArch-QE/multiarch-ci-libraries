@@ -1,6 +1,6 @@
 ---
 - name: "Run Scripts on each Inventory Host"
-  hosts: all
+  hosts: master_node
   gather_facts: true
   vars_prompt:
     - name: test_dir
@@ -8,6 +8,7 @@
 
   tasks:
    - name: install rsync and the utilities to copy the tests to the remote host
+     become: yes
      package:
        name: "{{ item }}"
        state: latest
@@ -41,14 +42,22 @@
 
    - name: loop through script directories and create artifacts directory
      file:
-       path: "{{ script_dir }}/artifacts"
+       path: "{{ script_dir }}/artifacts/{{ ansible_architecture }}"
        state: directory
      loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
      loop_control:
         loop_var: script_dir
 
+   - name: loop through script directories and create inventory
+     copy:
+       src: "{{ inventory }}"
+       dest: "{{ script_dir }}/inventory"
+     loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
+     loop_control:
+        loop_var: script_dir
+
    - name: loop through script directories, run test, and store artifacts
-     shell: "bash -x test.sh {{ script_args | default('') }} &> artifacts/{{ ansible_architecture }}-runlog.txt"
+     shell: "bash -x test.sh {{ script_params | default('') }} &> artifacts/{{ ansible_architecture }}/{{ ansible_architecture }}-runlog.txt"
      args:
        chdir: "{{ script_dir }}"
      loop: "{{ scripts_dir.files | map(attribute='path') | list }}"
