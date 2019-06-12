@@ -43,8 +43,9 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             writeFile(file:runScriptsPlaybook, text:runScripts)
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
-                    -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
+                ansible-playbook -i '${host.inventoryPath}' --limit master_node --key-file "~/.ssh/id_rsa" \
+                    -e '{"test_dir":"${params.TEST_DIR}", "inventory":"${host.inventoryPath}", \
+                         "script_params":"${host.scriptParams ?: ''}"}' \
                     ${runScriptsPlaybook}
             """)
         } catch (e) {
