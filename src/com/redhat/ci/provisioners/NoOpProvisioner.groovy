@@ -117,7 +117,7 @@ class NoOpProvisioner extends AbstractProvisioner {
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
         // Check if the host was even created
-        if (!host) {
+        if (!host || !config.teardown) {
             return
         }
 

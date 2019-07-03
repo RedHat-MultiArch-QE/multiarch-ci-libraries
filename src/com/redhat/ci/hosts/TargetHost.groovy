@@ -19,9 +19,18 @@ class TargetHost extends Host {
     // Provisioner type priority list
     List<String> provisionerPriority = null
 
+    // Flag that allows linchpinTarget to be disabled for custom PinFiles
+    Boolean linchpinTargetEnabled = true
+
+    // Target of the linchpin PinFile (if linchpinTargetEnabled flag is set to true)
+    String linchpinTarget = null
+
     // Beaker hostrequires
     // Overrides ProvisioningConfig's hostrequires
     List<Map> bkrHostRequires = null
+
+    // Beaker keyvalue
+    List<String> bkrKeyValue = null
 
     // Beaker jobgroup
     // Overrides ProvisioningConfig's jobgroup
@@ -29,6 +38,12 @@ class TargetHost extends Host {
 
     // Beaker ks_meta
     String bkrKsMeta = null
+
+    // Beaker kernel_options
+    String bkrKernelOptions = null
+
+    // Beaker kernel_options_post
+    String bkrKernelOptionsPost = null
 
     // Beaker installation method
     String bkrMethod = null

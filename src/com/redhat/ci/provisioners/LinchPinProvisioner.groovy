@@ -20,7 +20,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     private static final String HYPERVISOR = 'hypervisor'
 
-    private static final Map<String, String> LINCHPIN_TARGETS = [
+    private static final Map<String, String> DEFAULT_TARGETS = [
         (com.redhat.ci.provider.Type.BEAKER):'beaker-slave',
     ]
 
@@ -52,8 +52,10 @@ class LinchPinProvisioner extends AbstractProvisioner {
             host.provider = com.redhat.ci.provider.Type.BEAKER
             host.typePriority = filterSupportedHostTypes(host.typePriority)
             host.type = host.typePriority.size() == 1 ? host.typePriority[0] : UNKNOWN
+            host.arch = host.arch ?: 'x86_64'
             host.distro = host.distro ?: 'RHEL-ALT-7.5'
             host.variant = host.variant ?: 'Server'
+            host.linchpinTarget = host.linchpinTarget ?: DEFAULT_TARGETS[host.provider]
 
             // Install keys we can connect via JNLP or SSH
             Utils.installCredentials(script, config)
@@ -80,7 +82,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
                         "linchpin --workspace ${workspaceDir} " +
                         "--config ${workspaceDir}/linchpin.conf " +
                         "--template-data \'${getTemplateData(host, config)}\' " +
-                        "--verbose up ${LINCHPIN_TARGETS[host.provider]}"
+                        "--verbose up ${host.linchpinTargetEnabled ? host.linchpinTarget : ''}"
                 )
             } catch (e) {
                 host.error = e.message
@@ -95,6 +97,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
             host.inventoryPath = getLinchpinInventoryPath(linchpinLatest, host)
             script.echo("inventoryPath:${host.inventoryPath}")
+            script.sh("cat ${host.inventoryPath}")
 
             host.hostname = getHostname(host)
             script.echo("hostname:${host.hostname}")
@@ -128,6 +131,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
         } catch (e) {
             host.error = host.error ? host.error + ", ${e.message}" : e.message
             script.echo("Error provisioning from LinchPin: ${host.error}")
+            script.echo("Stacktrace: $e.stackTrace")
         }
 
         // An error occured, so we should ensure resources are cleaned up
@@ -145,7 +149,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
      */
     void teardown(ProvisionedHost host, ProvisioningConfig config) {
         // Check if the host was even created
-        if (!host) {
+        if (!host || !config.teardown) {
             script.echo(TEARDOWN_NOOP)
             return
         }
@@ -193,10 +197,13 @@ class LinchPinProvisioner extends AbstractProvisioner {
             distro:host.distro,
             variant:host.variant,
             ks_meta:host.bkrKsMeta,
+            kernel_options:host.bkrKernelOptions,
+            kernel_options_post:host.bkrKernelOptionsPost,
             method:host.bkrMethod,
             reserve_duration:host.reserveDuration,
             job_group:host.bkrJobGroup ?: config.jobgroup,
             hostrequires:getHostRequires(host, config),
+            keyvalue:host.bkrKeyValue,
             inventory_vars:host.inventoryVars,
         ]
 
@@ -247,8 +254,7 @@ class LinchPinProvisioner extends AbstractProvisioner {
 
     private String getLinchpinInventoryPath(Map linchpinLatest, ProvisionedHost host) {
         Map linchpinTargets = linchpinLatest["${host.linchpinTxId}"]['targets'][0]
-        String linchpinTarget = LINCHPIN_TARGETS[host.provider]
-        linchpinTargets[linchpinTarget]['outputs']['inventory_path'][0]
+        linchpinTargets[host.linchpinTarget]['outputs']['inventory_path'][0]
     }
 
     private String getHostname(ProvisionedHost host) {

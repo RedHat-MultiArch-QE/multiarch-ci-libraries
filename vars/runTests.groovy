@@ -3,7 +3,7 @@ import com.redhat.ci.hosts.ProvisionedHost
 import com.redhat.ci.provisioner.Mode
 
 void call(ProvisioningConfig config, ProvisionedHost host) {
-    final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/provisioner/bin/activate;'
+    final String ACTIVATE_PROVISIONER = '. /home/jenkins/envs/ansible/bin/activate;'
     List<Exception> exceptions = []
 
     // JNLP Mode
@@ -43,8 +43,9 @@ void call(ProvisioningConfig config, ProvisionedHost host) {
             writeFile(file:runScriptsPlaybook, text:runScripts)
             sh("""
                 ${ACTIVATE_PROVISIONER}
-                ansible-playbook -i '${host.inventoryPath}' --key-file "~/.ssh/id_rsa" \
-                    -e '{"test_dir":"${params.TEST_DIR}", "script_params":"${host.scriptParams ?: ''}"}' \
+                ansible-playbook -i '${host.inventoryPath}' --limit master_node --key-file "~/.ssh/id_rsa" \
+                    -e '{"test_dir":"${params.TEST_DIR}", "inventory":"${host.inventoryPath}", \
+                         "script_params":"${host.scriptParams ?: ''}"}' \
                     ${runScriptsPlaybook}
             """)
         } catch (e) {
