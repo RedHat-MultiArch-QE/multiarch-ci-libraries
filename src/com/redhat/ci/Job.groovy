@@ -48,7 +48,7 @@ class Job {
     void run() {
         Map subJobs = [:]
         for (targetHost in targetHosts) {
-            subJobs[targetHost.arch] = jobWrapper(targetHost)
+            subJobs[targetHost.name ?: targetHost.id] = jobWrapper(targetHost)
         }
 
         // Run each single host job in parallel on each specified host
@@ -113,7 +113,8 @@ class Job {
             try {
                 host = provision(targetHost)
             } catch (e) {
-                script.echo("Exception: ${e.message}")
+                script.echo("Exception: ${e}")
+                script.echo("Stacktrace: $e.stackTrace")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
                 }
@@ -128,7 +129,7 @@ class Job {
                             body(host, config)
                         }
                     } catch (e) {
-                        script.echo("Exception: ${e.message}")
+                        script.echo("Exception: ${e}")
                         runInDirectory(SANDBOX_DIR) {
                             onFailure(e, host)
                         }
@@ -144,7 +145,7 @@ class Job {
                     body(host, config)
                 }
             } catch (e) {
-                script.echo("Exception: ${e.message}")
+                script.echo("Exception: ${e}")
                 runInDirectory(SANDBOX_DIR) {
                     onFailure(e, host)
                 }
