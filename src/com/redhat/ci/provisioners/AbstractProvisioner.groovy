@@ -92,7 +92,7 @@ abstract class AbstractProvisioner implements Provisioner {
                 'jenkins_master_url':"${config.jenkinsMasterUrl}",
                 'jenkins_slave_username':"${script.JENKINS_SLAVE_USERNAME}",
                 'jenkins_slave_password':"${script.JENKINS_SLAVE_PASSWORD}",
-                'jswarm_version':'3.9',
+                'jswarm_version':"${config.jswarmVersion}",
                 'jswarm_filename':'swarm-client-{{ jswarm_version }}.jar',
                 'jswarm_extra_args':"${config.jswarmExtraArgs}",
                 'jenkins_slave_repositories':[[

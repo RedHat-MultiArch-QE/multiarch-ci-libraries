@@ -88,6 +88,9 @@ class ProvisioningConfig {
     // host as a slave.
     String jenkinsMasterUrl = JENKINS_MASTER_URL_DEFAULT
 
+    // Version of the jswarm executable
+    String jswarmVersion = '3.17'
+
     // Extra arguments passed to the jswarm call.
     // Allows for the connection to be tunneled in the case of an OpenShift hosted Jenkins.
     String jswarmExtraArgs = JSWARM_EXTRA_ARGS_DEFAULT
